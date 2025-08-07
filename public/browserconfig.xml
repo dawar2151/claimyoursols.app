@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square150x150logo src="/bulk-sender-high-resolution-logo-black-transparent.png"/>
+            <square310x310logo src="/bulk-sender-high-resolution-logo-black-transparent.png"/>
+            <square70x70logo src="/bulk-sender-high-resolution-logo-black-transparent.png"/>
+            <TileColor>#8B5CF6</TileColor>
+        </tile>
+    </msapplication>
+</browserconfig> 

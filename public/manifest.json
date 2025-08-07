@@ -1,0 +1,76 @@
+{
+    "name": "ClaimYourSols - Token Bulk Sender for Solana",
+    "short_name": "ClaimYourSols",
+    "description": "Token Bulk Sender for Solana. Send SOL, SPL tokens, and NFTs to multiple addresses instantly.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#8B5CF6",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "dir": "ltr",
+    "categories": [
+        "finance",
+        "utilities",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "72x72",
+            "type": "image/png"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "96x96",
+            "type": "image/png"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "152x152",
+            "type": "image/png"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        },
+        {
+            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow"
+        }
+    ]
+}

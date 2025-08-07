@@ -1,0 +1,11 @@
+{
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "editor.formatOnSave": true,
+    "launch": {
+        "configurations": [],
+        "compounds": []
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    }
+}

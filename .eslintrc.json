@@ -1,0 +1,21 @@
+{
+  "extends": [
+    "next"
+  ],
+  "plugins": [
+    "unused-imports"
+  ],
+  "rules": {
+    "no-unused-vars": [
+      "warn",
+      {
+        "vars": "all",
+        "args": "after-used",
+        "ignoreRestSiblings": true,
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    "unused-imports/no-unused-imports": "error"
+  }
+}
