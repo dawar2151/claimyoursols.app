@@ -8,7 +8,7 @@ interface ReferralProps { }
 
 const Referral: React.FC<ReferralProps> = () => {
     const { publicKey } = useWallet();
-    const referralLink = `https://ClaimYourSols.app/refundyoursol?ref=${publicKey?.toBase58() || ''}`;
+    const referralLink = `https://ClaimYourSols.app?ref=${publicKey?.toBase58() || ''}`;
 
     const copyLink = () => {
         navigator.clipboard.writeText(referralLink);
