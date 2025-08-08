@@ -4,7 +4,7 @@
 
 When you hold SPL tokens on Solana, the blockchain reserves a small amount of SOL as rent. Even after you sell or stop using those tokens, the rent remains locked — unless you **close** those unused token accounts.
 
-**Solana Account Cleaner** helps you scan, close, and recover your SOL safely and securely.
+**ClaimYourSOLs** helps you scan, close, and recover your SOL safely and securely.
 
 ---
 
@@ -83,4 +83,4 @@ NEXT_PUBLIC_CLOSE_ACCOUNT_FEE=
    Receive your rent refund directly to your wallet  
    *(A 10% service fee is applied per closed account)*
 
----
+If there are any bugs, please create an issue and we’ll be happy to look into it.
