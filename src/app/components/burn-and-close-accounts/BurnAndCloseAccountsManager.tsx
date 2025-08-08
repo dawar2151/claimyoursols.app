@@ -132,19 +132,33 @@ export const BurnAndCloseAccountsManager = () => {
                     </div>
                     <button
                         onClick={refreshAccounts}
-                        className="flex items-center gap-1 text-sm font-medium transition-colors"
-                        style={{ color: colors.primary }}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all border"
+                        style={{
+                            borderColor: colors.primary,
+                            color: colors.primary
+                        }}
                         onMouseEnter={(e) => {
-                            e.currentTarget.style.color = colors.secondary;
+                            e.currentTarget.style.backgroundColor = colors.primary;
+                            e.currentTarget.style.color = colors.background.white;
                         }}
                         onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
                             e.currentTarget.style.color = colors.primary;
                         }}
                     >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round"
-                                d="M4 4v6h6M20 20v-6h-6M4 14a8 8 0 0113.66-5.66M20 10a8 8 0 01-13.66 5.66" />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M4 4v6h6M20 20v-6h-6M4 14a8 8 0 0113.66-5.66M20 10a8 8 0 01-13.66 5.66"
+                            />
                         </svg>
                         Refresh
                     </button>
@@ -206,45 +220,44 @@ export const BurnAndCloseAccountsManager = () => {
                 )}
 
                 {/* Total Calculation */}
-                <div
-                    className="mt-6 p-4 border rounded-lg"
-                    style={{
-                        backgroundColor: `${colors.background.light}/20`,
-                        borderColor: `${colors.border}/50`
-                    }}
-                >
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                        <div>
-                            <XTypography variant="body" className="text-sm" style={{ color: colors.text.secondary }}>
-                                Total Rent
-                            </XTypography>
-                            <XTypography variant="h4" className="font-bold" style={{ color: colors.secondary }}>
-                                {(totalRent / 1e9).toFixed(4)} SOL
-                            </XTypography>
-                        </div>
-                        <div>
-                            <XTypography variant="body" className="text-sm" style={{ color: colors.text.secondary }}>
-                                Commission (10%)
-                            </XTypography>
-                            <XTypography variant="h4" className="font-bold" style={{ color: colors.commission }}>
-                                {(commission / 1e9).toFixed(4)} SOL
-                            </XTypography>
-                        </div>
-                        <div>
-                            <XTypography variant="body" className="text-sm" style={{ color: colors.text.secondary }}>
-                                You Receive
-                            </XTypography>
-                            <XTypography variant="h4" className="font-bold" style={{ color: colors.primary }}>
-                                {(userReceives / 1e9).toFixed(4)} SOL
-                            </XTypography>
+                {accounts.length > 0 && (
+                    <div
+                        className="mt-6 p-4 border rounded-lg"
+                        style={{
+                            backgroundColor: `${colors.background.light}/20`,
+                            borderColor: `${colors.border}/50`
+                        }}
+                    >
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                            <div>
+                                <XTypography variant="body" className="text-sm" style={{ color: colors.text.secondary }}>
+                                    Total Rent
+                                </XTypography>
+                                <XTypography variant="h4" className="font-bold" style={{ color: colors.secondary }}>
+                                    {(totalRent / 1e9).toFixed(4)} SOL
+                                </XTypography>
+                            </div>
+                            <div>
+                                <XTypography variant="body" className="text-sm" style={{ color: colors.text.secondary }}>
+                                    Commission (10%)
+                                </XTypography>
+                                <XTypography variant="h4" className="font-bold" style={{ color: colors.commission }}>
+                                    {(commission / 1e9).toFixed(4)} SOL
+                                </XTypography>
+                            </div>
+                            <div>
+                                <XTypography variant="body" className="text-sm" style={{ color: colors.text.secondary }}>
+                                    You Receive
+                                </XTypography>
+                                <XTypography variant="h4" className="font-bold" style={{ color: colors.primary }}>
+                                    {(userReceives / 1e9).toFixed(4)} SOL
+                                </XTypography>
+                            </div>
                         </div>
                     </div>
-                    <div className="mt-3 text-center">
-                        <XTypography variant="body" className="text-xs" style={{ color: colors.text.secondary }}>
-                            Fee recipient: {feeRecipient}
-                        </XTypography>
-                    </div>
-                </div>
+                )}
+
+                {/* Fee Recipient */}
 
                 <div className="mt-8 pt-6 border-t" style={{ borderColor: `${colors.border}/50` }}>
                     <XButton

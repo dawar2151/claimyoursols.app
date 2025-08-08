@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { AccountsManager } from "../close-accounts/CloseAccount";
 import { BurnAndCloseAccountsManager } from "../burn-and-close-accounts/BurnAndCloseAccountsManager";
 import { colors } from "@/app/utils/colors";
+import { motion, AnimatePresence } from "framer-motion";
 
 const FAQItem = ({ question, children }: { question: string; children: React.ReactNode }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,20 +15,34 @@ const FAQItem = ({ question, children }: { question: string; children: React.Rea
         >
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex justify-between items-center w-full text-left text-xl font-semibold"
+                className="flex justify-between items-center w-full text-left text-lg font-semibold transition-colors hover:opacity-80"
                 style={{ color: colors.text.primary }}
             >
                 <span>{question}</span>
-                <span style={{ color: colors.primary }}>{isOpen ? "−" : "+"}</span>
-            </button>
-            {isOpen && (
-                <div
-                    className="mt-2"
-                    style={{ color: colors.text.secondary }}
+                <motion.span
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: isOpen ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    style={{ color: colors.primary, fontSize: "1.2rem" }}
                 >
-                    {children}
-                </div>
-            )}
+                    ▼
+                </motion.span>
+            </button>
+
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-2 text-base leading-relaxed"
+                        style={{ color: colors.text.secondary }}
+                    >
+                        {children}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };
@@ -42,21 +57,41 @@ const RefundSol: React.FC = () => {
         }
     };
 
+    const TabButton = ({ label, value }: { label: string; value: "close" | "burn" }) => (
+        <button
+            onClick={() => setActiveTab(value)}
+            className={`relative px-6 py-3 text-sm font-semibold transition-all duration-300 ${activeTab === value ? "text-[var(--tab-active)]" : "text-[var(--tab-inactive)]"
+                }`}
+            style={{
+                //@ts-ignore
+                "--tab-active": colors.secondary,
+                "--tab-inactive": colors.text.secondary,
+            }}
+        >
+            {label}
+            {activeTab === value && (
+                <motion.div
+                    layoutId="tab-underline"
+                    className="absolute left-0 bottom-0 w-full h-[2px]"
+                    style={{ backgroundColor: colors.secondary }}
+                />
+            )}
+        </button>
+    );
+
     return (
         <div
-            className="w-full max-w-6xl mx-auto p-6 rounded-lg shadow-lg"
+            className="w-full max-w-6xl mx-auto p-6 rounded-2xl shadow-lg"
             style={{ backgroundColor: colors.background.white }}
         >
-            {/* Centered "How does it work?" Button */}
+            {/* How does it work? */}
             <div className="flex justify-center items-center my-8">
                 <button
-                    onClick={() => handleScroll()}
-                    className="font-bold text-center text-lg"
+                    onClick={handleScroll}
+                    className="px-6 py-3 font-bold text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
                     style={{
                         background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text'
+                        color: "#fff"
                     }}
                 >
                     How does it work?
@@ -64,56 +99,24 @@ const RefundSol: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="flex justify-center mb-6 border-b" style={{ borderColor: '#E5E7EB' }}>
-                <button
-                    onClick={() => setActiveTab("close")}
-                    className={`px-6 py-2 text-sm font-semibold transition-colors duration-300 ${activeTab === "close" ? "border-b-2" : ""
-                        }`}
-                    style={{
-                        color: activeTab === "close" ? colors.secondary : colors.text.secondary,
-                        borderColor: activeTab === "close" ? colors.secondary : 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                        if (activeTab !== "close") {
-                            e.currentTarget.style.color = colors.secondary;
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        if (activeTab !== "close") {
-                            e.currentTarget.style.color = colors.text.secondary;
-                        }
-                    }}
-                >
-                    Close Accounts
-                </button>
-                <button
-                    onClick={() => setActiveTab("burn")}
-                    className={`px-6 py-2 text-sm font-semibold transition-colors duration-300 ${activeTab === "burn" ? "border-b-2" : ""
-                        }`}
-                    style={{
-                        color: activeTab === "burn" ? colors.secondary : colors.text.secondary,
-                        borderColor: activeTab === "burn" ? colors.secondary : 'transparent'
-                    }}
-                    onMouseEnter={(e) => {
-                        if (activeTab !== "burn") {
-                            e.currentTarget.style.color = colors.secondary;
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        if (activeTab !== "burn") {
-                            e.currentTarget.style.color = colors.text.secondary;
-                        }
-                    }}
-                >
-                    Burn and Close Accounts
-                </button>
+            <div className="flex justify-center mb-6 border-b" style={{ borderColor: "#E5E7EB" }}>
+                <TabButton label="Close Accounts" value="close" />
+                <TabButton label="Burn & Close Accounts" value="burn" />
             </div>
 
             {/* Tab Content */}
-            <div>
-                {activeTab === "close" && <AccountsManager />}
-                {activeTab === "burn" && <BurnAndCloseAccountsManager />}
-            </div>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={activeTab}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    {activeTab === "close" && <AccountsManager />}
+                    {activeTab === "burn" && <BurnAndCloseAccountsManager />}
+                </motion.div>
+            </AnimatePresence>
 
             {/* FAQ Section */}
             <div
@@ -129,50 +132,44 @@ const RefundSol: React.FC = () => {
                 </h2>
 
                 <p
-                    className="mb-8 text-center"
+                    className="mb-8 text-center text-base"
                     style={{ color: colors.text.secondary }}
                 >
-                    To ensure our tool stays active, a small donation is included for the expenses of servers, RPC & development.
+                    To keep this tool running, a small donation is included to cover server, RPC, and development costs.
                 </p>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                     <FAQItem question="How does this work?">
                         <p className="mb-4">
-                            Every time you buy a token on Solana, a token account is created to store your tokens.
-                            To keep this account active, 0.00204 SOL is required as a rent fee, charged by the Solana blockchain.
+                            Every time you buy a token on Solana, a token account is created to store it.
+                            To keep this account alive, the blockchain requires a rent fee of 0.00204 SOL.
                         </p>
                         <p>
-                            Here is the catch: Even after you sell all your tokens, the account remains open, holding that rent fee.
-                            Our service identifies and closes these empty token accounts, refunding the SOL back to your wallet!
-                            We take a small 10% donation from the recovered amount to keep our servers running.
+                            Even after selling all your tokens, that account stays open and holds your rent.
+                            We detect and close these empty accounts, refunding your SOL back to your wallet.
+                            A small 10% donation from the recovered SOL supports our operations.
                         </p>
                     </FAQItem>
 
                     <FAQItem question="Is it safe to close token accounts?">
                         <p>
-                            Yes! We only close accounts that are completely empty and unused.
-                            You wont lose any tokens, and your wallet remains fully secure.
+                            Yes! We only close accounts that are empty and unused.
+                            You’ll never lose any tokens, and your wallet stays fully secure.
                         </p>
                     </FAQItem>
 
                     <FAQItem question="What is Account Rent?">
                         <p>
-                            When an account is created on Solana, a rent fee is required to store its data and process transactions for 2 years.
-                            This rent is refundable only when the account is closed.{" "}
+                            On Solana, every account requires a rent deposit to store its data for 2 years.
+                            You get this rent back only by closing the account.{" "}
                             <a
                                 href="https://docs.solana.com/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="transition-colors"
+                                className="underline font-medium hover:opacity-80"
                                 style={{ color: colors.secondary }}
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = colors.primary;
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = colors.secondary;
-                                }}
                             >
-                                Learn more in the official Solana Rent Documentation.
+                                Learn more here.
                             </a>
                         </p>
                     </FAQItem>

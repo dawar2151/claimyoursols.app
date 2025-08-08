@@ -10,6 +10,7 @@ import {
 import { sendTransactionHelper } from "../useSenTransactionHelper";
 import { createCloseAccountInstruction, TOKEN_PROGRAM_ID, ACCOUNT_SIZE, createBurnInstruction } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { connect } from "http2";
 
 interface AccountData {
     pubkey: PublicKey;
@@ -139,6 +140,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
         try {
             if (!publicKey) {
+
                 throw new Error("Wallet not connected. Please connect your wallet to fetch accounts.");
             }
             const rentExemptReserve = await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
@@ -167,7 +169,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         } finally {
             setIsLoading(false);
         }
-    }, [connection]);
+    }, [connection, publicKey]);
 
     const closeAllAccounts = useCallback(async () => {
         setIsClosing(true);

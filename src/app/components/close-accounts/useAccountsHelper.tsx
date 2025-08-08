@@ -164,7 +164,7 @@ export function useAccountsHelper(connection: Connection) {
         } finally {
             setIsLoading(false);
         }
-    }, [connection]);
+    }, [connection, publicKey]);
 
     const closeAllAccounts = useCallback(async () => {
         setIsClosing(true);
