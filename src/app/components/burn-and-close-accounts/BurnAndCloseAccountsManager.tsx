@@ -36,12 +36,10 @@ export const BurnAndCloseAccountsManager = () => {
 
     const [selectAll, setSelectAll] = useState(true);
 
-    // Calculate totals
     const totalRent = accounts.reduce((sum, account) => sum + account.lamports, 0);
     const commission = totalRent * (parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || '0.1')); // 10% commission
     const userReceives = totalRent - commission;
 
-    // Initialize all accounts as selected by default
     useEffect(() => {
         if (accounts.length > 0) {
             const allAccountKeys = new Set(accounts.map(account => account.pubkey.toString()));
@@ -49,7 +47,6 @@ export const BurnAndCloseAccountsManager = () => {
         }
     }, [accounts]);
 
-    // Handle select all toggle
     const handleSelectAll = () => {
         if (selectAll) {
             setSelectedAccounts(new Set());
@@ -61,7 +58,6 @@ export const BurnAndCloseAccountsManager = () => {
         }
     };
 
-    // Handle individual account selection
     const handleAccountSelection = (accountKey: string) => {
         const newSelected = new Set(selectedAccounts);
         if (newSelected.has(accountKey)) {
@@ -92,7 +88,6 @@ export const BurnAndCloseAccountsManager = () => {
             className="w-full max-w-4xl mx-auto p-6"
             style={{ backgroundColor: colors.background.white }}
         >
-            {/* Your Accounts Section */}
             <div
                 className="border rounded-lg shadow-lg p-6"
                 style={{
@@ -100,7 +95,6 @@ export const BurnAndCloseAccountsManager = () => {
                     borderColor: `${colors.border}/50`
                 }}
             >
-                {/* Select All Checkbox */}
                 <div
                     className="flex items-center justify-between mb-4 p-4 border rounded-lg"
                     style={{
@@ -175,10 +169,10 @@ export const BurnAndCloseAccountsManager = () => {
                         {accounts.map((account, _) => (
                             <div
                                 key={account.pubkey.toString()}
-                                className="flex items-center p-4 border rounded-lg transition-colors"
+                                className="flex items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
                                 style={{
                                     backgroundColor: `${colors.background.light}/10`,
-                                    borderColor: `${colors.border}/50`
+                                    borderColor: `${colors.border}/50`,
                                 }}
                                 onMouseEnter={(e) => {
                                     e.currentTarget.style.backgroundColor = `${colors.background.hover}/10`;
@@ -191,23 +185,51 @@ export const BurnAndCloseAccountsManager = () => {
                                     type="checkbox"
                                     checked={selectedAccounts.has(account.pubkey.toString())}
                                     onChange={() => handleAccountSelection(account.pubkey.toString())}
-                                    className="w-4 h-4 bg-white rounded mr-4"
+                                    className="w-5 h-5 bg-white rounded border focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-4"
                                     style={{
                                         color: colors.secondary,
-                                        borderColor: colors.primary
+                                        borderColor: colors.primary,
                                     }}
                                 />
+
                                 <div className="flex-1">
-                                    <XTypography variant="body" className="font-mono text-sm" style={{ color: colors.text.primary }}>
+                                    <XTypography
+                                        variant="body"
+                                        className="font-mono text-sm truncate"
+                                        style={{ color: colors.text.primary }}
+                                    >
                                         {account.pubkey.toString()}
                                     </XTypography>
-                                    <XTypography variant="body" className="text-xs" style={{ color: colors.text.secondary }}>
-                                        Balance: {account.lamports / 1e9} SOL
+                                    <XTypography
+                                        variant="body"
+                                        className="text-xs mt-1"
+                                        style={{ color: colors.text.secondary }}
+                                    >
+                                        <span className="font-semibold">Balance:</span> {(account.lamports / 1e9).toFixed(4)} SOL
+                                    </XTypography>
+                                    <XTypography
+                                        variant="body"
+                                        className="text-xs mt-1"
+                                        style={{ color: colors.text.secondary }}
+                                    >
+                                        <span className="font-semibold">Amount to Burn:</span> {account?.uiAmount?.toString()}
                                     </XTypography>
                                 </div>
+
                                 <div className="text-right">
-                                    <XTypography variant="body" className="text-xs" style={{ color: colors.text.secondary }}>
-                                        Rent: {account.rentExemptReserve / 1e9} SOL
+                                    <XTypography
+                                        variant="body"
+                                        className="text-xs font-semibold"
+                                        style={{ color: colors.text.secondary }}
+                                    >
+                                        Rent:
+                                    </XTypography>
+                                    <XTypography
+                                        variant="body"
+                                        className="text-xs"
+                                        style={{ color: colors.text.secondary }}
+                                    >
+                                        {(account.rentExemptReserve / 1e9).toFixed(4)} SOL
                                     </XTypography>
                                 </div>
                             </div>

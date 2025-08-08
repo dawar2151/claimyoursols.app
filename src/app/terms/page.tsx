@@ -48,7 +48,7 @@ export default function TermsOfService() {
                 </section>
                 <section className="mb-6">
                     <h2 className="text-xl font-semibold mb-2">Contact Information</h2>
-                    <p className="text-gray-300">If you have any questions about these Terms of Service, please contact us at <a href="mailto:support@ClaimYourSols.xyz" className="text-blue-400 underline">support@ClaimYourSols.xyz</a>.</p>
+                    <p className="text-gray-300">If you have any questions about these Terms of Service, please contact us at <a href="mailto:support@BulkSendTokens.xyz." className="text-blue-400 underline">support@BulkSendTokens.xyz.</a>.</p>
                 </section>
             </div>
         </div>

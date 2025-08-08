@@ -33,7 +33,7 @@ export const XFooter = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="border-t border-gray-800">
+      <div className="border-t border-gray-800 relative z-10">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2 text-gray-400 text-sm">
@@ -50,9 +50,6 @@ export const XFooter = () => {
               </Link>
               <Link href="/terms" className="text-gray-400 hover:text-white transition-colors duration-200">
                 Terms of Service
-              </Link>
-              <Link href="/faq" className="text-gray-400 hover:text-white transition-colors duration-200">
-                FAQ
               </Link>
               <Link href="/support" className="text-gray-400 hover:text-white transition-colors duration-200">
                 Support

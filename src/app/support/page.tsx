@@ -29,7 +29,7 @@ export default function Support() {
                 <section className="mb-6">
                     <h2 className="text-xl font-semibold mb-2">Contact Methods</h2>
                     <ul className="mb-2 text-gray-300 list-disc list-inside">
-                        <li>Email: <a href="mailto:support@ClaimYourSols.xyz" className="text-blue-400 underline">support@ClaimYourSols.xyz</a></li>
+                        <li>Email: <a href="mailto:support@BulkSendTokens.xyz." className="text-blue-400 underline">support@BulkSendTokens.xyz.</a></li>
                         <li>Telegram: <a href="https://t.me/+Vwyn1CmtJhA5OTg8" className="text-blue-400 underline" target="_blank" rel="noopener noreferrer">@ClaimYourSols</a></li>
                     </ul>
                 </section>

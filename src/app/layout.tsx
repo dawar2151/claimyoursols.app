@@ -200,12 +200,13 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`bg-white text-gray-900 ${inter.className}`}>
+      <body className={`bg-white text-gray-900 ${inter.className} flex flex-col min-h-screen`}>
         <Toaster position="bottom-center" />
         <Providers>
           <AppWalletProvider>
             <XHeader />
-            <main className="max-w-7xl mx-auto">{children}</main>
+            <main className="flex-1">
+              {children}</main>
             <XFooter />
           </AppWalletProvider>
         </Providers>
