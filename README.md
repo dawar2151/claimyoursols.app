@@ -7,6 +7,8 @@ When you hold SPL tokens on Solana, the blockchain reserves a small amount of SO
 **ClaimYourSOLs** helps you scan, close, and recover your SOL safely and securely.
 
 ---
+## DEMO
+![Claim Your SOLs](./public/demo.gif)
 
 ##  Built with [Next.js](https://nextjs.org/)
 
