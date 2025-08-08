@@ -5,7 +5,6 @@ import { ClaimYourSolsStateContext } from "@/app/providers";
 import { useBurnAndCloseAccountsManager } from "./useBurnAndCloseAccountsManager";
 import XButton from "@/app/components/x-components/XButton";
 import { XTypography } from "@/app/components/x-components/XTypography";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
@@ -35,15 +34,12 @@ export const BurnAndCloseAccountsManager = () => {
         }
     }, [refAccount, setReferralAccount]);
 
-    const publicKey = useWallet().publicKey;
-
     const [selectAll, setSelectAll] = useState(true);
 
     // Calculate totals
     const totalRent = accounts.reduce((sum, account) => sum + account.lamports, 0);
     const commission = totalRent * (parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || '0.1')); // 10% commission
     const userReceives = totalRent - commission;
-    const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT;
 
     // Initialize all accounts as selected by default
     useEffect(() => {

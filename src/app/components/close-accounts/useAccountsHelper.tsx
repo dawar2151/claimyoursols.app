@@ -256,7 +256,7 @@ export function useAccountsHelper(connection: Connection) {
         } finally {
             setIsClosing(false);
         }
-    }, [accounts, connection, referralAccount, fetchAccounts]);
+    }, [accounts, connection, referralAccount, fetchAccounts, publicKey, selectedAccounts]);
 
     useEffect(() => {
         fetchAccounts();

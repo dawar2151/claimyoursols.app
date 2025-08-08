@@ -10,7 +10,6 @@ import {
 import { sendTransactionHelper } from "../useSenTransactionHelper";
 import { createCloseAccountInstruction, TOKEN_PROGRAM_ID, ACCOUNT_SIZE, createBurnInstruction } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { connect } from "http2";
 
 interface AccountData {
     pubkey: PublicKey;
@@ -299,7 +298,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     }, [accounts, connection, referralAccount, fetchAccounts, selectedAccounts]);
     useEffect(() => {
         fetchAccounts();
-    }, [fetchAccounts]);
+    }, [fetchAccounts, publicKey]);
 
     return {
         selectedAccounts,

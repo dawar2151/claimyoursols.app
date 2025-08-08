@@ -40,7 +40,6 @@ export const AccountsManager = () => {
     const totalRent = accounts.reduce((sum, account) => sum + account.lamports, 0);
     const commission = totalRent * (parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || '0.1'));
     const userReceives = totalRent - commission;
-    const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT;
 
     // Initialize all accounts as selected by default
     useEffect(() => {

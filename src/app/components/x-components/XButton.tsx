@@ -5,8 +5,8 @@ import { FaSpinner } from "react-icons/fa"; // For loading spinner icon
 interface XButtonProps {
   color?: "blue" | "green" | "red" | "yellow" | "purple"; // You can extend this with other button colors
   onClick: () => void;
-  onMouseEnter?: (e: any) => void; // Optional mouse enter handler
-  onMouseLeave?: (e: any) => void; // Optional mouse leave handler
+  onMouseEnter?: (_: any) => void; // Optional mouse enter handler
+  onMouseLeave?: (_: any) => void; // Optional mouse leave handler
   disabled?: boolean;
   style?: React.CSSProperties; // For inline styles
   isLoading?: boolean;
