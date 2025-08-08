@@ -31,7 +31,7 @@ const PROGRAM_IDS: ProgramIds = {
 };
 
 const BATCH_SIZE = 20;
-const FEE_PERCENTAGE = 0.1;
+const FEE_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || '0.1');
 
 
 const fetchTokenAccounts = async (
