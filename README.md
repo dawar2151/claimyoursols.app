@@ -85,4 +85,18 @@ NEXT_PUBLIC_CLOSE_ACCOUNT_FEE=
    Receive your rent refund directly to your wallet  
    *(A 10% service fee is applied per closed account)*
 
+## ⚠️ IMPORTANT DISCLAIMER
+
+**USE AT YOUR OWN RISK**
+
+- **No Liability**: We are NOT responsible for any losses, damages, or issues that may occur while using this tool.
+- **Test First**: Always test with small amounts or on testnet before using on mainnet.
+- **Your Responsibility**: You are solely responsible for your wallet security and transaction decisions.
+- **No Guarantees**: This tool is provided "as-is" without any warranties or guarantees.
+- **Backup Your Wallet**: Always ensure you have proper backups of your wallet before using any DeFi tools.
+- **Review Transactions**: Always review transaction details before signing.
+- **Community Tool**: This is a community-built tool - use with caution and at your own discretion.
+
+**By using this tool, you acknowledge that you understand the risks and accept full responsibility for any outcomes.**
+
 If there are any bugs, please create an issue and we’ll be happy to look into it.
