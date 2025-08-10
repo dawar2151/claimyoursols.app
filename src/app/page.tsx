@@ -10,8 +10,8 @@ import { colors } from './utils/colors';
 import GitHubButton from './components/claimyoursol/GithubButton';
 
 export const metadata: Metadata = {
-  title: 'Claim Your SOLs | Récupérer vos SOL',
-  description: 'Close unused SPL token accounts and reclaim your SOL rent fees safely and securely. Recover locked SOL from inactive token accounts on Solana blockchain. Fermez les comptes de jetons SPL inutilisés et récupérez vos frais de location SOL en toute sécurité.',
+  title: 'Claim Your SOLs',
+  description: 'Close unused SPL token accounts and reclaim your SOL rent fees safely and securely. Recover locked SOL from inactive token accounts on Solana blockchain.',
   keywords: 'Solana, SOL, token accounts, rent recovery, blockchain, cryptocurrency, SPL tokens, account cleaner, récupération SOL, comptes jetons, blockchain Solana, cryptomonnaie, nettoyeur comptes, fermer comptes SPL, récupérer SOL, frais location, portefeuille Solana, DeFi, Web3',
   authors: [{ name: 'Claim Your SOLs' }],
   creator: 'Claim Your SOLs',
@@ -99,7 +99,7 @@ const ReferralWrapper: React.FC = () => {
   );
 };
 
-const Accounts: NextPage = () => {
+const ClaimYourSOLs: NextPage = () => {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -228,4 +228,4 @@ const Accounts: NextPage = () => {
   );
 };
 
-export default Accounts;
+export default ClaimYourSOLs;

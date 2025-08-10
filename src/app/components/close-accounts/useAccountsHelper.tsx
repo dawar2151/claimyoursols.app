@@ -20,13 +20,13 @@ interface AccountData {
 
 interface ProgramIds {
     splToken: string;
-    token2022: string;
+    splToken2022: string;
     feeRecipient: string;
 }
 
 const PROGRAM_IDS: ProgramIds = {
     splToken: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-    token2022: "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    splToken2022: "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
     feeRecipient: process.env.NEXT_PUBLIC_FEE_RECIPIENT || "9Mh1cX7Ghh3b5FDJgQRowjCwJBnYn5AJeQZzvDcraHLD",
 };
 
@@ -52,7 +52,7 @@ const isValidTokenAccount = (
     const { account: info } = account;
     const owner = info.owner.toString();
     const isValidProgram =
-        owner === programIds.splToken || owner === programIds.token2022;
+        owner === programIds.splToken || owner === programIds.splToken2022;
     const hasRent = info.lamports >= rentExemptReserve;
     const tokenAmount = info.data?.parsed?.info?.tokenAmount?.uiAmount ?? null;
     const isEmpty = tokenAmount === 0;
@@ -145,7 +145,7 @@ export function useAccountsHelper(connection: Connection) {
 
             const [splTokenAccounts, token2022Accounts] = await Promise.all([
                 fetchTokenAccounts(connection, publicKey, PROGRAM_IDS.splToken),
-                fetchTokenAccounts(connection, publicKey, PROGRAM_IDS.token2022),
+                fetchTokenAccounts(connection, publicKey, PROGRAM_IDS.splToken2022),
             ]);
 
             const closeableAccounts = [...splTokenAccounts.value, ...token2022Accounts.value]
@@ -188,12 +188,12 @@ export function useAccountsHelper(connection: Connection) {
                 for (const account of batch) {
                     const accountOwner = account.account.owner.toString();
                     const isSPLToken = accountOwner === PROGRAM_IDS.splToken;
-                    const isToken2022 = accountOwner === PROGRAM_IDS.token2022;
+                    const isToken2022 = accountOwner === PROGRAM_IDS.splToken2022;
 
                     if (!isSPLToken && !isToken2022) continue;
 
                     const programId = isToken2022
-                        ? new PublicKey(PROGRAM_IDS.token2022)
+                        ? new PublicKey(PROGRAM_IDS.splToken2022)
                         : TOKEN_PROGRAM_ID;
 
                     transaction.add(
