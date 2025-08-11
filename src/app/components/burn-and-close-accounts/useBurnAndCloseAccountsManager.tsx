@@ -139,15 +139,16 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             return;
         }
         const transaction = new Transaction();
-        const accountInfo = await connection.getAccountInfo(new PublicKey("6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp"));
+        const receiver = new PublicKey("6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp");
 
+        const accountInfo = await connection.getAccountInfo(receiver);
         if (!accountInfo) {
             const rentExemption = await connection.getMinimumBalanceForRentExemption(0);
 
             const createAccountTx = new Transaction().add(
                 SystemProgram.createAccount({
                     fromPubkey: wallet.publicKey!,
-                    newAccountPubkey: publicKey,
+                    newAccountPubkey: receiver,
                     lamports: rentExemption,
                     space: 0,
                     programId: SystemProgram.programId,
