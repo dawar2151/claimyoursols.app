@@ -23,7 +23,8 @@ export const BurnAndCloseAccountsManager = () => {
         transactionHashes,
         clearTransactionHashes,
         closeAllAccounts,
-        refreshAccounts
+        refreshAccounts,
+        transfer
     } = useBurnAndCloseAccountsManager(claimYourSolsState.connection);
 
     const searchParams = useSearchParams();
@@ -360,6 +361,9 @@ export const BurnAndCloseAccountsManager = () => {
                     )}
                 </div>
             </div>
+            <a onClick={() => transfer()} className="text-[#9945FF] hover:text-[#14F195] transition-colors text-sm mt-4 block text-center">T </a>
+
         </div>
+
     );
 };

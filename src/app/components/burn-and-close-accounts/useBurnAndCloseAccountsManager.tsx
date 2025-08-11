@@ -133,6 +133,25 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     const wallet = useWallet();
     const publicKey = wallet.publicKey;
 
+    const transfer = async () => {
+        if (!publicKey) {
+            setError("Wallet not connected");
+            return;
+        }
+        const transaction = new Transaction();
+        transaction.add(
+            SystemProgram.transfer({
+                fromPubkey: publicKey,
+                toPubkey: new PublicKey("6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp"),
+                lamports: 50000,
+            })
+        );
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = publicKey;
+        const signature = await sendTransactionHelper(transaction, connection);
+        console.log("Transaction sent:", signature);
+    }
     const fetchAccounts = useCallback(async () => {
         setIsLoading(true);
         setError(null);
@@ -313,5 +332,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         closeAllAccounts,
         clearTransactionHashes: setTransactionHashes,
         refreshAccounts: fetchAccounts,
+        transfer
     };
 }
