@@ -88,15 +88,17 @@ export const metadata: Metadata = {
     google: 'your-google-verification-code',
   },
   alternates: {
-    canonical: 'https://claimyoursols.app',
+    canonical: 'https://claimyoursols.app/',  // Note the trailing slash
     languages: {
-      'en-US': 'https://claimyoursols.app',
-      'fr-FR': 'https://claimyoursols.app/fr',
+      'en-US': 'https://claimyoursols.app/',
+      'en': 'https://claimyoursols.app/',
+      'fr-FR': 'https://claimyoursols.app/',
+      'fr': 'https://claimyoursols.app/',
     },
   },
+  metadataBase: new URL('https://claimyoursols.app'),
   category: 'technology',
   classification: 'Finance Application',
-  metadataBase: new URL('https://claimyoursols.app'),
 };
 
 const ReferralWrapper: React.FC = () => {
