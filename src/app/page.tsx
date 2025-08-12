@@ -134,7 +134,7 @@ const ClaimYourSOLs: NextPage = () => {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-
+      <script src="https://analytics.ahrefs.com/analytics.js" data-key="/Dc1fonqZVBe9hCEuAiUfg" async></script>
       <AnimatedPage>
         <div className="w-full max-w-4xl mx-auto">
           <ReferralMessage />
