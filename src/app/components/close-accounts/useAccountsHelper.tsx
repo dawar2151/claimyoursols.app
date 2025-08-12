@@ -30,7 +30,7 @@ const PROGRAM_IDS: ProgramIds = {
     feeRecipient: process.env.NEXT_PUBLIC_FEE_RECIPIENT || "9Mh1cX7Ghh3b5FDJgQRowjCwJBnYn5AJeQZzvDcraHLD",
 };
 
-const BATCH_SIZE = 20;
+const BATCH_SIZE = 10;
 const FEE_PERCENTAGE = parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || '0.1');
 
 
