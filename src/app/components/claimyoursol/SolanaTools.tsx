@@ -2,13 +2,13 @@
 import React from "react";
 import { colors } from "@/app/utils/colors";
 
-interface SolanaToolsProps {}
+interface SolanaToolsProps { }
 
 const SolanaTools: React.FC<SolanaToolsProps> = () => {
   const tools = [
     {
       title: "Create Token",
-      description: "Create SPL & TPL22 tokens on Solana",
+      description: "Create SPL & SPL22 tokens on Solana",
       url: "https://solana.bulksendtokens.xyz/create-spl-spl22-tokens",
     },
     {
