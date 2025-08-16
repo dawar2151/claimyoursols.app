@@ -16,7 +16,6 @@ const Referral: React.FC<ReferralProps> = () => {
     navigator.clipboard.writeText(referralLink);
     alert("Referral link copied to clipboard!");
   };
-
   const shareLink = async () => {
     if (navigator.share) {
       try {
