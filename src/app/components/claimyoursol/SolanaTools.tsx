@@ -13,12 +13,12 @@ const SolanaTools: React.FC<SolanaToolsProps> = () => {
     },
     {
       title: "Mint Tokens",
-      description: "Mint your created tokens easily",
+      description: "Mint your created tokens easily with your mint authority",
       url: "https://solana.bulksendtokens.xyz/mint-spl-spl22-tokens",
     },
     {
       title: "Airdrop Token",
-      description: "Distribute tokens to multiple wallets",
+      description: "Distribute SOL, SPL and SPL22 tokens to multiple wallets",
       url: "https://solana.bulksendtokens.xyz/",
     },
   ];
