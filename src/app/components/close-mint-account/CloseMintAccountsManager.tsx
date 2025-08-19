@@ -2,79 +2,82 @@
 
 import { useContext, useState, useEffect } from "react";
 import { ClaimYourSolsStateContext } from "@/app/providers";
-import { useBurnAndCloseAccountsManager } from "./useBurnAndCloseAccountsManager";
+import { useCloseMintAccountsManager } from "./useCloseMintAccountsManager";
 import XButton from "@/app/components/x-components/XButton";
 import { XTypography } from "@/app/components/x-components/XTypography";
 import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 
-export const BurnAndCloseAccountsManager = () => {
+export const CloseMintAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
 
   const {
-    selectedAccounts,
-    setSelectedAccounts,
-    setReferralAccount,
-    accounts,
-    isSuccess,
+    mintAccounts,
     isLoading,
+    error,
+    isSuccess,
     isClosing,
     transactionHashes,
-    clearTransactionHashes,
-    closeAllAccounts,
     refreshAccounts,
-  } = useBurnAndCloseAccountsManager(claimYourSolsState.connection);
+    closeAllAccounts,
+    selectedMintAccounts,
+    setSelectedMintAccounts,
+    clearTransactionHashes,
+  } = useCloseMintAccountsManager(claimYourSolsState.connection);
 
   const searchParams = useSearchParams();
   const refAccount = searchParams.get("ref");
-  useEffect(() => {
-    if (refAccount) {
-      setReferralAccount(refAccount);
-    }
-  }, [refAccount, setReferralAccount]);
 
   const [selectAll, setSelectAll] = useState(true);
 
-  const totalRent = accounts.reduce(
-    (sum, account) => sum + account.lamports,
+  const totalRent = Array.from(selectedMintAccounts).reduce(
+    (sum, accountKey) => {
+      const account = mintAccounts.find(
+        (acc) => acc.pubkey.toString() === accountKey
+      );
+      return sum + (account?.lamports || 0);
+    },
     0
   );
-  const commission =
-    totalRent * parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || "0.1"); // 10% commission
+
+  const feePercentage = parseFloat(
+    process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
+  );
+  const commission = Math.floor(totalRent * feePercentage); // Use Math.floor for lamports precision
   const userReceives = totalRent - commission;
 
   useEffect(() => {
-    if (accounts.length > 0) {
+    if (mintAccounts.length > 0) {
       const allAccountKeys = new Set(
-        accounts.map((account) => account.pubkey.toString())
+        mintAccounts.map((account) => account.pubkey.toString())
       );
-      setSelectedAccounts(allAccountKeys);
+      setSelectedMintAccounts(allAccountKeys);
     }
-  }, [accounts]);
+  }, [mintAccounts, setSelectedMintAccounts]);
 
   const handleSelectAll = () => {
     if (selectAll) {
-      setSelectedAccounts(new Set());
+      setSelectedMintAccounts(new Set());
       setSelectAll(false);
     } else {
       const allAccountKeys = new Set(
-        accounts.map((account) => account.pubkey.toString())
+        mintAccounts.map((account) => account.pubkey.toString())
       );
-      setSelectedAccounts(allAccountKeys);
+      setSelectedMintAccounts(allAccountKeys);
       setSelectAll(true);
     }
   };
 
   const handleAccountSelection = (accountKey: string) => {
-    const newSelected = new Set(selectedAccounts);
+    const newSelected = new Set(selectedMintAccounts);
     if (newSelected.has(accountKey)) {
       newSelected.delete(accountKey);
     } else {
       newSelected.add(accountKey);
     }
-    setSelectedAccounts(newSelected);
-    setSelectAll(newSelected.size === accounts.length);
+    setSelectedMintAccounts(newSelected);
+    setSelectAll(newSelected.size === mintAccounts.length);
   };
 
   if (isLoading) {
@@ -85,8 +88,39 @@ export const BurnAndCloseAccountsManager = () => {
           style={{ borderColor: colors.primary }}
         ></div>
         <XTypography variant="body" style={{ color: colors.text.secondary }}>
-          Loading your accounts...
+          Loading your mint accounts...
         </XTypography>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center space-y-4 bg-white min-h-screen p-6">
+        <div className="text-6xl mb-4">❌</div>
+        <XTypography
+          variant="h4"
+          className="mb-2"
+          style={{ color: colors.error }}
+        >
+          Error Loading Accounts
+        </XTypography>
+        <XTypography
+          variant="body"
+          className="text-center max-w-md"
+          style={{ color: colors.text.secondary }}
+        >
+          {error}
+        </XTypography>
+        <XButton
+          onClick={refreshAccounts}
+          style={{
+            background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
+            color: colors.background.white,
+          }}
+        >
+          Try Again
+        </XButton>
       </div>
     );
   }
@@ -103,6 +137,19 @@ export const BurnAndCloseAccountsManager = () => {
           borderColor: `${colors.border}/50`,
         }}
       >
+        <div className="mb-6">
+          <XTypography
+            variant="h3"
+            className="mb-2"
+            style={{ color: colors.text.primary }}
+          >
+            Close Mint Accounts
+          </XTypography>
+          <XTypography variant="body" style={{ color: colors.text.secondary }}>
+            Close unused mint accounts and recover your SOL rent deposits.
+          </XTypography>
+        </div>
+
         <div
           className="flex items-center justify-between mb-4 p-4 border rounded-lg"
           style={{
@@ -125,7 +172,7 @@ export const BurnAndCloseAccountsManager = () => {
               className="ml-2 text-sm font-medium"
               style={{ color: colors.text.primary }}
             >
-              Select All Accounts ({selectedAccounts.size} selected)
+              Select All Accounts ({selectedMintAccounts.size} selected)
             </label>
           </div>
           <button
@@ -162,7 +209,7 @@ export const BurnAndCloseAccountsManager = () => {
           </button>
         </div>
 
-        {accounts.length === 0 ? (
+        {mintAccounts.length === 0 ? (
           <div className="text-center py-12 flex flex-col justify-center items-center">
             <div className="text-6xl mb-4">🎉</div>
             <XTypography
@@ -177,14 +224,13 @@ export const BurnAndCloseAccountsManager = () => {
               className="text-center max-w-md"
               style={{ color: colors.text.secondary }}
             >
-              {
-                "No open accounts found. All your accounts are already closed or you don't have any accounts to close."
-              }
+              No mint accounts found. All your mint accounts are already closed
+              or you dont have any mint accounts to close.
             </XTypography>
           </div>
         ) : (
           <div className="space-y-4">
-            {accounts.map((account, _) => (
+            {mintAccounts.map((account) => (
               <div
                 key={account.pubkey.toString()}
                 className="flex items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
@@ -201,7 +247,7 @@ export const BurnAndCloseAccountsManager = () => {
               >
                 <input
                   type="checkbox"
-                  checked={selectedAccounts.has(account.pubkey.toString())}
+                  checked={selectedMintAccounts.has(account.pubkey.toString())}
                   onChange={() =>
                     handleAccountSelection(account.pubkey.toString())
                   }
@@ -228,14 +274,16 @@ export const BurnAndCloseAccountsManager = () => {
                     <span className="font-semibold">Balance:</span>{" "}
                     {(account.lamports / 1e9).toFixed(4)} SOL
                   </XTypography>
-                  <XTypography
-                    variant="body"
-                    className="text-xs mt-1"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    <span className="font-semibold">Amount to Burn:</span>{" "}
-                    {account?.uiAmount?.toString()}
-                  </XTypography>
+                  {account.supply && (
+                    <XTypography
+                      variant="body"
+                      className="text-xs mt-1"
+                      style={{ color: colors.text.secondary }}
+                    >
+                      <span className="font-semibold">Total Supply:</span>{" "}
+                      {account.supply}
+                    </XTypography>
+                  )}
                 </div>
 
                 <div className="text-right">
@@ -260,7 +308,7 @@ export const BurnAndCloseAccountsManager = () => {
         )}
 
         {/* Total Calculation */}
-        {accounts.length > 0 && (
+        {mintAccounts.length > 0 && (
           <div
             className="mt-6 p-4 border rounded-lg"
             style={{
@@ -296,7 +344,7 @@ export const BurnAndCloseAccountsManager = () => {
                 <XTypography
                   variant="h4"
                   className="font-bold"
-                  style={{ color: colors.commission }}
+                  style={{ color: colors.commission || colors.error }}
                 >
                   {(commission / 1e9).toFixed(4)} SOL
                 </XTypography>
@@ -321,15 +369,13 @@ export const BurnAndCloseAccountsManager = () => {
           </div>
         )}
 
-        {/* Fee Recipient */}
-
         <div
           className="mt-8 pt-6 border-t"
           style={{ borderColor: `${colors.border}/50` }}
         >
           <XButton
             onClick={closeAllAccounts}
-            disabled={isClosing || selectedAccounts.size === 0}
+            disabled={isClosing || selectedMintAccounts.size === 0}
             isLoading={isClosing}
             className="w-full disabled:opacity-50"
             style={{
@@ -337,28 +383,29 @@ export const BurnAndCloseAccountsManager = () => {
               color: colors.background.white,
             }}
             onMouseEnter={(e) => {
-              if (!isClosing && selectedAccounts.size > 0) {
+              if (!isClosing && selectedMintAccounts.size > 0) {
                 e.currentTarget.style.background = `linear-gradient(to right, ${colors.secondary}, ${colors.secondary})`;
               }
             }}
             onMouseLeave={(e) => {
-              if (!isClosing && selectedAccounts.size > 0) {
+              if (!isClosing && selectedMintAccounts.size > 0) {
                 e.currentTarget.style.background = `linear-gradient(to right, ${colors.primary}, ${colors.accent})`;
               }
             }}
           >
             {isClosing
-              ? "Closing Accounts..."
-              : `Burn & Close Accounts & Get SOL Back (${selectedAccounts.size})`}
+              ? "Closing Mint Accounts..."
+              : `Close Mint Accounts & Get SOL Back (${selectedMintAccounts.size})`}
           </XButton>
           <XTypography
             variant="body"
             className="text-xs mt-3 text-center"
             style={{ color: colors.text.secondary }}
           >
-            This will close selected accounts and refund your locked SOL back to
-            your wallet
+            This will close selected mint accounts and refund your locked SOL
+            back to your wallet
           </XTypography>
+
           {isSuccess && transactionHashes.length > 0 && (
             <div
               className="mt-4 p-4 border rounded-lg"
@@ -376,7 +423,7 @@ export const BurnAndCloseAccountsManager = () => {
                   Transaction Hashes
                 </XTypography>
                 <button
-                  onClick={() => clearTransactionHashes([])}
+                  onClick={() => clearTransactionHashes()}
                   className="text-sm transition-colors"
                   style={{ color: colors.primary }}
                   onMouseEnter={(e) => {
@@ -414,7 +461,7 @@ export const BurnAndCloseAccountsManager = () => {
                         className="ml-2 text-xs"
                         style={{ color: colors.text.secondary }}
                       >
-                        [Solscan]
+                        [View on Solscan]
                       </span>
                     </a>
                   </li>
