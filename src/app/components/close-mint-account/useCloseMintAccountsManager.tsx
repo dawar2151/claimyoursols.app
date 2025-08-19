@@ -13,6 +13,7 @@ import {
   getAssociatedTokenAddressSync,
   getMint,
 } from "@solana/spl-token";
+import { sendTransactionHelper } from "../useSenTransactionHelper";
 
 // Types
 interface ParsedTokenAccountData {
@@ -330,8 +331,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
       );
 
       // Send and confirm transaction
-      const signature = await sendTransaction(transaction, connection);
-      await connection.confirmTransaction(signature, "confirmed");
+      const signature = await sendTransactionHelper(transaction, connection);
 
       console.log(
         `Successfully processed mint account: ${account.pubkey.toString()}`
