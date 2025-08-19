@@ -12,6 +12,8 @@ import {
   TOKEN_2022_PROGRAM_ID,
   getAssociatedTokenAddressSync,
   getMint,
+  getMintCloseAuthority,
+  MintCloseAuthority,
 } from "@solana/spl-token";
 import { sendTransactionHelper } from "../useSenTransactionHelper";
 
@@ -40,7 +42,7 @@ interface MintAccountData {
   hasAssociatedTokenAccount: boolean;
   associatedTokenAccountAddress: PublicKey;
   ataBalance: string;
-  ataCloseAuthority: string | null;
+  closeAuthority: MintCloseAuthority | null;
 }
 
 interface TokenAccountInfo {
@@ -78,7 +80,8 @@ const canCloseMintAccount = (
 ): boolean => {
   const userAddress = publicKey.toString();
   const canCloseAta =
-    !mint.hasAssociatedTokenAccount || mint.ataCloseAuthority === userAddress;
+    !mint.hasAssociatedTokenAccount ||
+    mint.closeAuthority?.closeAuthority.toString() == userAddress;
 
   return canCloseAta;
 };
@@ -172,7 +175,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
           false,
           TOKEN_2022_PROGRAM_ID
         );
-
+        const closeAuthority = getMintCloseAuthority(mintInfo);
         const ataInfo = tokenAccountInfo || {
           address: associatedTokenAccountAddress,
           balance: "0",
@@ -192,7 +195,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
           hasAssociatedTokenAccount: Boolean(tokenAccountInfo),
           associatedTokenAccountAddress: ataInfo.address,
           ataBalance: ataInfo.balance,
-          ataCloseAuthority: ataInfo.closeAuthority,
+          closeAuthority: closeAuthority,
         };
       } catch (error) {
         console.warn(`Failed to fetch mint ${mintAddress}:`, error);

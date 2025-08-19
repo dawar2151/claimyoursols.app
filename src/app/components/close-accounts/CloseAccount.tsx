@@ -37,13 +37,17 @@ export const AccountsManager = () => {
 
   const [selectAll, setSelectAll] = useState(true);
 
-  // Calculate totals
-  const totalRent = accounts.reduce(
-    (sum, account) => sum + account.lamports,
-    0
+  const totalRent = Array.from(selectedAccounts).reduce((sum, accountKey) => {
+    const account = accounts.find(
+      (acc) => acc.pubkey.toString() === accountKey
+    );
+    return sum + (account?.lamports || 0);
+  }, 0);
+
+  const feePercentage = parseFloat(
+    process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
   );
-  const commission =
-    totalRent * parseFloat(process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || "0.1");
+  const commission = Math.floor(totalRent * feePercentage); // Use Math.floor for lamports precision
   const userReceives = totalRent - commission;
 
   // Initialize all accounts as selected by default

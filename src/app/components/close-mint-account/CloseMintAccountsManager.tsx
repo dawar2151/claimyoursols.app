@@ -129,6 +129,14 @@ export const CloseMintAccountsManager = () => {
       className="w-full max-w-4xl mx-auto p-6"
       style={{ backgroundColor: colors.background.white }}
     >
+      <label
+        className="ml-2 text-sm font-medium"
+        style={{
+          color: colors.text.primary,
+        }}
+      >
+        Only Mints where you are the close authority will be listed to close.
+      </label>
       <div
         className="border rounded-lg shadow-lg p-6"
         style={{
@@ -156,7 +164,9 @@ export const CloseMintAccountsManager = () => {
             />
             <label
               className="ml-2 text-sm font-medium"
-              style={{ color: colors.text.primary }}
+              style={{
+                color: selectAll ? colors.primary : colors.text.primary,
+              }}
             >
               Select All Accounts ({selectedMintAccounts.size} selected)
             </label>
@@ -389,7 +399,7 @@ export const CloseMintAccountsManager = () => {
             style={{ color: colors.text.secondary }}
           >
             This will close selected mint accounts and refund your locked SOL
-            back to your wallet
+            back to your wallet.
           </XTypography>
 
           {isSuccess && transactionHashes.length > 0 && (

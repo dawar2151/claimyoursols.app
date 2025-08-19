@@ -6,6 +6,12 @@ import { colors } from "@/app/utils/colors";
 import { motion, AnimatePresence } from "framer-motion";
 import { CloseMintAccountsManager } from "../close-mint-account/CloseMintAccountsManager";
 
+enum TabType {
+  CLOSE = "close",
+  BURN = "burn",
+  CLOSE_MINT = "close-mint",
+}
+
 const FAQItem = ({
   question,
   children,
@@ -55,9 +61,7 @@ const FAQItem = ({
 };
 
 const RefundSol: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"close" | "burn" | "close-mint">(
-    "close"
-  );
+  const [activeTab, setActiveTab] = useState<TabType>(TabType.CLOSE);
 
   const handleScroll = () => {
     const faqSection = document.getElementById("faq-section");
@@ -66,13 +70,7 @@ const RefundSol: React.FC = () => {
     }
   };
 
-  const TabButton = ({
-    label,
-    value,
-  }: {
-    label: string;
-    value: "close" | "burn" | "close-mint";
-  }) => (
+  const TabButton = ({ label, value }: { label: string; value: TabType }) => (
     <button
       onClick={() => setActiveTab(value)}
       className={`relative px-6 py-3 text-sm font-semibold transition-all duration-300 ${
@@ -80,11 +78,12 @@ const RefundSol: React.FC = () => {
           ? "text-[var(--tab-active)]"
           : "text-[var(--tab-inactive)]"
       }`}
-      style={{
-        //@ts-ignore
-        "--tab-active": colors.secondary,
-        "--tab-inactive": colors.text.secondary,
-      }}
+      style={
+        {
+          "--tab-active": colors.secondary,
+          "--tab-inactive": colors.text.secondary,
+        } as React.CSSProperties
+      }
     >
       {label}
       {activeTab === value && (
@@ -206,9 +205,9 @@ const RefundSol: React.FC = () => {
         className="flex justify-center mb-6 border-b"
         style={{ borderColor: "#E5E7EB" }}
       >
-        <TabButton label="Close Accounts" value="close" />
-        <TabButton label="Burn & Close Accounts" value="burn" />
-        <TabButton label="Close Mint Accounts" value="close-mint" />
+        <TabButton label="Close Accounts" value={TabType.CLOSE} />
+        <TabButton label="Burn & Close Accounts" value={TabType.BURN} />
+        <TabButton label="Close Mint Accounts" value={TabType.CLOSE_MINT} />
       </div>
 
       {/* Tab Content */}
@@ -220,9 +219,9 @@ const RefundSol: React.FC = () => {
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.3 }}
         >
-          {activeTab === "close" && <AccountsManager />}
-          {activeTab === "burn" && <BurnAndCloseAccountsManager />}
-          {activeTab === "close-mint" && <CloseMintAccountsManager />}
+          {activeTab === TabType.CLOSE && <AccountsManager />}
+          {activeTab === TabType.BURN && <BurnAndCloseAccountsManager />}
+          {activeTab === TabType.CLOSE_MINT && <CloseMintAccountsManager />}
         </motion.div>
       </AnimatePresence>
 
@@ -264,7 +263,7 @@ const RefundSol: React.FC = () => {
 
           <FAQItem question="Is it safe to close token accounts?">
             <p>
-              Yes! We only close accounts that are empty and unused. You’ll
+              Yes! We only close accounts that are empty and unused. You will
               never lose any tokens, and your wallet stays fully secure.
             </p>
           </FAQItem>

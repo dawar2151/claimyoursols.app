@@ -138,6 +138,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const [transactionHashes, setTransactionHashes] = useState<string[]>([]); // New state for transaction hashes
   const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(
     new Set()
@@ -244,10 +245,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
           const pubkey = ensurePublicKey(account.pubkey);
           const mintPubkey = new PublicKey(mint); // Convert mint to PublicKey
-          console.log(`Processing account: ${pubkey.toString()}`);
-          console.log(`Mint address: ${mint}`);
-          console.log(`Amount to burn: ${amount}`);
-
           transaction.add(
             createBurnInstruction(
               pubkey,
