@@ -97,7 +97,6 @@ export const CloseMintAccountsManager = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center space-y-4 bg-white min-h-screen p-6">
-        <div className="text-6xl mb-4">❌</div>
         <XTypography
           variant="h4"
           className="mb-2"
@@ -137,19 +136,6 @@ export const CloseMintAccountsManager = () => {
           borderColor: `${colors.border}/50`,
         }}
       >
-        <div className="mb-6">
-          <XTypography
-            variant="h3"
-            className="mb-2"
-            style={{ color: colors.text.primary }}
-          >
-            Close Mint Accounts
-          </XTypography>
-          <XTypography variant="body" style={{ color: colors.text.secondary }}>
-            Close unused mint accounts and recover your SOL rent deposits.
-          </XTypography>
-        </div>
-
         <div
           className="flex items-center justify-between mb-4 p-4 border rounded-lg"
           style={{

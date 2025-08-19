@@ -17,6 +17,7 @@ export const BurnAndCloseAccountsManager = () => {
     setSelectedAccounts,
     setReferralAccount,
     accounts,
+    error,
     isSuccess,
     isLoading,
     isClosing,
@@ -90,7 +91,35 @@ export const BurnAndCloseAccountsManager = () => {
       </div>
     );
   }
-
+  if (error) {
+    return (
+      <div className="flex flex-col items-center space-y-4 bg-white min-h-screen p-6">
+        <XTypography
+          variant="h4"
+          className="mb-2"
+          style={{ color: colors.error }}
+        >
+          Error Loading Accounts
+        </XTypography>
+        <XTypography
+          variant="body"
+          className="text-center max-w-md"
+          style={{ color: colors.text.secondary }}
+        >
+          {error}
+        </XTypography>
+        <XButton
+          onClick={refreshAccounts}
+          style={{
+            background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
+            color: colors.background.white,
+          }}
+        >
+          Try Again
+        </XButton>
+      </div>
+    );
+  }
   return (
     <div
       className="w-full max-w-4xl mx-auto p-6"
