@@ -76,16 +76,10 @@ const canCloseMintAccount = (
   publicKey: PublicKey
 ): boolean => {
   const userAddress = publicKey.toString();
-  const hasNoSupply = mint.supply === "0";
-  const isMintAuthority = mint.mintAuthority === userAddress;
-  const isFreezeAuthority = mint.freezeAuthority === userAddress;
   const canCloseAta =
     !mint.hasAssociatedTokenAccount || mint.ataCloseAuthority === userAddress;
 
-  return (
-    (hasNoSupply && (isMintAuthority || isFreezeAuthority)) ||
-    (isMintAuthority && canCloseAta)
-  );
+  return canCloseAta;
 };
 
 export const useCloseMintAccountsManager = (connection: Connection) => {
@@ -163,11 +157,6 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
         // Check if user has authority
         const mintAuthority = mintInfo.mintAuthority?.toBase58() || null;
         const freezeAuthority = mintInfo.freezeAuthority?.toBase58() || null;
-        const userAddress = publicKey!.toString();
-
-        if (mintAuthority !== userAddress && freezeAuthority !== userAddress) {
-          return null; // User has no authority over this mint
-        }
 
         // Calculate rent exempt reserve
         const rentExemptReserve =
