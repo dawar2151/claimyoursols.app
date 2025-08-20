@@ -182,7 +182,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
       setAccounts(closeableAccounts);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to fetch accounts");
       console.error("Error fetching accounts:", err);
     } finally {
       setIsLoading(false);
