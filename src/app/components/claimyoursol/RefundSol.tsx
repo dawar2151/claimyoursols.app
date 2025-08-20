@@ -5,6 +5,7 @@ import { BurnAndCloseAccountsManager } from "../burn-and-close-accounts/BurnAndC
 import { colors } from "@/app/utils/colors";
 import { motion, AnimatePresence } from "framer-motion";
 import { CloseMintAccountsManager } from "../close-mint-account/CloseMintAccountsManager";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 
 enum TabType {
   CLOSE = "close",
@@ -98,21 +99,12 @@ const RefundSol: React.FC = () => {
 
   return (
     <div
-      className="w-full max-w-6xl mx-auto p-6 rounded-2xl shadow-lg"
+      className="w-full max-w-6xl mx-auto rounded-2xl shadow-lg"
       style={{ backgroundColor: colors.background.white }}
     >
       {/* How does it work? */}
       <div className="flex justify-center items-center my-8">
-        <button
-          onClick={handleScroll}
-          className="px-6 py-3 font-bold text-lg rounded-full shadow-lg hover:shadow-xl transition-all"
-          style={{
-            background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
-            color: "#fff",
-          }}
-        >
-          How does it work?
-        </button>
+        <WalletMultiButton style={{ justifyContent: "center" }} />
       </div>
       {/* Use Cases Cards */}
       <section className="py-8">
@@ -226,6 +218,7 @@ const RefundSol: React.FC = () => {
       </AnimatePresence>
 
       {/* FAQ Section */}
+
       <div
         id="faq-section"
         className="mt-16 p-6 rounded-lg shadow"

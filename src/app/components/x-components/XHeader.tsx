@@ -1,13 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useContext, useRef } from 'react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { FaGithub, FaTwitter, FaTelegram } from 'react-icons/fa';
-import { ClaimYourSolsStateContext } from '@/app/providers';
-import { Connection } from '@solana/web3.js';
+import { useState, useEffect, useContext, useRef } from "react";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  ChevronDownIcon,
+} from "@heroicons/react/24/outline";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { FaGithub, FaTwitter, FaTelegram } from "react-icons/fa";
+import { ClaimYourSolsStateContext } from "@/app/providers";
+import { Connection } from "@solana/web3.js";
 
 export const XHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,7 +20,9 @@ export const XHeader = () => {
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement>(null);
 
-  const { claimYourSolsState, setClainYourSolsState } = useContext(ClaimYourSolsStateContext);
+  const { claimYourSolsState, setClainYourSolsState } = useContext(
+    ClaimYourSolsStateContext
+  );
 
   const handleToggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -50,26 +55,29 @@ export const XHeader = () => {
 
   const socialLinks = [
     {
-      name: 'GitHub',
-      href: 'https://github.com/dawar2151/claimyoursols.app',
+      name: "GitHub",
+      href: "https://github.com/dawar2151/claimyoursols.app",
       icon: FaGithub,
-      hoverColor: 'hover:text-gray-300'
+      hoverColor: "hover:text-gray-300",
     },
     {
-      name: 'Twitter',
-      href: 'https://x.com/claimsols',
+      name: "Twitter",
+      href: "https://x.com/claimsols",
       icon: FaTwitter,
-      hoverColor: 'hover:text-blue-400'
+      hoverColor: "hover:text-blue-400",
     },
     {
-      name: 'Telegram',
-      href: 'https://t.me/+AOcRPkMqg8QzYzk0',
+      name: "Telegram",
+      href: "https://t.me/+AOcRPkMqg8QzYzk0",
       icon: FaTelegram,
-      hoverColor: 'hover:text-blue-500'
-    }
+      hoverColor: "hover:text-blue-500",
+    },
   ];
 
-  const handleRpcSelection = (selectedNetwork: string, event: React.MouseEvent) => {
+  const handleRpcSelection = (
+    selectedNetwork: string,
+    event: React.MouseEvent
+  ) => {
     event.stopPropagation();
     setSelectedNetwork(selectedNetwork);
     const rpcURL =
@@ -85,19 +93,22 @@ export const XHeader = () => {
 
   useEffect(() => {
     if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     }
 
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = "";
     };
   }, [mobileMenuOpen]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+      if (
+        headerRef.current &&
+        !headerRef.current.contains(event.target as Node)
+      ) {
         setRpcDropdownOpen(false);
       }
     };
@@ -117,7 +128,7 @@ export const XHeader = () => {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <button
-            onClick={() => router.push('/')}
+            onClick={() => router.push("/")}
             className="flex items-center space-x-2 text-left hover:opacity-80 transition-opacity"
           >
             <Image
@@ -141,18 +152,24 @@ export const XHeader = () => {
                 className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors duration-200"
               >
                 <Image
-                  src={rpcOptions.find((option) => option.value === selectedNetwork)?.icon || "/mainnet-icon.png"}
+                  src={
+                    rpcOptions.find(
+                      (option) => option.value === selectedNetwork
+                    )?.icon || "/mainnet-icon.png"
+                  }
                   alt="Network"
                   width={20}
                   height={20}
                   className="h-5 w-5"
                 />
                 <span className="text-sm font-medium">
-                  {rpcOptions.find((option) => option.value === selectedNetwork)?.name || "Mainnet"}
+                  {rpcOptions.find((option) => option.value === selectedNetwork)
+                    ?.name || "Mainnet"}
                 </span>
                 <ChevronDownIcon
-                  className={`h-4 w-4 transition-transform ${rpcDropdownOpen ? "rotate-180" : ""
-                    }`}
+                  className={`h-4 w-4 transition-transform ${
+                    rpcDropdownOpen ? "rotate-180" : ""
+                  }`}
                 />
               </button>
 
@@ -196,14 +213,10 @@ export const XHeader = () => {
                 );
               })}
             </div>
-
-            {/* Wallet Button */}
-            <WalletMultiButton style={{ width: '170px', justifyContent: 'center' }} />
           </div>
 
           {/* Mobile Menu Toggle */}
           <div className="flex items-center space-x-4 md:hidden">
-            <WalletMultiButton style={{ width: '140px', justifyContent: 'center' }} />
             <button
               onClick={handleToggleMobileMenu}
               className="text-white hover:text-gray-200 focus:outline-none transition-colors"
@@ -224,7 +237,9 @@ export const XHeader = () => {
             <div className="flex flex-col space-y-4 pt-4">
               {/* Mobile RPC Selection */}
               <div>
-                <span className="text-sm font-medium text-gray-300 mb-2 block">Network Selection:</span>
+                <span className="text-sm font-medium text-gray-300 mb-2 block">
+                  Network Selection:
+                </span>
                 <div className="space-y-2">
                   {rpcOptions.map((option) => (
                     <button
@@ -233,10 +248,11 @@ export const XHeader = () => {
                         handleRpcSelection(option.value, e);
                         setMobileMenuOpen(false);
                       }}
-                      className={`flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg transition-colors ${selectedNetwork === option.value
-                        ? "bg-purple-700 text-white"
-                        : "text-gray-300 hover:bg-gray-700"
-                        }`}
+                      className={`flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg transition-colors ${
+                        selectedNetwork === option.value
+                          ? "bg-purple-700 text-white"
+                          : "text-gray-300 hover:bg-gray-700"
+                      }`}
                     >
                       <Image
                         src={option.icon}
@@ -253,7 +269,9 @@ export const XHeader = () => {
 
               {/* Mobile Social Icons */}
               <div>
-                <span className="text-sm font-medium text-gray-300 mb-3 block">Follow Us:</span>
+                <span className="text-sm font-medium text-gray-300 mb-3 block">
+                  Follow Us:
+                </span>
                 <div className="flex items-center space-x-6">
                   {socialLinks.map((social) => {
                     const IconComponent = social.icon;
