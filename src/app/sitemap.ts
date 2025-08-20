@@ -5,12 +5,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date().toISOString();
   return [
     {
-      url: `${baseUrl}/`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
       url: `${baseUrl}/support`,
       lastModified: now,
       changeFrequency: "monthly",
