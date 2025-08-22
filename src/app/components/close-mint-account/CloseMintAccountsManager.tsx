@@ -8,9 +8,17 @@ import { XTypography } from "@/app/components/x-components/XTypography";
 import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
+import { SuccessAlert } from "../SuccessAlert";
 
 export const CloseMintAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
+
+  // Add state for success alert
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [lastSuccessData, setLastSuccessData] = useState<{
+    recoveredAmount: number;
+    accountCount: number;
+  } | null>(null);
 
   const {
     mintAccounts,
@@ -44,8 +52,31 @@ export const CloseMintAccountsManager = () => {
   const feePercentage = parseFloat(
     process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
   );
-  const commission = Math.floor(totalRent * feePercentage); // Use Math.floor for lamports precision
+  const commission = Math.floor(totalRent * feePercentage);
   const userReceives = totalRent - commission;
+
+  // Add useEffect to show success alert
+  useEffect(() => {
+    if (isSuccess && !showSuccessAlert) {
+      const recoveredAmount = userReceives;
+      const accountCount = selectedMintAccounts.size;
+
+      setLastSuccessData({ recoveredAmount, accountCount });
+      setShowSuccessAlert(true);
+
+      // Auto-hide after 8 seconds
+      const timer = setTimeout(() => {
+        setShowSuccessAlert(false);
+      }, 8000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isSuccess]);
+
+  // Handle closing the alert
+  const handleCloseSuccessAlert = () => {
+    setShowSuccessAlert(false);
+  };
 
   useEffect(() => {
     if (mintAccounts.length > 0) {
@@ -125,316 +156,374 @@ export const CloseMintAccountsManager = () => {
   }
 
   return (
-    <div
-      className="w-full max-w-4xl mx-auto p-6"
-      style={{ backgroundColor: colors.background.white }}
-    >
-      <label
-        className="ml-2 text-sm font-medium"
-        style={{
-          color: colors.text.primary,
-        }}
-      >
-        Only Mints where you are the close authority will be listed to close.
-      </label>
+    <>
+      {/* Success Alert */}
+      {showSuccessAlert && lastSuccessData && (
+        <SuccessAlert
+          isVisible={showSuccessAlert}
+          onClose={handleCloseSuccessAlert}
+          recoveredAmount={lastSuccessData.recoveredAmount}
+          accountCount={lastSuccessData.accountCount}
+        />
+      )}
+
       <div
-        className="border rounded-lg shadow-lg p-6"
-        style={{
-          backgroundColor: colors.background.white,
-          borderColor: `${colors.border}/50`,
-        }}
+        className="w-full max-w-4xl mx-auto p-6"
+        style={{ backgroundColor: colors.background.white }}
       >
-        <div
-          className="flex items-center justify-between mb-4 p-4 border rounded-lg"
+        <label
+          className="ml-2 text-sm font-medium"
           style={{
-            backgroundColor: `${colors.background.light}/20`,
+            color: colors.text.primary,
+          }}
+        >
+          Only Mints where you are the close authority will be listed to close.
+        </label>
+        <div
+          className="border rounded-lg shadow-lg p-6"
+          style={{
+            backgroundColor: colors.background.white,
             borderColor: `${colors.border}/50`,
           }}
         >
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={selectAll}
-              onChange={handleSelectAll}
-              className="w-4 h-4 bg-white rounded"
-              style={{
-                color: colors.secondary,
-                borderColor: colors.primary,
-              }}
-            />
-            <label
-              className="ml-2 text-sm font-medium"
-              style={{
-                color: selectAll ? colors.primary : colors.text.primary,
-              }}
-            >
-              Select All Accounts ({selectedMintAccounts.size} selected)
-            </label>
-          </div>
-          <button
-            onClick={refreshAccounts}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all border"
-            style={{
-              borderColor: colors.primary,
-              color: colors.primary,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = colors.primary;
-              e.currentTarget.style.color = colors.background.white;
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "transparent";
-              e.currentTarget.style.color = colors.primary;
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 4v6h6M20 20v-6h-6M4 14a8 8 0 0113.66-5.66M20 10a8 8 0 01-13.66 5.66"
-              />
-            </svg>
-            Refresh
-          </button>
-        </div>
-
-        {mintAccounts.length === 0 ? (
-          <div className="text-center py-12 flex flex-col justify-center items-center">
-            <div className="text-6xl mb-4">🎉</div>
-            <XTypography
-              variant="h4"
-              className="mb-2"
-              style={{ color: colors.text.primary }}
-            >
-              All Clean!
-            </XTypography>
-            <XTypography
-              variant="body"
-              className="text-center max-w-md"
-              style={{ color: colors.text.secondary }}
-            >
-              No mint accounts found. All your mint accounts are already closed
-              or you dont have any mint accounts to close.
-            </XTypography>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {mintAccounts.map((account) => (
-              <div
-                key={account.pubkey.toString()}
-                className="flex items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
-                style={{
-                  backgroundColor: `${colors.background.light}/10`,
-                  borderColor: `${colors.border}/50`,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = `${colors.background.hover}/10`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = `${colors.background.light}/10`;
-                }}
-              >
-                <input
-                  type="checkbox"
-                  checked={selectedMintAccounts.has(account.pubkey.toString())}
-                  onChange={() =>
-                    handleAccountSelection(account.pubkey.toString())
-                  }
-                  className="w-5 h-5 bg-white rounded border focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-4"
-                  style={{
-                    color: colors.secondary,
-                    borderColor: colors.primary,
-                  }}
-                />
-
-                <div className="flex-1">
-                  <XTypography
-                    variant="body"
-                    className="font-mono text-sm truncate"
-                    style={{ color: colors.text.primary }}
-                  >
-                    {account.pubkey.toString()}
-                  </XTypography>
-                  <XTypography
-                    variant="body"
-                    className="text-xs mt-1"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    <span className="font-semibold">Balance:</span>{" "}
-                    {(account.lamports / 1e9).toFixed(4)} SOL
-                  </XTypography>
-                  {account.supply && (
-                    <XTypography
-                      variant="body"
-                      className="text-xs mt-1"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      <span className="font-semibold">Total Supply:</span>{" "}
-                      {account.supply}
-                    </XTypography>
-                  )}
-                </div>
-
-                <div className="text-right">
-                  <XTypography
-                    variant="body"
-                    className="text-xs font-semibold"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    Rent:
-                  </XTypography>
-                  <XTypography
-                    variant="body"
-                    className="text-xs"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    {(account.rentExemptReserve / 1e9).toFixed(4)} SOL
-                  </XTypography>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Total Calculation */}
-        {mintAccounts.length > 0 && (
           <div
-            className="mt-6 p-4 border rounded-lg"
+            className="flex items-center justify-between mb-4 p-4 border rounded-lg"
             style={{
               backgroundColor: `${colors.background.light}/20`,
               borderColor: `${colors.border}/50`,
             }}
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <XTypography
-                  variant="body"
-                  className="text-sm"
-                  style={{ color: colors.text.secondary }}
-                >
-                  Total SOL to Claim
-                </XTypography>
-                <XTypography
-                  variant="h4"
-                  className="font-bold"
-                  style={{ color: colors.secondary }}
-                >
-                  {(totalRent / 1e9).toFixed(4)} SOL
-                </XTypography>
-              </div>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectAll}
+                onChange={handleSelectAll}
+                className="w-4 h-4 bg-white rounded"
+                style={{
+                  color: colors.secondary,
+                  borderColor: colors.primary,
+                }}
+              />
+              <label
+                className="ml-2 text-sm font-medium"
+                style={{
+                  color: selectAll ? colors.primary : colors.text.primary,
+                }}
+              >
+                Select All Accounts ({selectedMintAccounts.size} selected)
+              </label>
             </div>
+            <button
+              onClick={refreshAccounts}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all border"
+              style={{
+                borderColor: colors.primary,
+                color: colors.primary,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = colors.primary;
+                e.currentTarget.style.color = colors.background.white;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+                e.currentTarget.style.color = colors.primary;
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 4v6h6M20 20v-6h-6M4 14a8 8 0 0113.66-5.66M20 10a8 8 0 01-13.66 5.66"
+                />
+              </svg>
+              Refresh
+            </button>
           </div>
-        )}
 
-        <div
-          className="mt-8 pt-6 border-t"
-          style={{ borderColor: `${colors.border}/50` }}
-        >
-          <XButton
-            onClick={closeAllAccounts}
-            disabled={isClosing || selectedMintAccounts.size === 0}
-            isLoading={isClosing}
-            className="w-full disabled:opacity-50"
-            style={{
-              background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
-              color: colors.background.white,
-            }}
-            onMouseEnter={(e) => {
-              if (!isClosing && selectedMintAccounts.size > 0) {
-                e.currentTarget.style.background = `linear-gradient(to right, ${colors.secondary}, ${colors.secondary})`;
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isClosing && selectedMintAccounts.size > 0) {
-                e.currentTarget.style.background = `linear-gradient(to right, ${colors.primary}, ${colors.accent})`;
-              }
-            }}
-          >
-            {isClosing
-              ? "Closing Mint Accounts..."
-              : `Close Mint Accounts & Get SOL Back (${selectedMintAccounts.size})`}
-          </XButton>
-          <XTypography
-            variant="body"
-            className="text-xs mt-3 text-center"
-            style={{ color: colors.text.secondary }}
-          >
-            This will close selected mint accounts and refund your locked SOL
-            back to your wallet.
-          </XTypography>
+          {mintAccounts.length === 0 ? (
+            <div className="text-center py-12 flex flex-col justify-center items-center">
+              <div className="text-6xl mb-4">🎉</div>
+              <XTypography
+                variant="h4"
+                className="mb-2"
+                style={{ color: colors.text.primary }}
+              >
+                All Clean!
+              </XTypography>
+              <XTypography
+                variant="body"
+                className="text-center max-w-md"
+                style={{ color: colors.text.secondary }}
+              >
+                No mint accounts found. All your mint accounts are already
+                closed or you dont have any mint accounts to close.
+              </XTypography>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {mintAccounts.map((account) => (
+                <div
+                  key={account.pubkey.toString()}
+                  className="flex items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+                  style={{
+                    backgroundColor: `${colors.background.light}/10`,
+                    borderColor: `${colors.border}/50`,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = `${colors.background.hover}/10`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = `${colors.background.light}/10`;
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedMintAccounts.has(
+                      account.pubkey.toString()
+                    )}
+                    onChange={() =>
+                      handleAccountSelection(account.pubkey.toString())
+                    }
+                    className="w-5 h-5 bg-white rounded border focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-4"
+                    style={{
+                      color: colors.secondary,
+                      borderColor: colors.primary,
+                    }}
+                  />
 
-          {isSuccess && transactionHashes.length > 0 && (
+                  <div className="flex-1">
+                    <XTypography
+                      variant="body"
+                      className="font-mono text-sm truncate"
+                      style={{ color: colors.text.primary }}
+                    >
+                      {account.pubkey.toString()}
+                    </XTypography>
+                    <XTypography
+                      variant="body"
+                      className="text-xs mt-1"
+                      style={{ color: colors.text.secondary }}
+                    >
+                      <span className="font-semibold">Balance:</span>{" "}
+                      {(account.lamports / 1e9).toFixed(4)} SOL
+                    </XTypography>
+                    {account.supply && (
+                      <XTypography
+                        variant="body"
+                        className="text-xs mt-1"
+                        style={{ color: colors.text.secondary }}
+                      >
+                        <span className="font-semibold">Total Supply:</span>{" "}
+                        {account.supply}
+                      </XTypography>
+                    )}
+                  </div>
+
+                  <div className="text-right">
+                    <XTypography
+                      variant="body"
+                      className="text-xs font-semibold"
+                      style={{ color: colors.text.secondary }}
+                    >
+                      Rent:
+                    </XTypography>
+                    <XTypography
+                      variant="body"
+                      className="text-xs"
+                      style={{ color: colors.text.secondary }}
+                    >
+                      {(account.rentExemptReserve / 1e9).toFixed(4)} SOL
+                    </XTypography>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Total Calculation */}
+          {mintAccounts.length > 0 && (
             <div
-              className="mt-4 p-4 border rounded-lg"
+              className="mt-6 p-4 border rounded-lg"
               style={{
                 backgroundColor: `${colors.background.light}/20`,
                 borderColor: `${colors.border}/50`,
               }}
             >
-              <div className="flex justify-between items-center mb-2">
-                <XTypography
-                  variant="body"
-                  className="text-sm font-semibold"
-                  style={{ color: colors.text.primary }}
-                >
-                  Transaction Hashes
-                </XTypography>
-                <button
-                  onClick={() => clearTransactionHashes()}
-                  className="text-sm transition-colors"
-                  style={{ color: colors.primary }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = colors.secondary;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = colors.primary;
-                  }}
-                >
-                  Hide
-                </button>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Total SOL to Claim ({selectedMintAccounts.size} selected)
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.secondary }}
+                  >
+                    {(totalRent / 1e9).toFixed(6)} SOL
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Commission ({(feePercentage * 100).toFixed(1)}%)
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.commission || colors.error }}
+                  >
+                    {(commission / 1e9).toFixed(6)} SOL
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    You Receive
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.primary }}
+                  >
+                    {(userReceives / 1e9).toFixed(6)} SOL
+                  </XTypography>
+                </div>
               </div>
-              <ul className="space-y-2">
-                {transactionHashes.map((hash, index) => (
-                  <li key={index}>
-                    <a
-                      href={getSolscanURL(
-                        claimYourSolsState.network,
-                        hash,
-                        "tx"
-                      )}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-mono text-sm break-all transition-colors"
-                      style={{ color: colors.secondary }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = colors.primary;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = colors.secondary;
-                      }}
-                    >
-                      {hash.slice(0, 6)}...{hash.slice(-4)}
-                      <span
-                        className="ml-2 text-xs"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        [View on Solscan]
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
+
+              {selectedMintAccounts.size === 0 && (
+                <div className="text-center mt-4">
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Select accounts to see calculation
+                  </XTypography>
+                </div>
+              )}
             </div>
           )}
+
+          <div
+            className="mt-8 pt-6 border-t"
+            style={{ borderColor: `${colors.border}/50` }}
+          >
+            <XButton
+              onClick={closeAllAccounts}
+              disabled={isClosing || selectedMintAccounts.size === 0}
+              isLoading={isClosing}
+              className="w-full disabled:opacity-50"
+              style={{
+                background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
+                color: colors.background.white,
+              }}
+              onMouseEnter={(e) => {
+                if (!isClosing && selectedMintAccounts.size > 0) {
+                  e.currentTarget.style.background = `linear-gradient(to right, ${colors.secondary}, ${colors.secondary})`;
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isClosing && selectedMintAccounts.size > 0) {
+                  e.currentTarget.style.background = `linear-gradient(to right, ${colors.primary}, ${colors.accent})`;
+                }
+              }}
+            >
+              {isClosing
+                ? "Closing Mint Accounts..."
+                : `Close Mint Accounts & Get SOL Back (${selectedMintAccounts.size})`}
+            </XButton>
+            <XTypography
+              variant="body"
+              className="text-xs mt-3 text-center"
+              style={{ color: colors.text.secondary }}
+            >
+              This will close selected mint accounts and refund your locked SOL
+              back to your wallet.
+            </XTypography>
+
+            {isSuccess && transactionHashes.length > 0 && (
+              <div
+                className="mt-4 p-4 border rounded-lg"
+                style={{
+                  backgroundColor: `${colors.background.light}/20`,
+                  borderColor: `${colors.border}/50`,
+                }}
+              >
+                <div className="flex justify-between items-center mb-2">
+                  <XTypography
+                    variant="body"
+                    className="text-sm font-semibold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    Transaction Details
+                  </XTypography>
+                  <button
+                    onClick={() => clearTransactionHashes()}
+                    className="text-sm transition-colors"
+                    style={{ color: colors.primary }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = colors.secondary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = colors.primary;
+                    }}
+                  >
+                    Hide
+                  </button>
+                </div>
+                <ul className="space-y-2">
+                  {transactionHashes.map((hash, index) => (
+                    <li key={index}>
+                      <a
+                        href={getSolscanURL(
+                          claimYourSolsState.network,
+                          hash,
+                          "tx"
+                        )}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-mono text-sm break-all transition-colors"
+                        style={{ color: colors.secondary }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.color = colors.primary;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.color = colors.secondary;
+                        }}
+                      >
+                        {hash.slice(0, 6)}...{hash.slice(-4)}
+                        <span
+                          className="ml-2 text-xs"
+                          style={{ color: colors.text.secondary }}
+                        >
+                          [View on Solscan]
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
