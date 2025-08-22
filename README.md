@@ -27,9 +27,6 @@ This is a Next.js-based web app designed for Solana users to easily reclaim SOL 
 - **Secure by Design**  
   Direct wallet integration — *no private keys required*.
 
-- **Transparent Fees**  
-  Clear overview of recoverable SOL and service fee (10%).
-
 - **Referral System**  
   Earn rewards in SOL by inviting others to use the tool.
 
@@ -83,7 +80,6 @@ NEXT_PUBLIC_CLOSE_ACCOUNT_FEE=
 
 4. **Reclaim Your SOL**  
    Receive your rent refund directly to your wallet  
-   *(A 10% service fee is applied per closed account)*
 
 ## ⚠️ IMPORTANT DISCLAIMER
 

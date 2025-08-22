@@ -309,44 +309,12 @@ export const BurnAndCloseAccountsManager = () => {
                   className="text-sm"
                   style={{ color: colors.text.secondary }}
                 >
-                  Total Rent
-                </XTypography>
-                <XTypography
-                  variant="h4"
-                  className="font-bold"
-                  style={{ color: colors.secondary }}
-                >
-                  {(totalRent / 1e9).toFixed(4)} SOL
-                </XTypography>
-              </div>
-              <div>
-                <XTypography
-                  variant="body"
-                  className="text-sm"
-                  style={{ color: colors.text.secondary }}
-                >
-                  Commission (10%)
-                </XTypography>
-                <XTypography
-                  variant="h4"
-                  className="font-bold"
-                  style={{ color: colors.commission }}
-                >
-                  {(commission / 1e9).toFixed(4)} SOL
-                </XTypography>
-              </div>
-              <div>
-                <XTypography
-                  variant="body"
-                  className="text-sm"
-                  style={{ color: colors.text.secondary }}
-                >
                   You Receive
                 </XTypography>
                 <XTypography
                   variant="h4"
                   className="font-bold"
-                  style={{ color: colors.primary }}
+                  style={{ color: colors.secondary }}
                 >
                   {(userReceives / 1e9).toFixed(4)} SOL
                 </XTypography>
