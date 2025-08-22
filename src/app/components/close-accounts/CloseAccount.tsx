@@ -306,14 +306,14 @@ export const AccountsManager = () => {
                                     className="text-sm"
                                     style={{ color: colors.text.secondary }}
                                 >
-                                    You Receive
+                                    Total SOL to Claim
                                 </XTypography>
                                 <XTypography
                                     variant="h4"
                                     className="font-bold"
                                     style={{ color: colors.secondary }}
                                 >
-                                    {(userReceives / 1e9).toFixed(4)} SOL
+                                    {(totalRent / 1e9).toFixed(4)} SOL
                                 </XTypography>
                             </div>
                         </div>
