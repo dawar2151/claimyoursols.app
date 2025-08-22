@@ -373,38 +373,6 @@ export const CloseMintAccountsManager = () => {
                     {(totalRent / 1e9).toFixed(6)} SOL
                   </XTypography>
                 </div>
-                <div>
-                  <XTypography
-                    variant="body"
-                    className="text-sm"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    Commission ({(feePercentage * 100).toFixed(1)}%)
-                  </XTypography>
-                  <XTypography
-                    variant="h4"
-                    className="font-bold"
-                    style={{ color: colors.commission || colors.error }}
-                  >
-                    {(commission / 1e9).toFixed(6)} SOL
-                  </XTypography>
-                </div>
-                <div>
-                  <XTypography
-                    variant="body"
-                    className="text-sm"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    You Receive
-                  </XTypography>
-                  <XTypography
-                    variant="h4"
-                    className="font-bold"
-                    style={{ color: colors.primary }}
-                  >
-                    {(userReceives / 1e9).toFixed(6)} SOL
-                  </XTypography>
-                </div>
               </div>
 
               {selectedMintAccounts.size === 0 && (
