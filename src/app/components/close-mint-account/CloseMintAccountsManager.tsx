@@ -67,7 +67,7 @@ export const CloseMintAccountsManager = () => {
       // Auto-hide after 8 seconds
       const timer = setTimeout(() => {
         setShowSuccessAlert(false);
-      }, 8000);
+      }, 16000);
 
       return () => clearTimeout(timer);
     }
