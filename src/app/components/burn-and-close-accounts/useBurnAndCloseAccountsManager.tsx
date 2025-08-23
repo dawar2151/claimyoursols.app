@@ -17,7 +17,7 @@ import {
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
-import { isValidTokenAccount } from "@/app/utils/spl-utils";
+import { isValidTokenAccountForBurnAndClose } from "@/app/utils/spl-utils";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -142,7 +142,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         ...token2022Accounts.value,
       ]
         .filter((account) =>
-          isValidTokenAccount(account, rentExemptReserve)
+          isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
         )
         .map((account) => ({
           pubkey: account.pubkey,

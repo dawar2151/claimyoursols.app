@@ -16,6 +16,7 @@ import {
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
+import { isValidTokenAccountForClose } from "@/app/utils/spl-utils";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -35,26 +36,6 @@ const fetchTokenAccounts = async (
   return connection.getParsedTokenAccountsByOwner(publicKey, {
     programId: programId,
   });
-};
-
-const isValidTokenAccount = (
-  account: { account: AccountInfo<ParsedAccountData> },
-  rentExemptReserve: number
-) => {
-  const { account: info } = account;
-  const owner = info.owner.toString();
-  const isValidProgram =
-    owner === TOKEN_PROGRAM_ID.toString() || owner === TOKEN_2022_PROGRAM_ID.toString();
-  const hasRent = info.lamports >= rentExemptReserve;
-  const tokenAmount = info.data?.parsed?.info?.tokenAmount?.uiAmount ?? null;
-  const isEmpty = tokenAmount === 0;
-
-  console.log(
-    `Account ${account.account.owner.toString()} => balance: ${tokenAmount}, rent: ${info.lamports
-    }, closeable: ${isValidProgram && hasRent && isEmpty}`
-  );
-
-  return isValidProgram && hasRent && isEmpty;
 };
 
 const createFeeInstructions = async (
@@ -151,7 +132,7 @@ export function useAccountsHelper(connection: Connection) {
         ...token2022Accounts.value,
       ]
         .filter((account) =>
-          isValidTokenAccount(account, rentExemptReserve)
+          isValidTokenAccountForClose(account, rentExemptReserve)
         )
         .map((account) => ({
           pubkey: account.pubkey,
