@@ -12,8 +12,10 @@ import {
   createCloseAccountInstruction,
   TOKEN_PROGRAM_ID,
   ACCOUNT_SIZE,
+  TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -22,51 +24,33 @@ interface AccountData {
   rentExemptReserve: number;
 }
 
-interface ProgramIds {
-  splToken: string;
-  splToken2022: string;
-  feeRecipient: string;
-}
-
-const PROGRAM_IDS: ProgramIds = {
-  splToken: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
-  splToken2022: "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
-  feeRecipient:
-    process.env.NEXT_PUBLIC_FEE_RECIPIENT ||
-    "9Mh1cX7Ghh3b5FDJgQRowjCwJBnYn5AJeQZzvDcraHLD",
-};
-
 const BATCH_SIZE = 20;
-const FEE_PERCENTAGE = parseFloat(
-  process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || "0.1"
-);
+
 
 const fetchTokenAccounts = async (
   connection: Connection,
   publicKey: PublicKey,
-  programId: string
+  programId: PublicKey
 ) => {
   return connection.getParsedTokenAccountsByOwner(publicKey, {
-    programId: new PublicKey(programId),
+    programId: programId,
   });
 };
 
 const isValidTokenAccount = (
   account: { account: AccountInfo<ParsedAccountData> },
-  programIds: ProgramIds,
   rentExemptReserve: number
 ) => {
   const { account: info } = account;
   const owner = info.owner.toString();
   const isValidProgram =
-    owner === programIds.splToken || owner === programIds.splToken2022;
+    owner === TOKEN_PROGRAM_ID.toString() || owner === TOKEN_2022_PROGRAM_ID.toString();
   const hasRent = info.lamports >= rentExemptReserve;
   const tokenAmount = info.data?.parsed?.info?.tokenAmount?.uiAmount ?? null;
   const isEmpty = tokenAmount === 0;
 
   console.log(
-    `Account ${account.account.owner.toString()} => balance: ${tokenAmount}, rent: ${
-      info.lamports
+    `Account ${account.account.owner.toString()} => balance: ${tokenAmount}, rent: ${info.lamports
     }, closeable: ${isValidProgram && hasRent && isEmpty}`
   );
 
@@ -77,12 +61,12 @@ const createFeeInstructions = async (
   publicKey: PublicKey,
   totalFee: number,
   referralAccount: string | undefined,
-  programIds: ProgramIds,
   connection: Connection // Add connection parameter
 ): Promise<Transaction> => {
   const transaction = new Transaction();
+  var recicipient = getFeeRecipient();
 
-  if (totalFee > 0) {
+  if (totalFee > 0 && recicipient != null) {
     if (
       referralAccount &&
       referralAccount !== publicKey.toString() &&
@@ -100,7 +84,7 @@ const createFeeInstructions = async (
         transaction.add(
           SystemProgram.transfer({
             fromPubkey: publicKey,
-            toPubkey: new PublicKey(programIds.feeRecipient),
+            toPubkey: recicipient,
             lamports: totalFee,
           })
         );
@@ -114,7 +98,7 @@ const createFeeInstructions = async (
           }),
           SystemProgram.transfer({
             fromPubkey: publicKey,
-            toPubkey: new PublicKey(programIds.feeRecipient),
+            toPubkey: new PublicKey(recicipient),
             lamports: totalFee / 2,
           })
         );
@@ -124,7 +108,7 @@ const createFeeInstructions = async (
       transaction.add(
         SystemProgram.transfer({
           fromPubkey: publicKey,
-          toPubkey: new PublicKey(programIds.feeRecipient),
+          toPubkey: new PublicKey(recicipient),
           lamports: totalFee,
         })
       );
@@ -158,8 +142,8 @@ export function useAccountsHelper(connection: Connection) {
         await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
 
       const [splTokenAccounts, token2022Accounts] = await Promise.all([
-        fetchTokenAccounts(connection, publicKey, PROGRAM_IDS.splToken),
-        fetchTokenAccounts(connection, publicKey, PROGRAM_IDS.splToken2022),
+        fetchTokenAccounts(connection, publicKey, TOKEN_PROGRAM_ID),
+        fetchTokenAccounts(connection, publicKey, TOKEN_2022_PROGRAM_ID),
       ]);
 
       const closeableAccounts = [
@@ -167,7 +151,7 @@ export function useAccountsHelper(connection: Connection) {
         ...token2022Accounts.value,
       ]
         .filter((account) =>
-          isValidTokenAccount(account, PROGRAM_IDS, rentExemptReserve)
+          isValidTokenAccount(account, rentExemptReserve)
         )
         .map((account) => ({
           pubkey: account.pubkey,
@@ -205,13 +189,13 @@ export function useAccountsHelper(connection: Connection) {
 
         for (const account of batch) {
           const accountOwner = account.account.owner.toString();
-          const isSPLToken = accountOwner === PROGRAM_IDS.splToken;
-          const isToken2022 = accountOwner === PROGRAM_IDS.splToken2022;
+          const isSPLToken = accountOwner === TOKEN_PROGRAM_ID.toString();
+          const isToken2022 = accountOwner === TOKEN_2022_PROGRAM_ID.toString();
 
           if (!isSPLToken && !isToken2022) continue;
 
           const programId = isToken2022
-            ? new PublicKey(PROGRAM_IDS.splToken2022)
+            ? TOKEN_2022_PROGRAM_ID
             : TOKEN_PROGRAM_ID;
 
           transaction.add(
@@ -224,7 +208,7 @@ export function useAccountsHelper(connection: Connection) {
             )
           );
 
-          totalFee += Math.floor(account.lamports * FEE_PERCENTAGE);
+          totalFee += calculateCommission(account.lamports) || 0;
         }
 
         if (transaction.instructions.length === 0) continue;
@@ -233,7 +217,6 @@ export function useAccountsHelper(connection: Connection) {
           publicKey,
           totalFee,
           referralAccount,
-          PROGRAM_IDS,
           connection
         );
         transaction.add(...feeInstructions.instructions);
@@ -263,8 +246,7 @@ export function useAccountsHelper(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${
-              Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
