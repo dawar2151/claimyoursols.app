@@ -16,8 +16,8 @@ import {
   MintCloseAuthority,
 } from "@solana/spl-token";
 import { sendTransactionHelper } from "../useSenTransactionHelper";
+import { calculateCommission, getFeeConfiguration } from "@/app/utils/utils";
 
-// Types
 interface ParsedTokenAccountData {
   mint: string;
   owner: string;
@@ -50,19 +50,6 @@ interface TokenAccountInfo {
   balance: string;
   closeAuthority: string | null;
 }
-
-// Constants
-const FEE_PERCENTAGE = parseFloat(
-  process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
-);
-const DEFAULT_FEE_RECIPIENT = "6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp";
-
-// Helper functions
-const getFeeRecipient = (): PublicKey => {
-  const recipient =
-    process.env.NEXT_PUBLIC_FEE_RECIPIENT || DEFAULT_FEE_RECIPIENT;
-  return new PublicKey(recipient);
-};
 
 const isValidParsedData = (data: any): data is ParsedTokenAccountData => {
   return (
@@ -258,7 +245,9 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
   const createCloseInstructions = useCallback(
     (account: MintAccountData): Transaction => {
       const transaction = new Transaction();
-
+      if (!publicKey) {
+        throw new Error("Wallet not connected");
+      }
       // Step 1: Burn tokens if they exist in ATA
       if (account.hasAssociatedTokenAccount && BigInt(account.ataBalance) > 0) {
         if (account.mintAuthority === publicKey!.toString()) {
@@ -278,8 +267,8 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
       if (account.hasAssociatedTokenAccount) {
         const closeAtaInstruction = createCloseAccountInstruction(
           account.associatedTokenAccountAddress,
-          publicKey!,
-          publicKey!,
+          publicKey,
+          publicKey,
           [],
           TOKEN_2022_PROGRAM_ID
         );
@@ -289,25 +278,36 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
       // Step 4: Close the mint account
       const closeInstruction = createCloseAccountInstruction(
         account.pubkey,
-        publicKey!,
-        publicKey!,
+        publicKey,
+        publicKey,
         [],
         TOKEN_2022_PROGRAM_ID
       );
       transaction.add(closeInstruction);
 
-      // Step 5: Add commission transfer
-      const commission = Math.floor(account.lamports * FEE_PERCENTAGE);
-      if (commission > 0) {
-        transaction.add(
-          SystemProgram.transfer({
-            fromPubkey: publicKey!,
-            toPubkey: getFeeRecipient(),
-            lamports: commission,
-          })
-        );
-      }
+      const feeConfig = getFeeConfiguration();
 
+      if (feeConfig.isValid && feeConfig.percentage && feeConfig.recipient) {
+        const commission = calculateCommission(account.lamports);
+
+        if (commission != null && commission > 0) {
+          const remainingAfterCommission = account.lamports - commission;
+
+          if (remainingAfterCommission >= 0 && publicKey) {
+            transaction.add(
+              SystemProgram.transfer({
+                fromPubkey: publicKey,
+                toPubkey: feeConfig.recipient,
+                lamports: commission,
+              })
+            );
+          } else {
+            throw new Error('Account balance insufficient for commission');
+          }
+        } else {
+          console.warn('Fee configuration incomplete - no commission will be charged');
+        }
+      }
       return transaction;
     },
     [publicKey]
