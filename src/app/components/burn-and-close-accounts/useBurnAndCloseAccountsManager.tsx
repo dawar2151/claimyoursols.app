@@ -29,7 +29,6 @@ interface AccountData {
   rentExemptReserve: number;
 }
 
-
 const BATCH_SIZE = 10;
 
 const fetchTokenAccounts = async (
@@ -41,8 +40,6 @@ const fetchTokenAccounts = async (
     programId: programId,
   });
 };
-
-
 
 const createFeeInstructions = async (
   publicKey: PublicKey,
@@ -278,7 +275,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${
+              Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
@@ -296,8 +294,10 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
       console.log(
         `All accounts closed successfully. Total: ${totalClosed}/${accountsToBurnAndClose.length}`
       );
-      setIsSuccess(true);
-      await fetchAccounts();
+      if (totalClosed > 0) {
+        setIsSuccess(true);
+        await fetchAccounts();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to close accounts");
       console.error("Error closing accounts:", err);

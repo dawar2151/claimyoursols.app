@@ -27,7 +27,6 @@ interface AccountData {
 
 const BATCH_SIZE = 20;
 
-
 const fetchTokenAccounts = async (
   connection: Connection,
   publicKey: PublicKey,
@@ -227,7 +226,8 @@ export function useAccountsHelper(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${
+              Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
@@ -245,8 +245,10 @@ export function useAccountsHelper(connection: Connection) {
       console.log(
         `All accounts closed successfully. Total: ${totalClosed}/${accountsToClose.length}`
       );
-      setIsSuccess(true);
-      await fetchAccounts();
+      if (totalClosed > 0) {
+        setIsSuccess(true);
+        await fetchAccounts();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to close accounts");
       console.error("Error closing accounts:", err);
