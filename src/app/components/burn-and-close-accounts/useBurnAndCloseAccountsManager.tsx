@@ -208,10 +208,19 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             continue;
           }
 
-          const amount =
-            account.account.data.parsed?.info?.tokenAmount?.amount
-            ;
-          if (isNaN(amount) || amount <= 0) {
+          const rawAmount = account.account.data.parsed?.info?.tokenAmount?.amount; // Raw lamports
+          if (rawAmount === undefined) {
+            console.error(
+              `Token amount not found for account: ${account.pubkey.toString()}`
+            );
+            continue;
+          }
+
+          // Use raw amount for burning
+          const burnAmount = rawAmount ? BigInt(rawAmount) : BigInt(0);
+
+          console.log(`Burn Amount: ${burnAmount.toString()} lamports`);;
+          if (isNaN(rawAmount) || rawAmount <= 0) {
             console.error(
               `Invalid or zero token amount for account: ${account.pubkey.toString()}`
             );
@@ -231,7 +240,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               pubkey,
               mintPubkey,
               publicKey,
-              amount,
+              burnAmount,
               [],
               programId
             )
