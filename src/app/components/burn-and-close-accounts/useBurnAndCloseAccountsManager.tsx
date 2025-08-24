@@ -208,9 +208,9 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             continue;
           }
 
-          const amount = Number(
+          const amount =
             account.account.data.parsed?.info?.tokenAmount?.amount
-          );
+            ;
           if (isNaN(amount) || amount <= 0) {
             console.error(
               `Invalid or zero token amount for account: ${account.pubkey.toString()}`
@@ -286,8 +286,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${
-              Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
