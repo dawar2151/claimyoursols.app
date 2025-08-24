@@ -21,6 +21,7 @@ export const AccountsManager = () => {
   const {
     selectedAccounts,
     setSelectedAccounts,
+    cleanClosedAccounts,
     setReferralAccount,
     accounts,
     error,
@@ -64,6 +65,7 @@ export const AccountsManager = () => {
       // Auto-hide after 8 seconds
       const timer = setTimeout(() => {
         setShowSuccessAlert(false);
+        cleanClosedAccounts();
       }, 16000);
 
       return () => clearTimeout(timer);
@@ -94,6 +96,10 @@ export const AccountsManager = () => {
       setSelectedAccounts(allAccountKeys);
       setSelectAll(true);
     }
+  };
+  const handleCloseSuccessAlert = () => {
+    cleanClosedAccounts();
+    setShowSuccessAlert(false);
   };
 
   // Handle individual account selection
@@ -159,7 +165,7 @@ export const AccountsManager = () => {
       {showSuccessAlert && lastSuccessData && (
         <SuccessAlert
           isVisible={showSuccessAlert}
-          onClose={() => setShowSuccessAlert(false)}
+          onClose={() => handleCloseSuccessAlert()}
           recoveredAmount={lastSuccessData.recoveredAmount}
           accountCount={lastSuccessData.accountCount}
         />

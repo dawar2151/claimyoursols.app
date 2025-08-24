@@ -105,6 +105,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [referralAccount, setReferralAccount] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTotalRent, setCurrentTotalRent] = useState<number>(0);
 
   const [isSuccess, setIsSuccess] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -116,6 +117,15 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   );
   const wallet = useWallet();
   const publicKey = wallet.publicKey;
+  const cleanClosedAccounts = useCallback(() => {
+    setAccounts(
+      accounts.filter(
+        (account) => !selectedAccounts.has(account.pubkey.toString())
+      )
+    );
+    setSelectedAccounts(new Set());
+    setIsSuccess(false);
+  }, [selectedAccounts]);
   const fetchAccounts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -178,6 +188,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
       const accountsToBurnAndClose = accounts.filter((account) =>
         selectedAccounts.has(account.pubkey.toString())
       );
+      let currentRent = 0;
 
       for (let i = 0; i < accountsToBurnAndClose.length; i += BATCH_SIZE) {
         const batch = accountsToBurnAndClose.slice(i, i + BATCH_SIZE);
@@ -237,8 +248,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           );
 
           totalFee += calculateCommission(account.lamports) || 0;
+          currentRent += account.lamports;
         }
-
         if (transaction.instructions.length === 0) continue;
 
         const feeInstructions = await createFeeInstructions(
@@ -289,14 +300,13 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           await new Promise((resolve) => setTimeout(resolve, 2000));
         }
       }
-
+      setCurrentTotalRent(currentRent);
       setTransactionHashes(newTransactionHashes);
       console.log(
         `All accounts closed successfully. Total: ${totalClosed}/${accountsToBurnAndClose.length}`
       );
       if (totalClosed > 0) {
         setIsSuccess(true);
-        await fetchAccounts();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to close accounts");
@@ -304,7 +314,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     } finally {
       setIsClosing(false);
     }
-  }, [accounts, connection, referralAccount, fetchAccounts, selectedAccounts]);
+  }, [publicKey, accounts, selectedAccounts, referralAccount, connection]);
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts, publicKey]);
@@ -313,6 +323,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     selectedAccounts,
     setSelectedAccounts,
     setReferralAccount,
+    cleanClosedAccounts,
+    currentTotalRent,
     accounts,
     isSuccess,
     isLoading,

@@ -31,6 +31,7 @@ export const CloseMintAccountsManager = () => {
     closeAllAccounts,
     selectedMintAccounts,
     setSelectedMintAccounts,
+    cleanClosedAccounts,
     clearTransactionHashes,
   } = useCloseMintAccountsManager(claimYourSolsState.connection);
 
@@ -67,6 +68,7 @@ export const CloseMintAccountsManager = () => {
       // Auto-hide after 8 seconds
       const timer = setTimeout(() => {
         setShowSuccessAlert(false);
+        cleanClosedAccounts();
       }, 16000);
 
       return () => clearTimeout(timer);
@@ -76,6 +78,7 @@ export const CloseMintAccountsManager = () => {
   // Handle closing the alert
   const handleCloseSuccessAlert = () => {
     setShowSuccessAlert(false);
+    cleanClosedAccounts();
   };
 
   useEffect(() => {
@@ -321,7 +324,7 @@ export const CloseMintAccountsManager = () => {
                         style={{ color: colors.text.secondary }}
                       >
                         <span className="font-semibold">Total Supply:</span>{" "}
-                        {account.supply}
+                        {account.ataBalance}
                       </XTypography>
                     )}
                   </div>

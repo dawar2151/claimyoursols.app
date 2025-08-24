@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 import { SuccessAlert } from "../SuccessAlert";
+import { calculateCommission } from "@/app/utils/utils";
 
 export const BurnAndCloseAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
@@ -24,6 +25,8 @@ export const BurnAndCloseAccountsManager = () => {
     selectedAccounts,
     setSelectedAccounts,
     setReferralAccount,
+    cleanClosedAccounts,
+    currentTotalRent,
     accounts,
     error,
     isSuccess,
@@ -48,10 +51,6 @@ export const BurnAndCloseAccountsManager = () => {
     return sum + (account?.lamports || 0);
   }, 0);
 
-  const feePercentage = parseFloat(
-    process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
-  );
-
   useEffect(() => {
     if (refAccount) {
       setReferralAccount(refAccount);
@@ -61,18 +60,7 @@ export const BurnAndCloseAccountsManager = () => {
   // Fixed useEffect with proper dependency management
   useEffect(() => {
     if (isSuccess && !showSuccessAlert) {
-      // Calculate fresh values when success occurs
-      const currentTotalRent = Array.from(selectedAccounts).reduce(
-        (sum, accountKey) => {
-          const account = accounts.find(
-            (acc) => acc.pubkey.toString() === accountKey
-          );
-          return sum + (account?.lamports || 0);
-        },
-        0
-      );
-
-      const currentCommission = Math.floor(currentTotalRent * feePercentage);
+      const currentCommission = calculateCommission(currentTotalRent) ?? 0;
       const recoveredAmount = currentTotalRent - currentCommission;
       const accountCount = selectedAccounts.size;
 
@@ -82,6 +70,7 @@ export const BurnAndCloseAccountsManager = () => {
       // Auto-hide after 8 seconds
       const timer = setTimeout(() => {
         setShowSuccessAlert(false);
+        cleanClosedAccounts();
       }, 16000);
 
       return () => clearTimeout(timer);
@@ -90,6 +79,7 @@ export const BurnAndCloseAccountsManager = () => {
 
   // Handle closing the alert
   const handleCloseSuccessAlert = () => {
+    cleanClosedAccounts();
     setShowSuccessAlert(false);
   };
 

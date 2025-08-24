@@ -86,6 +86,16 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [transactionHashes, setTransactionHashes] = useState<string[]>([]);
 
+  const cleanClosedAccounts = useCallback(() => {
+    setMintAccounts(
+      mintAccounts.filter(
+        (account) => !selectedMintAccounts.has(account.pubkey.toString())
+      )
+    );
+    setSelectedMintAccounts(new Set());
+    setIsSuccess(false);
+  }, [mintAccounts, selectedMintAccounts]);
+
   // Fetch token accounts and extract mint addresses
   const fetchTokenAccounts = useCallback(async (): Promise<
     Map<string, TokenAccountInfo>
@@ -302,10 +312,12 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
               })
             );
           } else {
-            throw new Error('Account balance insufficient for commission');
+            throw new Error("Account balance insufficient for commission");
           }
         } else {
-          console.warn('Fee configuration incomplete - no commission will be charged');
+          console.warn(
+            "Fee configuration incomplete - no commission will be charged"
+          );
         }
       }
       return transaction;
@@ -397,8 +409,6 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
       if (hashes.length > 0) {
         setTransactionHashes(hashes);
         setIsSuccess(true);
-        await fetchOwnedMintAccounts(); // Refresh
-        setSelectedMintAccounts(new Set()); // Clear selection
       }
     } catch (err) {
       console.error("Error closing mint accounts:", err);
@@ -445,6 +455,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
     transactionHashes,
     refreshAccounts: fetchOwnedMintAccounts,
     closeAllAccounts,
+    cleanClosedAccounts,
     selectedMintAccounts,
     setSelectedMintAccounts,
     clearTransactionHashes,

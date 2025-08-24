@@ -110,6 +110,17 @@ export function useAccountsHelper(connection: Connection) {
   );
   const [transactionHashes, setTransactionHashes] = useState<string[]>([]); // New state for transaction hashes
   const publicKey = useWallet().publicKey;
+
+  const cleanClosedAccounts = useCallback(() => {
+    setAccounts(
+      accounts.filter(
+        (account) => !selectedAccounts.has(account.pubkey.toString())
+      )
+    );
+    setSelectedAccounts(new Set());
+    setIsSuccess(false);
+  }, [selectedAccounts]);
+
   const fetchAccounts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -247,7 +258,6 @@ export function useAccountsHelper(connection: Connection) {
       );
       if (totalClosed > 0) {
         setIsSuccess(true);
-        await fetchAccounts();
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to close accounts");
@@ -255,14 +265,7 @@ export function useAccountsHelper(connection: Connection) {
     } finally {
       setIsClosing(false);
     }
-  }, [
-    accounts,
-    connection,
-    referralAccount,
-    fetchAccounts,
-    publicKey,
-    selectedAccounts,
-  ]);
+  }, [accounts, connection, referralAccount, publicKey, selectedAccounts]);
 
   useEffect(() => {
     fetchAccounts();
@@ -272,6 +275,7 @@ export function useAccountsHelper(connection: Connection) {
     setSelectedAccounts,
     selectedAccounts,
     setReferralAccount,
+    cleanClosedAccounts,
     accounts,
     isSuccess,
     isLoading,
