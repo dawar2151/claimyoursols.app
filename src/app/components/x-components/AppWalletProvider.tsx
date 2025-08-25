@@ -10,31 +10,63 @@ import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { clusterApiUrl } from "@solana/web3.js";
 import { ClaimYourSolsStateContext } from "@/app/providers";
 
-// Default styles that can be overridden by your app
 require("@solana/wallet-adapter-react-ui/styles.css");
 
-// imports here
+import {
+    PhantomWalletAdapter,
+    SolflareWalletAdapter,
+    AlphaWalletAdapter,
+    LedgerWalletAdapter,
+    SolongWalletAdapter,
+    CoinbaseWalletAdapter,
+    TorusWalletAdapter,
+    CloverWalletAdapter,
+    MathWalletAdapter,
+    TokenPocketWalletAdapter,
+    WalletConnectWalletAdapter,
+    BitgetWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
 
 export default function AppWalletProvider({ children }: { children: React.ReactNode }) {
-
     const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
+
     const endpoint = useMemo(() => {
-        // Dynamically change the endpoint based on the selected network
-        return clusterApiUrl(claimYourSolsState.network as unknown as WalletAdapterNetwork);
+        return clusterApiUrl(
+            claimYourSolsState.network as unknown as WalletAdapterNetwork
+        );
     }, [claimYourSolsState.network]);
 
-    const wallets = useMemo(() => [
-        // Add the wallets you want to support
-        // Example: new PhantomWalletAdapter(),
-    ], [claimYourSolsState.network]);
+    const wallets = useMemo(
+        () => [
+            new PhantomWalletAdapter(),
+            new SolflareWalletAdapter(),
+            new LedgerWalletAdapter(),
+            new SolongWalletAdapter({ network: claimYourSolsState.network }),
+            new CoinbaseWalletAdapter(),
+            new AlphaWalletAdapter(),
+            new TorusWalletAdapter(),
+            new BitgetWalletAdapter(),
+            new CloverWalletAdapter(),
+            new MathWalletAdapter(),
+            new TokenPocketWalletAdapter(),
+            new WalletConnectWalletAdapter({
+                network:
+                    claimYourSolsState.network === "devnet"
+                        ? WalletAdapterNetwork.Devnet
+                        : WalletAdapterNetwork.Mainnet,
+                options: {
+                    relayUrl: 'wss://relay.walletconnect.com', // WalletConnect v1 relay URL
+                    projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || 'ccfd553984d17c8eb13ac9d69badf968'// WalletConnect v2 project ID (if applicable)
+                },
+            }),
+        ],
+        [claimYourSolsState.network]
+    );
 
     return (
         <ConnectionProvider endpoint={endpoint}>
             <WalletProvider wallets={wallets} autoConnect>
-                <WalletModalProvider>
-                    {/* Pass down the handleNetworkChange function to children if needed */}
-                    {children}
-                </WalletModalProvider>
+                <WalletModalProvider>{children}</WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>
     );
