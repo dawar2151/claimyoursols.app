@@ -41,7 +41,7 @@ export const BurnAndCloseAccountsManager = () => {
   const searchParams = useSearchParams();
   const refAccount = searchParams.get("ref");
 
-  const [selectAll, setSelectAll] = useState(true);
+  const [selectAll, setSelectAll] = useState(false);
 
   // Move calculations outside of useEffect to avoid stale closures
   const totalRent = Array.from(selectedAccounts).reduce((sum, accountKey) => {
@@ -82,16 +82,6 @@ export const BurnAndCloseAccountsManager = () => {
     cleanClosedAccounts();
     setShowSuccessAlert(false);
   };
-
-  useEffect(() => {
-    if (accounts.length > 0) {
-      const allAccountKeys = new Set(
-        accounts.map((account) => account.pubkey.toString())
-      );
-      setSelectedAccounts(allAccountKeys);
-      setSelectAll(true); // Reset selectAll when accounts change
-    }
-  }, [accounts, setSelectedAccounts]);
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -417,7 +407,8 @@ export const BurnAndCloseAccountsManager = () => {
               style={{ color: colors.text.secondary }}
             >
               This will burn all tokens in selected accounts and close them,
-              refunding your locked SOL back to your wallet
+              refunding your locked SOL back to your wallet. Large batches may
+              require multiple transactions.
             </XTypography>
 
             {transactionHashes.length > 0 && (

@@ -427,7 +427,8 @@ export const CloseMintAccountsManager = () => {
               style={{ color: colors.text.secondary }}
             >
               This will close selected mint accounts and refund your locked SOL
-              back to your wallet.
+              back to your wallet. Large batches may require multiple
+              transactions.
             </XTypography>
 
             {transactionHashes.length > 0 && (

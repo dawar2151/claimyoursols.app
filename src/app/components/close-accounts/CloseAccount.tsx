@@ -388,7 +388,7 @@ export const AccountsManager = () => {
               style={{ color: colors.text.secondary }}
             >
               This will close selected accounts and refund your locked SOL back
-              to your wallet
+              to your wallet. Large batches may require multiple transactions.
             </XTypography>
             {transactionHashes.length > 0 && (
               <div
