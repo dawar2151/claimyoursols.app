@@ -1,17 +1,24 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { colors } from "../utils/colors";
+import { getSolscanURL } from "../utils";
+import { useContext } from "react";
+import { ClaimYourSolsStateContext } from "../providers";
 
 export const SuccessAlert = ({
   isVisible,
   onClose,
   recoveredAmount,
   accountCount,
+  transactionHashes = [],
 }: {
   isVisible: boolean;
   onClose: () => void;
   recoveredAmount: number;
   accountCount: number;
+  transactionHashes?: string[];
 }) => {
+  const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
+
   return (
     <AnimatePresence>
       {isVisible && (
@@ -35,7 +42,7 @@ export const SuccessAlert = ({
             onClick={onClose} // Click outside to close
           >
             <div
-              className="p-8 rounded-2xl shadow-2xl border max-w-md w-full relative"
+              className="p-8 rounded-2xl shadow-2xl border max-w-lg w-full relative max-h-[90vh] overflow-y-auto"
               style={{
                 backgroundColor: colors.background.white,
                 borderColor: `${colors.success || colors.primary}40`,
@@ -102,10 +109,65 @@ export const SuccessAlert = ({
                   className="text-sm mb-6"
                   style={{ color: colors.text.secondary }}
                 >
-                  The SOL has been transferred back to your wallet, check below
-                  the proofs. Please allow a few moments for the transaction to
-                  reflect in your wallet (about 1 min), and refresh account.
+                  The SOL has been transferred back to your wallet. Please allow
+                  a few moments for the transaction to reflect in your wallet
+                  (about 1 min), and refresh account.
                 </p>
+
+                {/* Transaction Hashes */}
+                {transactionHashes.length > 0 && (
+                  <div
+                    className="mt-4 mb-6 p-4 border rounded-lg text-left"
+                    style={{
+                      backgroundColor: `${
+                        colors.background.light || colors.border
+                      }/10`,
+                      borderColor: `${colors.border}/30`,
+                    }}
+                  >
+                    <div className="mb-3">
+                      <h4
+                        className="text-sm font-semibold"
+                        style={{ color: colors.text.primary }}
+                      >
+                        Transaction Proofs ({transactionHashes.length})
+                      </h4>
+                    </div>
+                    <div className="max-h-32 overflow-y-auto">
+                      <ul className="space-y-2">
+                        {transactionHashes.map((hash, index) => (
+                          <li key={index}>
+                            <a
+                              href={getSolscanURL(
+                                claimYourSolsState.network,
+                                hash,
+                                "tx"
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-xs break-all transition-colors hover:underline"
+                              style={{ color: colors.secondary }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = colors.primary;
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = colors.secondary;
+                              }}
+                            >
+                              {hash.slice(0, 8)}...{hash.slice(-8)}
+                              <span
+                                className="ml-2 text-xs"
+                                style={{ color: colors.text.secondary }}
+                              >
+                                [View on Solscan]
+                              </span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
 
                 {/* Close Button */}
                 <button
@@ -122,7 +184,7 @@ export const SuccessAlert = ({
                     e.currentTarget.style.backgroundColor = colors.primary;
                   }}
                 >
-                  Continue
+                  Close
                 </button>
               </div>
 
@@ -132,7 +194,9 @@ export const SuccessAlert = ({
                 className="absolute top-4 right-4 p-1 rounded-full transition-colors"
                 style={{ color: colors.text.secondary }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = `${colors.border}30`;
+                  e.currentTarget.style.backgroundColor = `${
+                    colors.border || colors.text.secondary
+                  }30`;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = "transparent";

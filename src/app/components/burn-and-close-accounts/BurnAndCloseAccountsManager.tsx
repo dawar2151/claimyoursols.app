@@ -170,6 +170,7 @@ export const BurnAndCloseAccountsManager = () => {
           onClose={handleCloseSuccessAlert}
           recoveredAmount={lastSuccessData.recoveredAmount}
           accountCount={lastSuccessData.accountCount}
+          transactionHashes={transactionHashes}
         />
       )}
 
@@ -419,7 +420,7 @@ export const BurnAndCloseAccountsManager = () => {
               refunding your locked SOL back to your wallet
             </XTypography>
 
-            {isSuccess && transactionHashes.length > 0 && (
+            {transactionHashes.length > 0 && (
               <div
                 className="mt-4 p-4 border rounded-lg"
                 style={{

@@ -168,6 +168,7 @@ export const AccountsManager = () => {
           onClose={() => handleCloseSuccessAlert()}
           recoveredAmount={lastSuccessData.recoveredAmount}
           accountCount={lastSuccessData.accountCount}
+          transactionHashes={transactionHashes}
         />
       )}
       <div
@@ -389,7 +390,7 @@ export const AccountsManager = () => {
               This will close selected accounts and refund your locked SOL back
               to your wallet
             </XTypography>
-            {isSuccess && transactionHashes.length > 0 && (
+            {transactionHashes.length > 0 && (
               <div
                 className="mt-4 p-4 border rounded-lg"
                 style={{
