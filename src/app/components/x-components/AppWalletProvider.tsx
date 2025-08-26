@@ -41,14 +41,11 @@ export default function AppWalletProvider({ children }: { children: React.ReactN
             new PhantomWalletAdapter(),
             new SolflareWalletAdapter(),
             new LedgerWalletAdapter(),
-            new SolongWalletAdapter({ network: claimYourSolsState.network }),
             new CoinbaseWalletAdapter(),
             new AlphaWalletAdapter(),
             new TorusWalletAdapter(),
-            new BitgetWalletAdapter(),
             new CloverWalletAdapter(),
             new MathWalletAdapter(),
-            new TokenPocketWalletAdapter(),
             new WalletConnectWalletAdapter({
                 network:
                     claimYourSolsState.network === "devnet"
@@ -56,7 +53,7 @@ export default function AppWalletProvider({ children }: { children: React.ReactN
                         : WalletAdapterNetwork.Mainnet,
                 options: {
                     relayUrl: 'wss://relay.walletconnect.com', // WalletConnect v1 relay URL
-                    projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || 'ccfd553984d17c8eb13ac9d69badf968'// WalletConnect v2 project ID (if applicable)
+                    projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID || ''// WalletConnect v2 project ID (if applicable)
                 },
             }),
         ],
@@ -65,7 +62,28 @@ export default function AppWalletProvider({ children }: { children: React.ReactN
 
     return (
         <ConnectionProvider endpoint={endpoint}>
-            <WalletProvider wallets={wallets} autoConnect>
+            <WalletProvider wallets={wallets} autoConnect onError={async (error, adapter) => {
+                console.error("Wallet error:", error);
+
+                // Handle specific wallet errors
+                if (error.name === "WalletNotReadyError") {
+                    console.warn("Wallet not ready. Prompting user to install the wallet.");
+
+                    const userResponse = alert(
+                        `This wallet is not installed. Please install it first.`
+                    );
+                }
+
+                // Reset the wallet adapter state
+                if (adapter) {
+                    try {
+                        await adapter.disconnect(); // Disconnect the wallet to reset its state
+                        console.log("Wallet state reset successfully.");
+                    } catch (disconnectError) {
+                        console.error("Failed to reset wallet adapter state:", disconnectError);
+                    }
+                }
+            }}>
                 <WalletModalProvider>{children}</WalletModalProvider>
             </WalletProvider>
         </ConnectionProvider>
