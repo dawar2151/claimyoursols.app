@@ -303,13 +303,32 @@ export const CloseMintAccountsManager = () => {
                   />
 
                   <div className="flex-1">
-                    <XTypography
-                      variant="body"
-                      className="font-mono text-sm truncate"
-                      style={{ color: colors.text.primary }}
-                    >
-                      {account.pubkey.toString()}
-                    </XTypography>
+                    <>
+                      {/* Truncated version for mobile */}
+                      <XTypography
+                        variant="body"
+                        className="font-mono text-sm truncate sm:hidden"
+                        style={{
+                          color: colors.text.primary,
+                          maxWidth: "100%",
+                        }}
+                        title={account.pubkey.toString()} // Tooltip to show the full public key
+                      >
+                        {account.pubkey.toString().slice(0, 4)}...{account.pubkey.toString().slice(-4)}
+                      </XTypography>
+
+                      {/* Full version for larger screens */}
+                      <XTypography
+                        variant="body"
+                        className="font-mono text-sm hidden sm:block"
+                        style={{
+                          color: colors.text.primary,
+                          maxWidth: "100%",
+                        }}
+                      >
+                        {account.pubkey.toString()}
+                      </XTypography>
+                    </>
                     <XTypography
                       variant="body"
                       className="text-xs mt-1"

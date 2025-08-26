@@ -13,7 +13,7 @@ const ReferralMessage: React.FC<ReferralMessageProps> = () => {
     };
 
     return (
-        <p className={`text-center text-sm md:text-base mt-8 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 opacity-90 animate-pulse`}>
+        <p className={`text-center text-sm md:text-base mt-8 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 opacity-90 animate-pulse px-8`}>
             Share your unique referral link with friends and earn a massive 50% more SOL on every referral!{' '}
             <a
                 href="#bottom"
