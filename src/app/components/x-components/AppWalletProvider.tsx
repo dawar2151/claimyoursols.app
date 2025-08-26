@@ -17,14 +17,11 @@ import {
     SolflareWalletAdapter,
     AlphaWalletAdapter,
     LedgerWalletAdapter,
-    SolongWalletAdapter,
     CoinbaseWalletAdapter,
     TorusWalletAdapter,
     CloverWalletAdapter,
     MathWalletAdapter,
-    TokenPocketWalletAdapter,
     WalletConnectWalletAdapter,
-    BitgetWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 
 export default function AppWalletProvider({ children }: { children: React.ReactNode }) {
