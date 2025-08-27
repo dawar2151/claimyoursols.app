@@ -32,7 +32,7 @@ export async function validateTokenPrice(
 
       // If we can't determine the price, ask the user if they want to continue
       const shouldContinue = confirm(
-        `Unable to verify token price. Please confirm its price is lower than $${maxValue}?`
+        `Please confirm its price is lower than $${maxValue}?`
       );
 
       if (!shouldContinue) {
