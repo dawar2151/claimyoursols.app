@@ -18,15 +18,21 @@ import {
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
 import { isValidTokenAccountForBurnAndClose } from "@/app/utils/spl-utils";
+import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
 
 interface AccountData {
   pubkey: PublicKey;
   account: AccountInfo<ParsedAccountData>;
   lamports: number;
   uiAmount: number | null;
+  mint: PublicKey;
   decimals: number;
   amount: string;
   rentExemptReserve: number;
+  tokenName?: string;
+  tokenSymbol?: string;
+  tokenUri?: string;
+  metadata?: TokenMetadata;
 }
 
 const BATCH_SIZE = 10;
@@ -144,7 +150,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         fetchTokenAccounts(connection, publicKey, TOKEN_2022_PROGRAM_ID),
       ]);
 
-      const closeableAccounts = [
+      let closeableAccounts = [
         ...splTokenAccounts.value,
         ...token2022Accounts.value,
       ]
@@ -156,12 +162,39 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           account: account.account,
           uiAmount: account.account.data.parsed.info.tokenAmount.uiAmount,
           decimals: account.account.data.parsed.info.tokenAmount.decimals,
+          mint: account.account.data.parsed.info.mint,
           amount: account.account.data.parsed.info.tokenAmount.amount,
           lamports: account.account.lamports,
           rentExemptReserve,
         }));
+      const updatedAccounts: AccountData[] = [];
+      try {
+        for (const account of closeableAccounts) {
+          try {
+            const metadata = await fetchTokenMetadata(
+              connection,
+              account.account.data.parsed.info.mint
+            );
 
-      setAccounts(closeableAccounts);
+            updatedAccounts.push({
+              ...account,
+              metadata,
+              tokenName: metadata.name,
+              tokenSymbol: metadata.symbol,
+              tokenUri: metadata.uri,
+            });
+          } catch (metadataError) {
+            console.error(
+              `Error fetching metadata for ${account.mint}:`,
+              metadataError
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching token metadata:", err);
+      }
+
+      setAccounts(updatedAccounts);
     } catch (err) {
       console.error("Error fetching accounts:", err);
     } finally {
@@ -208,7 +241,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             continue;
           }
 
-          const rawAmount = account.account.data.parsed?.info?.tokenAmount?.amount; // Raw lamports
+          const rawAmount =
+            account.account.data.parsed?.info?.tokenAmount?.amount; // Raw lamports
           if (rawAmount === undefined) {
             console.error(
               `Token amount not found for account: ${account.pubkey.toString()}`
@@ -219,7 +253,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           // Use raw amount for burning
           const burnAmount = rawAmount ? BigInt(rawAmount) : BigInt(0);
 
-          console.log(`Burn Amount: ${burnAmount.toString()} lamports`);;
+          console.log(`Burn Amount: ${burnAmount.toString()} lamports`);
           if (isNaN(rawAmount) || rawAmount <= 0) {
             console.error(
               `Invalid or zero token amount for account: ${account.pubkey.toString()}`
@@ -295,7 +329,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${
+              Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
