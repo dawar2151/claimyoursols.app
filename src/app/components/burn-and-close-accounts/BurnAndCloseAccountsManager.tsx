@@ -10,6 +10,11 @@ import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 import { SuccessAlert } from "../SuccessAlert";
 import { calculateCommission } from "@/app/utils/utils";
+import {
+  AccountDetails,
+  TokenAccountCard,
+} from "../x-components/TokenAccountCard";
+import { validateTokenPrice } from "@/app/utils/TokenPriceValidator";
 
 export const BurnAndCloseAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
@@ -40,8 +45,6 @@ export const BurnAndCloseAccountsManager = () => {
 
   const searchParams = useSearchParams();
   const refAccount = searchParams.get("ref");
-
-  const [selectAll, setSelectAll] = useState(false);
 
   // Move calculations outside of useEffect to avoid stale closures
   const totalRent = Array.from(selectedAccounts).reduce((sum, accountKey) => {
@@ -83,28 +86,19 @@ export const BurnAndCloseAccountsManager = () => {
     setShowSuccessAlert(false);
   };
 
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedAccounts(new Set());
-      setSelectAll(false);
-    } else {
-      const allAccountKeys = new Set(
-        accounts.map((account) => account.pubkey.toString())
-      );
-      setSelectedAccounts(allAccountKeys);
-      setSelectAll(true);
-    }
-  };
-
-  const handleAccountSelection = (accountKey: string) => {
+  const handleAccountSelection = async (account: AccountDetails) => {
     const newSelected = new Set(selectedAccounts);
-    if (newSelected.has(accountKey)) {
-      newSelected.delete(accountKey);
+    if (newSelected.has(account.pubkey.toString())) {
+      newSelected.delete(account.pubkey.toString());
     } else {
-      newSelected.add(accountKey);
+      const validation = await validateTokenPrice(account);
+      if (!validation.isValid) {
+        alert(validation.errorMessage);
+        return;
+      }
+      newSelected.add(account.pubkey.toString());
     }
     setSelectedAccounts(newSelected);
-    setSelectAll(newSelected.size === accounts.length);
   };
 
   if (isLoading) {
@@ -153,7 +147,6 @@ export const BurnAndCloseAccountsManager = () => {
 
   return (
     <>
-      {/* Success Alert */}
       {showSuccessAlert && lastSuccessData && (
         <SuccessAlert
           isVisible={showSuccessAlert}
@@ -175,65 +168,6 @@ export const BurnAndCloseAccountsManager = () => {
             borderColor: `${colors.border}/50`,
           }}
         >
-          <div
-            className="flex items-center justify-between mb-4 p-4 border rounded-lg"
-            style={{
-              backgroundColor: `${colors.background.light}/20`,
-              borderColor: `${colors.border}/50`,
-            }}
-          >
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                className="w-4 h-4 bg-white rounded"
-                style={{
-                  color: colors.secondary,
-                  borderColor: colors.primary,
-                }}
-              />
-              <label
-                className="ml-2 text-sm font-medium"
-                style={{ color: colors.text.primary }}
-              >
-                Select All Accounts ({selectedAccounts.size} selected)
-              </label>
-            </div>
-            <button
-              onClick={refreshAccounts}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all border"
-              style={{
-                borderColor: colors.primary,
-                color: colors.primary,
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = colors.primary;
-                e.currentTarget.style.color = colors.background.white;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-                e.currentTarget.style.color = colors.primary;
-              }}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 4v6h6M20 20v-6h-6M4 14a8 8 0 0113.66-5.66M20 10a8 8 0 01-13.66 5.66"
-                />
-              </svg>
-              Refresh
-            </button>
-          </div>
-
           {accounts.length === 0 ? (
             <div className="text-center py-12 flex flex-col justify-center items-center">
               <div className="text-6xl mb-4">🎉</div>
@@ -255,99 +189,78 @@ export const BurnAndCloseAccountsManager = () => {
               </XTypography>
             </div>
           ) : (
-            <div className="space-y-4">
-              {accounts.map((account, _) => (
-                <div
-                  key={account.pubkey.toString()}
-                  className="flex items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+            <>
+              {/* Account Selection Info */}
+              <div
+                className="flex items-center justify-between mb-4 p-4 border rounded-lg"
+                style={{
+                  backgroundColor: `${colors.background.light}/20`,
+                  borderColor: `${colors.border}/50`,
+                }}
+              >
+                <div className="flex items-center gap-4">
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Select accounts to burn tokens and recover locked SOL
+                  </XTypography>
+                </div>
+                <button
+                  onClick={refreshAccounts}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all border"
                   style={{
-                    backgroundColor: `${colors.background.light}/10`,
-                    borderColor: `${colors.border}/50`,
+                    borderColor: colors.primary,
+                    color: colors.primary,
+                    backgroundColor: colors.background.white,
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.background.hover}/10`;
+                    e.currentTarget.style.backgroundColor = colors.primary;
+                    e.currentTarget.style.color = colors.background.white;
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.background.light}/10`;
+                    e.currentTarget.style.backgroundColor =
+                      colors.background.white;
+                    e.currentTarget.style.color = colors.primary;
                   }}
                 >
-                  <input
-                    type="checkbox"
-                    checked={selectedAccounts.has(account.pubkey.toString())}
-                    onChange={() =>
-                      handleAccountSelection(account.pubkey.toString())
-                    }
-                    className="w-5 h-5 bg-white rounded border focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-4"
-                    style={{
-                      color: colors.secondary,
-                      borderColor: colors.primary,
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M4 4v6h6M20 20v-6h-6M4 14a8 8 0 0113.66-5.66M20 10a8 8 0 01-13.66 5.66"
+                    />
+                  </svg>
+                  Refresh
+                </button>
+              </div>
+
+              {/* Account Cards */}
+              <div className="space-y-4">
+                {accounts.map((account) => (
+                  <TokenAccountCard
+                    key={account.pubkey.toString()}
+                    account={{
+                      ...account,
+                      uiAmount:
+                        account.uiAmount === null
+                          ? undefined
+                          : account.uiAmount,
                     }}
+                    isSelected={selectedAccounts.has(account.pubkey.toString())}
+                    onSelect={handleAccountSelection}
                   />
-
-                  <div className="flex-1">
-                    <>
-                      {/* Truncated version for mobile */}
-                      <XTypography
-                        variant="body"
-                        className="font-mono text-sm truncate sm:hidden"
-                        style={{
-                          color: colors.text.primary,
-                          maxWidth: "100%",
-                        }}
-                        title={account.pubkey.toString()} // Tooltip to show the full public key
-                      >
-                        {account.pubkey.toString().slice(0, 4)}...{account.pubkey.toString().slice(-4)}
-                      </XTypography>
-
-                      {/* Full version for larger screens */}
-                      <XTypography
-                        variant="body"
-                        className="font-mono text-sm hidden sm:block"
-                        style={{
-                          color: colors.text.primary,
-                          maxWidth: "100%",
-                        }}
-                      >
-                        {account.pubkey.toString()}
-                      </XTypography>
-                    </>
-                    <XTypography
-                      variant="body"
-                      className="text-xs mt-1"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      <span className="font-semibold">Balance:</span>{" "}
-                      {(account.lamports / 1e9).toFixed(4)} SOL
-                    </XTypography>
-                    <XTypography
-                      variant="body"
-                      className="text-xs mt-1"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      <span className="font-semibold">Tokens to Burn:</span>{" "}
-                      {account?.uiAmount?.toString() || "0"}
-                    </XTypography>
-                  </div>
-
-                  <div className="text-right">
-                    <XTypography
-                      variant="body"
-                      className="text-xs font-semibold"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      Rent Recovery:
-                    </XTypography>
-                    <XTypography
-                      variant="body"
-                      className="text-xs"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      {(account.rentExemptReserve / 1e9).toFixed(4)} SOL
-                    </XTypography>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           )}
 
           {/* Enhanced Total Calculation */}
@@ -374,6 +287,38 @@ export const BurnAndCloseAccountsManager = () => {
                     style={{ color: colors.secondary }}
                   >
                     {(totalRent / 1e9).toFixed(4)} SOL
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Selected Accounts
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.primary }}
+                  >
+                    {selectedAccounts.size}
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Total Accounts
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    {accounts.length}
                   </XTypography>
                 </div>
               </div>

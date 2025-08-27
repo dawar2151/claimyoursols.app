@@ -9,6 +9,10 @@ import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 import { SuccessAlert } from "../SuccessAlert";
+import {
+  AccountDetails,
+  TokenAccountCard,
+} from "../x-components/TokenAccountCard";
 
 export const AccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
@@ -103,12 +107,12 @@ export const AccountsManager = () => {
   };
 
   // Handle individual account selection
-  const handleAccountSelection = (accountKey: string) => {
+  const handleAccountSelection = (account: AccountDetails) => {
     const newSelected = new Set(selectedAccounts);
-    if (newSelected.has(accountKey)) {
-      newSelected.delete(accountKey);
+    if (newSelected.has(account.pubkey.toString())) {
+      newSelected.delete(account.pubkey.toString());
     } else {
-      newSelected.add(accountKey);
+      newSelected.add(account.pubkey.toString());
     }
     setSelectedAccounts(newSelected);
     setSelectAll(newSelected.size === accounts.length);
@@ -265,78 +269,20 @@ export const AccountsManager = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {accounts.map((account, _) => (
-                <div
+              {accounts.map((account) => (
+                <TokenAccountCard
                   key={account.pubkey.toString()}
-                  className="flex items-center p-4 border rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: `${colors.background.light}/10`,
-                    borderColor: `${colors.border}/50`,
+                  account={{
+                    pubkey: account.pubkey,
+                    mint: account.pubkey, // For close accounts, we use pubkey as mint since these are system accounts
+                    tokenName: `Empty Account`,
+                    tokenSymbol: "",
+                    uiAmount: account.lamports / 1e9, // Show SOL balance as "token" amount
+                    rentExemptReserve: account.rentExemptReserve,
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.background.hover}/10`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.background.light}/10`;
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedAccounts.has(account.pubkey.toString())}
-                    onChange={() =>
-                      handleAccountSelection(account.pubkey.toString())
-                    }
-                    className="w-4 h-4 bg-white rounded mr-4"
-                    style={{
-                      color: colors.secondary,
-                      borderColor: colors.primary,
-                    }}
-                  />
-                  <div className="flex-1">
-                    <>
-                      {/* Truncated version for mobile */}
-                      <XTypography
-                        variant="body"
-                        className="font-mono text-sm truncate sm:hidden"
-                        style={{
-                          color: colors.text.primary,
-                          maxWidth: "100%",
-                        }}
-                        title={account.pubkey.toString()} // Tooltip to show the full public key
-                      >
-                        {account.pubkey.toString().slice(0, 4)}...{account.pubkey.toString().slice(-4)}
-                      </XTypography>
-
-                      {/* Full version for larger screens */}
-                      <XTypography
-                        variant="body"
-                        className="font-mono text-sm hidden sm:block"
-                        style={{
-                          color: colors.text.primary,
-                          maxWidth: "100%",
-                        }}
-                      >
-                        {account.pubkey.toString()}
-                      </XTypography>
-                    </>
-                    <XTypography
-                      variant="body"
-                      className="text-xs"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      Balance: {account.lamports / 1e9} SOL
-                    </XTypography>
-                  </div>
-                  <div className="text-right">
-                    <XTypography
-                      variant="body"
-                      className="text-xs"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      Rent: {account.rentExemptReserve / 1e9} SOL
-                    </XTypography>
-                  </div>
-                </div>
+                  isSelected={selectedAccounts.has(account.pubkey.toString())}
+                  onSelect={handleAccountSelection}
+                />
               ))}
             </div>
           )}
@@ -367,11 +313,41 @@ export const AccountsManager = () => {
                     {(totalRent / 1e9).toFixed(4)} SOL
                   </XTypography>
                 </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Selected Accounts
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.primary }}
+                  >
+                    {selectedAccounts.size}
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Total Accounts
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    {accounts.length}
+                  </XTypography>
+                </div>
               </div>
             </div>
           )}
-
-          {/* Fee Recipient Info */}
 
           <div
             className="mt-8 pt-6 border-t"

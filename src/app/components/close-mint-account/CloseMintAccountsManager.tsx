@@ -9,6 +9,10 @@ import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 import { SuccessAlert } from "../SuccessAlert";
+import {
+  AccountDetails,
+  TokenAccountCard,
+} from "../x-components/TokenAccountCard";
 
 export const CloseMintAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
@@ -103,12 +107,12 @@ export const CloseMintAccountsManager = () => {
     }
   };
 
-  const handleAccountSelection = (accountKey: string) => {
+  const handleAccountSelection = (account: AccountDetails) => {
     const newSelected = new Set(selectedMintAccounts);
-    if (newSelected.has(accountKey)) {
-      newSelected.delete(accountKey);
+    if (newSelected.has(account.pubkey.toString())) {
+      newSelected.delete(account.pubkey.toString());
     } else {
-      newSelected.add(accountKey);
+      newSelected.add(account.pubkey.toString());
     }
     setSelectedMintAccounts(newSelected);
     setSelectAll(newSelected.size === mintAccounts.length);
@@ -176,7 +180,7 @@ export const CloseMintAccountsManager = () => {
         style={{ backgroundColor: colors.background.white }}
       >
         <label
-          className="ml-2 text-sm font-medium"
+          className="ml-2 text-sm font-medium mb-4 block"
           style={{
             color: colors.text.primary,
           }}
@@ -273,99 +277,23 @@ export const CloseMintAccountsManager = () => {
           ) : (
             <div className="space-y-4">
               {mintAccounts.map((account) => (
-                <div
+                <TokenAccountCard
                   key={account.pubkey.toString()}
-                  className="flex items-center p-4 border rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
-                  style={{
-                    backgroundColor: `${colors.background.light}/10`,
-                    borderColor: `${colors.border}/50`,
+                  account={{
+                    pubkey: account.pubkey,
+                    mint: account.pubkey, // Use pubkey as mint for mint accounts
+                    tokenName: `Mint Account`,
+                    tokenSymbol: "MINT",
+                    uiAmount: account.ataBalance
+                      ? parseFloat(account.ataBalance)
+                      : 0, // Total supply as "token" amount
+                    rentExemptReserve: account.rentExemptReserve,
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.background.hover}/10`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = `${colors.background.light}/10`;
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedMintAccounts.has(
-                      account.pubkey.toString()
-                    )}
-                    onChange={() =>
-                      handleAccountSelection(account.pubkey.toString())
-                    }
-                    className="w-5 h-5 bg-white rounded border focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-4"
-                    style={{
-                      color: colors.secondary,
-                      borderColor: colors.primary,
-                    }}
-                  />
-
-                  <div className="flex-1">
-                    <>
-                      {/* Truncated version for mobile */}
-                      <XTypography
-                        variant="body"
-                        className="font-mono text-sm truncate sm:hidden"
-                        style={{
-                          color: colors.text.primary,
-                          maxWidth: "100%",
-                        }}
-                        title={account.pubkey.toString()} // Tooltip to show the full public key
-                      >
-                        {account.pubkey.toString().slice(0, 4)}...{account.pubkey.toString().slice(-4)}
-                      </XTypography>
-
-                      {/* Full version for larger screens */}
-                      <XTypography
-                        variant="body"
-                        className="font-mono text-sm hidden sm:block"
-                        style={{
-                          color: colors.text.primary,
-                          maxWidth: "100%",
-                        }}
-                      >
-                        {account.pubkey.toString()}
-                      </XTypography>
-                    </>
-                    <XTypography
-                      variant="body"
-                      className="text-xs mt-1"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      <span className="font-semibold">Balance:</span>{" "}
-                      {(account.lamports / 1e9).toFixed(4)} SOL
-                    </XTypography>
-                    {account.supply && (
-                      <XTypography
-                        variant="body"
-                        className="text-xs mt-1"
-                        style={{ color: colors.text.secondary }}
-                      >
-                        <span className="font-semibold">Total Supply:</span>{" "}
-                        {account.ataBalance}
-                      </XTypography>
-                    )}
-                  </div>
-
-                  <div className="text-right">
-                    <XTypography
-                      variant="body"
-                      className="text-xs font-semibold"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      Rent:
-                    </XTypography>
-                    <XTypography
-                      variant="body"
-                      className="text-xs"
-                      style={{ color: colors.text.secondary }}
-                    >
-                      {(account.rentExemptReserve / 1e9).toFixed(4)} SOL
-                    </XTypography>
-                  </div>
-                </div>
+                  isSelected={selectedMintAccounts.has(
+                    account.pubkey.toString()
+                  )}
+                  onSelect={handleAccountSelection}
+                />
               ))}
             </div>
           )}
@@ -386,7 +314,7 @@ export const CloseMintAccountsManager = () => {
                     className="text-sm"
                     style={{ color: colors.text.secondary }}
                   >
-                    Total SOL to Claim ({selectedMintAccounts.size} selected)
+                    Total SOL to Claim
                   </XTypography>
                   <XTypography
                     variant="h4"
@@ -394,6 +322,38 @@ export const CloseMintAccountsManager = () => {
                     style={{ color: colors.secondary }}
                   >
                     {(totalRent / 1e9).toFixed(6)} SOL
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Selected Accounts
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.primary }}
+                  >
+                    {selectedMintAccounts.size}
+                  </XTypography>
+                </div>
+                <div>
+                  <XTypography
+                    variant="body"
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Total Accounts
+                  </XTypography>
+                  <XTypography
+                    variant="h4"
+                    className="font-bold"
+                    style={{ color: colors.text.primary }}
+                  >
+                    {mintAccounts.length}
                   </XTypography>
                 </div>
               </div>
