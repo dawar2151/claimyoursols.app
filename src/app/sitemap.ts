@@ -5,28 +5,40 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date().toISOString();
   return [
     {
+      url: `${baseUrl}/`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/burn-and-close-accounts`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/close-mint-accounts`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
       url: `${baseUrl}/support`,
       lastModified: now,
       changeFrequency: "monthly",
-      priority: 0.5,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/terms`,
       lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
+      changeFrequency: "yearly",
+      priority: 0.4,
     },
     {
       url: `${baseUrl}/privacy`,
       lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
+      changeFrequency: "yearly",
+      priority: 0.4,
     },
   ];
 }
