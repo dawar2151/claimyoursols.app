@@ -1,7 +1,7 @@
 {
-    "name": "ClaimYourSols - Token Bulk Sender for Solana",
+    "name": "ClaimYourSols - Recover SOL from Token Accounts",
     "short_name": "ClaimYourSols",
-    "description": "Token Bulk Sender for Solana. Send SOL, SPL tokens, and NFTs to multiple addresses instantly.",
+    "description": "Close unused SPL token accounts and reclaim your SOL rent fees safely and securely. Recover locked SOL from inactive token accounts on Solana blockchain.",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
@@ -17,60 +17,31 @@
     ],
     "icons": [
         {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "src": "/android-chrome-192x192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "src": "/android-chrome-512x512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "72x72",
-            "type": "image/png"
-        },
-        {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
+            "src": "/favicon-96x96.png",
             "sizes": "96x96",
             "type": "image/png"
         },
         {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "128x128",
+            "src": "/web-app-manifest-192x192.png",
+            "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "144x144",
+            "src": "/web-app-manifest-512x512.png",
+            "sizes": "512x512",
             "type": "image/png"
-        },
-        {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "152x152",
-            "type": "image/png"
-        },
-        {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "384x384",
-            "type": "image/png"
-        }
-    ],
-    "screenshots": [
-        {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "1280x720",
-            "type": "image/png",
-            "form_factor": "wide"
-        },
-        {
-            "src": "/bulk-sender-high-resolution-logo-black-transparent.png",
-            "sizes": "750x1334",
-            "type": "image/png",
-            "form_factor": "narrow"
         }
     ]
 }
