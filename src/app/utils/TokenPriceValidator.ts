@@ -12,15 +12,23 @@ interface PriceValidationResult {
   errorMessage?: string;
 }
 
+type ConfirmFunction = (_options: {
+  title: string;
+  message: string;
+  severity?: "warning" | "error" | "info";
+}) => Promise<boolean>;
+
 /**
  * Validates if a token's total value is under $10 USD
  * @param account - The token account to validate
  * @param maxValue - Maximum allowed USD value (default: 10)
+ * @param confirmFn - Function to show confirmation dialog (defaults to browser confirm)
  * @returns Promise<PriceValidationResult>
  */
 export async function validateTokenPrice(
   account: TokenAccount,
-  maxValue: number = 10
+  maxValue: number = 10,
+  confirmFn?: ConfirmFunction
 ): Promise<PriceValidationResult> {
   try {
     const mintAddress = account.mint.toString();
@@ -31,9 +39,15 @@ export async function validateTokenPrice(
       console.log(`No price data found for token: ${mintAddress}`);
 
       // If we can't determine the price, ask the user if they want to continue
-      const shouldContinue = confirm(
-        `Please confirm its price is lower than $${maxValue}?`
-      );
+      const shouldContinue = confirmFn
+        ? await confirmFn({
+            title: "Unknown Token Price",
+            message: `We couldn't determine the price for this token. Please confirm your token balance value is lower than $${maxValue}.`,
+            severity: "warning",
+          })
+        : confirm(
+            `Please confirm your token balance value is lower than $${maxValue}?`
+          );
 
       if (!shouldContinue) {
         return {
@@ -84,9 +98,15 @@ export async function validateTokenPrice(
     console.error("Error validating token price:", error);
 
     // On API error, ask user to confirm
-    const shouldContinue = confirm(
-      `Error checking token price. Please confirm the token value is lower than $${maxValue}?`
-    );
+    const shouldContinue = confirmFn
+      ? await confirmFn({
+          title: "Price Check Error",
+          message: `There was an error checking the token price. Please confirm your token balance value is lower than $${maxValue}.`,
+          severity: "error",
+        })
+      : confirm(
+          `Error checking token price. Please confirm your token balance value is lower than $${maxValue}?`
+        );
 
     return {
       isValid: shouldContinue,
@@ -101,11 +121,13 @@ export async function validateTokenPrice(
  * Validates multiple tokens at once
  * @param accounts - Array of token accounts to validate
  * @param maxValue - Maximum allowed USD value per token (default: 10)
+ * @param confirmFn - Function to show confirmation dialog (defaults to browser confirm)
  * @returns Promise<{ validAccounts: TokenAccount[], invalidAccounts: Array<{ account: TokenAccount, reason: string }> }>
  */
 export async function validateMultipleTokenPrices(
   accounts: TokenAccount[],
-  maxValue: number = 10
+  maxValue: number = 10,
+  confirmFn?: ConfirmFunction
 ): Promise<{
   validAccounts: TokenAccount[];
   invalidAccounts: Array<{ account: TokenAccount; reason: string }>;
@@ -114,7 +136,7 @@ export async function validateMultipleTokenPrices(
   const invalidAccounts: Array<{ account: TokenAccount; reason: string }> = [];
 
   for (const account of accounts) {
-    const validation = await validateTokenPrice(account, maxValue);
+    const validation = await validateTokenPrice(account, maxValue, confirmFn);
 
     if (validation.isValid) {
       validAccounts.push(account);

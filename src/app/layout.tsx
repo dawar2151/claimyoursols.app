@@ -14,7 +14,7 @@ import SolanaTools from "./components/claimyoursol/SolanaTools";
 import Referral from "./components/claimyoursol/Referal";
 import GitHubButton from "./components/claimyoursol/GithubButton";
 import AnimatedPage from "./utils/AnimatedPage";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import WalletSection from "./components/wallet/WalletSection";
 import FAQSection from "./components/claimyoursol/FAQSection";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -243,9 +243,7 @@ export default function RootLayout({
                     </div>
 
                     {/* Wallet Button */}
-                    <div className="flex justify-center items-center my-8">
-                      <WalletMultiButton style={{ justifyContent: "center" }} />
-                    </div>
+                    <WalletSection />
 
                     {/* Use Cases Cards */}
                     <section className="py-8">
@@ -271,9 +269,9 @@ export default function RootLayout({
                             Close Empty Token Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close token accounts with zero balance and recover the rent
-                            deposit (0.00204 SOL per account). Safe and simple - only affects
-                            empty accounts.
+                            Close token accounts with zero balance and recover
+                            the rent deposit (0.00204 SOL per account). Safe and
+                            simple - only affects empty accounts.
                           </p>
                         </div>
 
@@ -298,9 +296,9 @@ export default function RootLayout({
                             Burn Tokens & Close Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Burn unwanted tokens and close their accounts in one step. Perfect
-                            for removing dust tokens, scam tokens, or tokens you no longer
-                            want.
+                            Burn unwanted tokens and close their accounts in one
+                            step. Perfect for removing dust tokens, scam tokens,
+                            or tokens you no longer want.
                           </p>
                         </div>
 
@@ -325,9 +323,10 @@ export default function RootLayout({
                             Close Mint Accounts (Token2022)
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close Token2022 mint accounts you created and recover their rent
-                            deposits. Automatically burns remaining tokens if only from close
-                            authority account.
+                            Close Token2022 mint accounts you created and
+                            recover their rent deposits. Automatically burns
+                            remaining tokens if only from close authority
+                            account.
                           </p>
                         </div>
                       </div>

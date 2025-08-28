@@ -69,22 +69,22 @@ const FAQSection = () => {
         className="mb-8 text-center text-base"
         style={{ color: colors.text.secondary }}
       >
-        To keep this tool running, a small donation is included to cover
-        server, RPC, and development costs.
+        To keep this tool running, a small donation is included to cover server,
+        RPC, and development costs.
       </p>
 
       <div className="space-y-4">
         <FAQItem question="How does this work?">
           <p className="mb-4">
-            Every time you buy a token on Solana, a token account is created
-            to store it. To keep this account alive, the blockchain requires a
-            rent fee of 0.00204 SOL.
+            Every time you buy a token on Solana, a token account is created to
+            store it. To keep this account alive, the blockchain requires a rent
+            fee of 0.00204 SOL.
           </p>
           <p>
             Even after selling all your tokens, that account stays open and
-            holds your rent. We detect and close these empty accounts,
-            refunding your SOL back to your wallet. A small 10% donation from
-            the recovered SOL supports our operations.
+            holds your rent. We detect and close these empty accounts, refunding
+            your SOL back to your wallet. A small 10% donation from the
+            recovered SOL supports our operations.
           </p>
         </FAQItem>
 

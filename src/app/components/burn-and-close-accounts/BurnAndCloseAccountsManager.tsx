@@ -15,6 +15,8 @@ import {
   TokenAccountCard,
 } from "../x-components/TokenAccountCard";
 import { validateTokenPrice } from "@/app/utils/TokenPriceValidator";
+import ConfirmDialog from "../x-components/ConfirmDialog";
+import { useConfirmDialog } from "@/app/hooks/useConfirmDialog";
 
 export const BurnAndCloseAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
@@ -25,6 +27,9 @@ export const BurnAndCloseAccountsManager = () => {
     recoveredAmount: number;
     accountCount: number;
   } | null>(null);
+
+  // Confirmation dialog hook
+  const { showConfirmation, confirmationProps } = useConfirmDialog();
 
   const {
     selectedAccounts,
@@ -91,9 +96,13 @@ export const BurnAndCloseAccountsManager = () => {
     if (newSelected.has(account.pubkey.toString())) {
       newSelected.delete(account.pubkey.toString());
     } else {
-      const validation = await validateTokenPrice(account);
+      const validation = await validateTokenPrice(
+        account,
+        10,
+        showConfirmation
+      );
       if (!validation.isValid) {
-        alert(validation.errorMessage);
+        // Error is already handled by the confirmation dialog
         return;
       }
       newSelected.add(account.pubkey.toString());
@@ -441,6 +450,9 @@ export const BurnAndCloseAccountsManager = () => {
           </div>
         </div>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmDialog {...confirmationProps} />
     </>
   );
 };
