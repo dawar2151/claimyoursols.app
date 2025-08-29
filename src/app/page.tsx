@@ -35,5 +35,20 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeContent />;
+  return (
+    <>
+      {/* Hidden H1 for SEO */}
+      <h1 className="sr-only">Close Empty Token Accounts - Claim Your SOLs</h1>
+
+      {/* Hidden Meta Description for SEO */}
+      <p className="sr-only">
+        Close unused SPL token accounts with zero balance and recover rent
+        deposits (0.00204 SOL per account). Safe and simple - only affects empty
+        accounts.
+      </p>
+
+      {/* Main Content */}
+      <HomeContent />
+    </>
+  );
 }
