@@ -16,7 +16,6 @@ import {
 
 export const AccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
-  // Add state for success alert
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [lastSuccessData, setLastSuccessData] = useState<{
     recoveredAmount: number;
@@ -50,7 +49,7 @@ export const AccountsManager = () => {
   const feePercentage = parseFloat(
     process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
   );
-  const commission = Math.floor(totalRent * feePercentage); // Use Math.floor for lamports precision
+  const commission = Math.floor(totalRent * feePercentage);
   const userReceives = totalRent - commission;
   useEffect(() => {
     if (refAccount) {
@@ -60,13 +59,12 @@ export const AccountsManager = () => {
 
   useEffect(() => {
     if (isSuccess && !showSuccessAlert) {
-      const recoveredAmount = userReceives; // This is now defined
+      const recoveredAmount = userReceives;
       const accountCount = selectedAccounts.size;
 
       setLastSuccessData({ recoveredAmount, accountCount });
       setShowSuccessAlert(true);
 
-      // Auto-hide after 8 seconds
       const timer = setTimeout(() => {
         setShowSuccessAlert(false);
         cleanClosedAccounts();
@@ -74,11 +72,11 @@ export const AccountsManager = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isSuccess]); // Add userReceives to dependencies
+  }, [isSuccess, userReceives]);
 
   const [selectAll, setSelectAll] = useState(true);
+  const [isListOpen, setIsListOpen] = useState(false); // New state for list visibility
 
-  // Initialize all accounts as selected by default
   useEffect(() => {
     if (accounts.length > 0) {
       const allAccountKeys = new Set(
@@ -88,7 +86,6 @@ export const AccountsManager = () => {
     }
   }, [accounts]);
 
-  // Handle select all toggle
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedAccounts(new Set());
@@ -101,12 +98,12 @@ export const AccountsManager = () => {
       setSelectAll(true);
     }
   };
+
   const handleCloseSuccessAlert = () => {
     cleanClosedAccounts();
     setShowSuccessAlert(false);
   };
 
-  // Handle individual account selection
   const handleAccountSelection = (account: AccountDetails) => {
     const newSelected = new Set(selectedAccounts);
     if (newSelected.has(account.pubkey.toString())) {
@@ -116,6 +113,10 @@ export const AccountsManager = () => {
     }
     setSelectedAccounts(newSelected);
     setSelectAll(newSelected.size === accounts.length);
+  };
+
+  const toggleList = () => {
+    setIsListOpen(!isListOpen);
   };
 
   if (isLoading) {
@@ -164,6 +165,7 @@ export const AccountsManager = () => {
       </div>
     );
   }
+
   return (
     <>
       {showSuccessAlert && lastSuccessData && (
@@ -179,7 +181,6 @@ export const AccountsManager = () => {
         className="w-full max-w-4xl mx-auto p-6"
         style={{ backgroundColor: colors.background.white }}
       >
-        {/* Your Accounts Section */}
         <div
           className="border rounded-lg shadow-lg p-6"
           style={{
@@ -187,7 +188,7 @@ export const AccountsManager = () => {
             borderColor: `${colors.border}/50`,
           }}
         >
-          {/* Select All Checkbox */}
+          {/* Toggle Button for Account List */}
           <div
             className="flex items-center justify-between mb-4 p-4 border rounded-lg"
             style={{
@@ -195,24 +196,31 @@ export const AccountsManager = () => {
               borderColor: `${colors.border}/50`,
             }}
           >
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                className="w-4 h-4 bg-white rounded"
-                style={{
-                  color: colors.secondary,
-                  borderColor: colors.primary,
-                }}
-              />
-              <label
-                className="ml-2 text-sm font-medium"
-                style={{ color: colors.text.primary }}
+            <button
+              onClick={toggleList}
+              className="flex items-center gap-2 text-sm font-medium"
+              style={{ color: colors.text.primary }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
               >
-                Select All Accounts ({selectedAccounts.size} selected)
-              </label>
-            </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d={
+                    isListOpen
+                      ? "M5 15l7-7 7 7"
+                      : "M19 9l-7 7-7-7"
+                  }
+                />
+              </svg>
+              {isListOpen ? "Hide Accounts" : "Show Accounts"}
+            </button>
             <button
               onClick={refreshAccounts}
               className="flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all border"
@@ -247,7 +255,55 @@ export const AccountsManager = () => {
             </button>
           </div>
 
-          {accounts.length === 0 ? (
+          {/* Collapsible Account List */}
+          {isListOpen && accounts.length > 0 && (
+            <>
+              <div
+                className="flex items-center mb-4 p-4 border rounded-lg"
+                style={{
+                  backgroundColor: `${colors.background.light}/20`,
+                  borderColor: `${colors.border}/50`,
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectAll}
+                  onChange={handleSelectAll}
+                  className="w-4 h-4 bg-white rounded"
+                  style={{
+                    color: colors.secondary,
+                    borderColor: colors.primary,
+                  }}
+                />
+                <label
+                  className="ml-2 text-sm font-medium"
+                  style={{ color: colors.text.primary }}
+                >
+                  Select All Accounts ({selectedAccounts.size} selected)
+                </label>
+              </div>
+              <div className="space-y-4">
+                {accounts.map((account) => (
+                  <TokenAccountCard
+                    key={account.pubkey.toString()}
+                    account={{
+                      pubkey: account.pubkey,
+                      mint: account.pubkey,
+                      tokenName: `Empty Account`,
+                      tokenSymbol: "",
+                      uiAmount: 0,
+                      rentExemptReserve: account.rentExemptReserve,
+                    }}
+                    isSelected={selectedAccounts.has(account.pubkey.toString())}
+                    onSelect={handleAccountSelection}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Empty State */}
+          {accounts.length === 0 && (
             <div className="text-center py-12 flex flex-col justify-center items-center">
               <div className="text-6xl mb-4">🎉</div>
               <XTypography
@@ -266,24 +322,6 @@ export const AccountsManager = () => {
                   "No open accounts found. All your accounts are already closed or you don't have any accounts to close."
                 }
               </XTypography>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {accounts.map((account) => (
-                <TokenAccountCard
-                  key={account.pubkey.toString()}
-                  account={{
-                    pubkey: account.pubkey,
-                    mint: account.pubkey, // For close accounts, we use pubkey as mint since these are system accounts
-                    tokenName: `Empty Account`,
-                    tokenSymbol: "",
-                    uiAmount: 0, // Show SOL balance as "token" amount
-                    rentExemptReserve: account.rentExemptReserve,
-                  }}
-                  isSelected={selectedAccounts.has(account.pubkey.toString())}
-                  onSelect={handleAccountSelection}
-                />
-              ))}
             </div>
           )}
 
@@ -349,6 +387,7 @@ export const AccountsManager = () => {
             </div>
           )}
 
+          {/* Claim Button and Transaction Hashes */}
           <div
             className="mt-8 pt-6 border-t"
             style={{ borderColor: `${colors.border}/50` }}
@@ -375,7 +414,7 @@ export const AccountsManager = () => {
             >
               {isClosing
                 ? "Closing Accounts..."
-                : `Clean Accounts & Get SOL Back (${selectedAccounts.size})`}
+                : `Close Accounts & Claim Your SOL (${selectedAccounts.size})`}
             </XButton>
             <XTypography
               variant="body"
