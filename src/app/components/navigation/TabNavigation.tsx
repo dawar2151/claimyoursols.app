@@ -17,11 +17,10 @@ const TabNavigation: React.FC = () => {
   const TabLink = ({ label, href }: { label: string; href: string }) => (
     <Link href={href}>
       <button
-        className={`relative px-6 py-3 text-sm font-semibold transition-all duration-300 ${
-          isActive(href)
+        className={`relative px-6 py-3 text-sm font-semibold transition-all duration-300 ${isActive(href)
             ? "text-[var(--tab-active)]"
             : "text-[var(--tab-inactive)]"
-        }`}
+          }`}
         style={
           {
             "--tab-active": colors.secondary,
@@ -48,7 +47,7 @@ const TabNavigation: React.FC = () => {
         className="flex justify-center mb-6 border-b"
         style={{ borderColor: "#E5E7EB" }}
       >
-        <TabLink label="Close Accounts with zero balance" href="/" />
+        <TabLink label="Close Zero-Balance Accounts" href="/" />
         <TabLink
           label="Burn & Close Accounts"
           href="/burn-and-close-accounts"

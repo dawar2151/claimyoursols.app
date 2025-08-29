@@ -266,12 +266,10 @@ export default function RootLayout({
                             </svg>
                           </div>
                           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-                            Close Empty Token Accounts
+                            Close Zero-Balance Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close token accounts with zero balance and recover
-                            the rent deposit (0.00204 SOL per account). Safe and
-                            simple - only affects empty accounts.
+                            Close empty token accounts and reclaim the rent deposit (0.00204 SOL per account). Safe, simple, and only targets accounts with zero balance..
                           </p>
                         </div>
 
@@ -279,16 +277,17 @@ export default function RootLayout({
                         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center hover:shadow-md transition-shadow">
                           <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg
-                              className="w-6 h-6 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-5 w-5 text-current"
                               fill="none"
-                              stroke="currentColor"
                               viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={2}
                             >
                               <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M17.657 18.657A8 8 0 716.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
+                                d="M12 8c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2zm0-6C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
                               />
                             </svg>
                           </div>
@@ -296,9 +295,7 @@ export default function RootLayout({
                             Burn Tokens & Close Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Burn unwanted tokens and close their accounts in one
-                            step. Perfect for removing dust tokens, scam tokens,
-                            or tokens you no longer want.
+                            Burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want (0.00204 SOL per account)
                           </p>
                         </div>
 
@@ -323,10 +320,7 @@ export default function RootLayout({
                             Close Mint Accounts (Token2022)
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close Token2022 mint accounts you created and
-                            recover their rent deposits. Automatically burns
-                            remaining tokens if only from close authority
-                            account.
+                            Close Token2022 mint accounts you created and recover their rent deposits (0.0048 SOL per account). Automatically burns remaining tokens if only from the close authority account.
                           </p>
                         </div>
                       </div>
