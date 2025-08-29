@@ -269,7 +269,7 @@ export default function RootLayout({
                             Close Zero-Balance Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close empty token accounts and reclaim the rent deposit (0.00204 SOL per account). Safe, simple, and only targets accounts with zero balance..
+                            Close empty token accounts and reclaim the rent deposit (0.00204 SOL per account). Safe, simple, and only targets accounts with zero balance.
                           </p>
                         </div>
 
