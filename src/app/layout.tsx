@@ -22,7 +22,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: {
     default: "Claim Your SOLs - Recover SOL from Token Accounts",
-    template: "%s | ClaimYourSols",
+    template: "%s | ClaimYourSols - SOL Recovery Platform",
   },
   description:
     "Close unused SPL token accounts and reclaim your SOL rent fees safely and securely. Recover locked SOL from inactive token accounts on Solana blockchain.",
