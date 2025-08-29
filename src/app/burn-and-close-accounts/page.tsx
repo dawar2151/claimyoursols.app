@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Burn Tokens & Close Accounts - Claim Your SOLs",
     description:
       "Burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want.",
-    url: "https://claimyoursols.app/burn-and-close-accounts",
+    url: "https://claimyoursols.app/burn-and-close-accounts/",
   },
   twitter: {
     title: "Burn Tokens & Close Accounts - Claim Your SOLs",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       "Burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want.",
   },
   alternates: {
-    canonical: "https://claimyoursols.app/burn-and-close-accounts",
+    canonical: "https://claimyoursols.app/burn-and-close-accounts/",
   },
 };
 

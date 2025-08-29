@@ -3,15 +3,15 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Privacy Policy - ClaimYourSols',
-    description: 'Read the Privacy Policy for ClaimYourSols platform.',
+    description: 'Read the Privacy Policy for ClaimYourSols token account management platform. Learn how we protect your data and privacy while using our tools.',
     alternates: {
-        canonical: 'https://ClaimYourSols.app/privacy',
+        canonical: 'https://claimyoursols.app/privacy/',
     },
     keywords: 'privacy policy, data protection, bulk sender privacy, solana privacy, spl token privacy',
     openGraph: {
         title: 'Privacy Policy - ClaimYourSols',
         description: 'Read the Privacy Policy for ClaimYourSols platform.',
-        url: 'https://ClaimYourSols.app/privacy',
+        url: 'https://claimyoursols.app/privacy/',
         type: 'website',
     },
 };

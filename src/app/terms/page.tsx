@@ -3,15 +3,15 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
     title: 'Terms of Service - ClaimYourSols',
-    description: 'Read the Terms of Service for ClaimYourSols platform.',
+    description: 'Read the Terms of Service for ClaimYourSols token account management platform. Legal terms and conditions for using our SOL recovery tools.',
     alternates: {
-        canonical: 'https://ClaimYourSols.app/terms',
+        canonical: 'https://claimyoursols.app/terms/',
     },
     keywords: 'terms, of service, legal, bulk sender terms, solana terms, spl token terms',
     openGraph: {
         title: 'Terms of Service - ClaimYourSols',
         description: 'Read the Terms of Service for ClaimYourSols platform.',
-        url: 'https://ClaimYourSols.app/terms',
+        url: 'https://claimyoursols.app/terms/',
         type: 'website',
     },
 };

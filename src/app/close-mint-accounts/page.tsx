@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Close Mint Accounts (Token2022) - Claim Your SOLs",
     description:
       "Close Token2022 mint accounts you created and recover their rent deposits. Automatically burns remaining tokens if only from close authority account.",
-    url: "https://claimyoursols.app/close-mint-accounts",
+    url: "https://claimyoursols.app/close-mint-accounts/",
   },
   twitter: {
     title: "Close Mint Accounts (Token2022) - Claim Your SOLs",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       "Close Token2022 mint accounts you created and recover their rent deposits. Automatically burns remaining tokens if only from close authority account.",
   },
   alternates: {
-    canonical: "https://claimyoursols.app/close-mint-accounts",
+    canonical: "https://claimyoursols.app/close-mint-accounts/",
   },
 };
 
