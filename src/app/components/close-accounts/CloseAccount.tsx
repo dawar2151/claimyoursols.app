@@ -72,7 +72,7 @@ export const AccountsManager = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isSuccess, userReceives]);
+  }, [isSuccess]);
 
   const [selectAll, setSelectAll] = useState(true);
   const [isListOpen, setIsListOpen] = useState(false); // New state for list visibility
