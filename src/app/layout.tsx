@@ -213,13 +213,13 @@ export default function RootLayout({
                         </div>
                       </div>
 
-                      <h1
+                      <h2
                         className="text-4xl font-bold mb-2"
                         style={{ color: colors.text.primary }}
                       >
                         Solana Blockchain holds your SOL
-                      </h1>
-                      <h2
+                      </h2>
+                      <h3
                         className="text-5xl font-bold mb-4"
                         style={{
                           background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
@@ -229,7 +229,7 @@ export default function RootLayout({
                         }}
                       >
                         Claim it Back!
-                      </h2>
+                      </h3>
 
                       <p
                         className="max-w-2xl mx-auto text-lg mb-4"

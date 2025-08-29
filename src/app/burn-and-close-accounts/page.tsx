@@ -5,7 +5,7 @@ import BurnAndCloseContent from "../components/pages/BurnAndCloseContent";
 export const metadata: Metadata = {
   title: "Burn Tokens & Close Accounts - Claim Your SOLs",
   description:
-    "Burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want on Solana blockchain.",
+    "Burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want on Solana.",
   keywords:
     "burn tokens, close token accounts, remove scam tokens, dust tokens, unwanted tokens, Solana token burner, token account cleanup",
   openGraph: {

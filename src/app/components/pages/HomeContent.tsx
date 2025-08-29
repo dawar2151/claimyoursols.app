@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 export default function HomeContent() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
+      <h1 className="sr-only">Close Empty Token Accounts - Claim Your SOLs</h1>
       <TabNavigation />
       <motion.div
         initial={{ opacity: 0, y: 10 }}

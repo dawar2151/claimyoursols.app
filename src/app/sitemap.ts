@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://ClaimYourSols.app";
+  const baseUrl = "https://claimyoursols.app";
   const now = new Date().toISOString();
   return [
     {
