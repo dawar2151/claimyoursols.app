@@ -2,6 +2,7 @@
 
 import { XTypography } from "@/app/components/x-components/XTypography";
 import { colors } from "@/app/utils/colors";
+import { getAmountString } from "@/app/utils/spl-utils";
 
 export type AccountDetails = {
   pubkey: { toString: () => string };
@@ -44,11 +45,10 @@ export const TokenAccountCard = ({
 
   return (
     <div
-      className={`flex items-center p-3 border-2 rounded-xl transition-all duration-200 cursor-pointer ${
-        isSelected
+      className={`flex items-center p-3 border-2 rounded-xl transition-all duration-200 cursor-pointer ${isSelected
           ? "shadow-lg scale-[1.02]"
           : "shadow-sm hover:shadow-md hover:scale-[1.01]"
-      }`}
+        }`}
       style={{
         backgroundColor: isSelected
           ? colors.background.light
@@ -152,7 +152,7 @@ export const TokenAccountCard = ({
               color: isSelected ? colors.primary : tokenColor,
             }}
           >
-            {account?.uiAmount?.toLocaleString() || "0"}
+            {getAmountString(account?.uiAmount)}
           </XTypography>
         </div>
 
