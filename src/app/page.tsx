@@ -13,11 +13,21 @@ export const metadata: Metadata = {
     description:
       "Close unused SPL token accounts with zero balance and recover rent deposits. Safe and simple - only affects empty accounts.",
     url: "https://claimyoursols.app/",
+    images: [
+      {
+        url: "https://claimyoursols.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Close Empty Token Accounts - Claim Your SOLs",
+      },
+    ],
   },
   twitter: {
     title: "Close Empty Token Accounts - Claim Your SOLs",
     description:
       "Close unused SPL token accounts with zero balance and recover rent deposits. Safe and simple - only affects empty accounts.",
+    card: "summary_large_image", // Ensures the large image card format is used
+    images: ["https://claimyoursols.app/og-image.png"], // Use the same image as Open Graph
   },
   alternates: {
     canonical: "https://claimyoursols.app/",
