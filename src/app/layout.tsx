@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     description:
       "Close unused SPL token accounts and reclaim your SOL rent fees safely and securely. Fermez les comptes de jetons SPL inutilisés.",
     images: ["https://claimyoursols.app/og-image.png"],
-    creator: "@your-twitter-handle",
+    creator: "@claimsols",
   },
   icons: {
     icon: [

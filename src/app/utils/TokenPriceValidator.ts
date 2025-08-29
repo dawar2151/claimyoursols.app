@@ -39,14 +39,15 @@ export async function validateTokenPrice(
       console.log(`No price data found for token: ${mintAddress}`);
 
       // If we can't determine the price, ask the user if they want to continue
+      const tokenBalance = account.uiAmount || 0;
       const shouldContinue = confirmFn
         ? await confirmFn({
             title: "Unknown Token Price",
-            message: `We couldn't determine the price for this token. Please confirm your token balance value is lower than $${maxValue}.`,
+            message: `We couldn't find price data for this token (${mintAddress}). You have a balance of ${tokenBalance} tokens. Before proceeding, please verify that your token's value is less than $${maxValue} USD.`,
             severity: "warning",
           })
         : confirm(
-            `Please confirm your token balance value is lower than $${maxValue}?`
+            `Warning: Price data unavailable for this token. You have a balance of ${tokenBalance} tokens. Please confirm that the value is less than $${maxValue} USD before proceeding.`
           );
 
       if (!shouldContinue) {
