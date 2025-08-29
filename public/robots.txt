@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://ClaimYourSols.app/sitemap.xml
+Sitemap: https://www.claimyoursols.app/sitemap.xml
 
 # Crawl-delay
 Crawl-delay: 1

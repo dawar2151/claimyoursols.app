@@ -5,13 +5,13 @@ export const metadata: Metadata = {
     title: 'Support - ClaimYourSols',
     description: 'Get help and support for ClaimYourSols token account management tools. Contact our team for assistance with SOL recovery and account cleanup.',
     alternates: {
-        canonical: 'https://claimyoursols.app/support/',
+        canonical: 'https://www.claimyoursols.app/support/',
     },
     keywords: 'support, help, contact, bulk sender support, solana support, spl token support',
     openGraph: {
         title: 'Support - ClaimYourSols',
         description: 'Get help and support for ClaimYourSols. Contact our team for assistance.',
-        url: 'https://claimyoursols.app/support/',
+        url: 'https://www.claimyoursols.app/support/',
         type: 'website',
     },
 };
