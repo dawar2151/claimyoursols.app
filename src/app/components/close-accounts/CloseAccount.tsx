@@ -277,7 +277,7 @@ export const AccountsManager = () => {
                     mint: account.pubkey, // For close accounts, we use pubkey as mint since these are system accounts
                     tokenName: `Empty Account`,
                     tokenSymbol: "",
-                    uiAmount: account.lamports / 1e9, // Show SOL balance as "token" amount
+                    uiAmount: 0, // Show SOL balance as "token" amount
                     rentExemptReserve: account.rentExemptReserve,
                   }}
                   isSelected={selectedAccounts.has(account.pubkey.toString())}
