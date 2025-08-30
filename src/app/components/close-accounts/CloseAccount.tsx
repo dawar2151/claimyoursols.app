@@ -351,7 +351,7 @@ export const AccountsManager = () => {
                     {(totalRent / 1e9).toFixed(4)} SOL
                   </XTypography>
                 </div>
-                <div>
+                {/* <div>
                   <XTypography
                     variant="body"
                     className="text-sm"
@@ -382,7 +382,7 @@ export const AccountsManager = () => {
                   >
                     {accounts.length}
                   </XTypography>
-                </div>
+                </div> */}
               </div>
             </div>
           )}
@@ -414,14 +414,14 @@ export const AccountsManager = () => {
             >
               {isClosing
                 ? "Closing Accounts..."
-                : `Close Accounts & Claim Your SOL (${selectedAccounts.size})`}
+                : `Close Accounts & Claim Your SOL`}
             </XButton>
             <XTypography
               variant="body"
               className="text-xs mt-3 text-center"
               style={{ color: colors.text.secondary }}
             >
-              This will close selected accounts and refund your locked SOL back
+              This will close empty accounts and refund your locked SOL back
               to your wallet. Large batches may require multiple transactions.
             </XTypography>
             {transactionHashes.length > 0 && (
