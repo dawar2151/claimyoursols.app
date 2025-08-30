@@ -17,7 +17,7 @@ export const metadata: Metadata = {
         url: "https://www.claimyoursols.app/privacy",
         images: [
             {
-                url: "https://www.claimyoursols.app/images/og-image.png",
+                url: "https://www.claimyoursols.app/og-image.png",
                 width: 1200,
                 height: 630,
                 alt: "Privacy Policy | Claim Your SOLs",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         description:
             "Learn how ClaimYourSols protects your data and ensures privacy while using our token account management tools. Read our Privacy Policy for more details.",
         card: "summary_large_image",
-        images: ["https://www.claimyoursols.app/images/og-image.png"],
+        images: ["https://www.claimyoursols.app/og-image.png"],
     },
 };
 

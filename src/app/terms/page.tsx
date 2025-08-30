@@ -17,7 +17,7 @@ export const metadata: Metadata = {
         url: 'https://www.claimyoursols.app/terms',
         images: [
             {
-                url: 'https://www.claimyoursols.app/images/og-image.png',
+                url: 'https://www.claimyoursols.app/og-image.png',
                 width: 1200,
                 height: 630,
                 alt: 'Terms of Service | Claim Your SOLs',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         description:
             'Read the Terms of Service for ClaimYourSols token account management platform. Learn about the legal terms and conditions for using our SOL recovery tools.',
         card: 'summary_large_image',
-        images: ['https://www.claimyoursols.app/images/og-image.png'],
+        images: ['https://www.claimyoursols.app/og-image.png'],
     },
 };
 
