@@ -321,7 +321,7 @@ export const CloseMintAccountsManager = () => {
                     className="font-bold"
                     style={{ color: colors.secondary }}
                   >
-                    {(totalRent / 1e9).toFixed(6)} SOL
+                    {(totalRent / 1e9).toFixed(4) === "0.0000" ? "0" : (totalRent / 1e9).toFixed(4)} SOL
                   </XTypography>
                 </div>
                 <div>

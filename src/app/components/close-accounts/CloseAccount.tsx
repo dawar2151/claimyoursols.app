@@ -334,8 +334,8 @@ export const AccountsManager = () => {
                 borderColor: `${colors.border}/50`,
               }}
             >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div>
+              <div className="text-center">
+                <div className="flex flex-col items-center justify-center">
                   <XTypography
                     variant="body"
                     className="text-sm"
@@ -348,41 +348,9 @@ export const AccountsManager = () => {
                     className="font-bold"
                     style={{ color: colors.secondary }}
                   >
-                    {(totalRent / 1e9).toFixed(4)} SOL
+                    {(totalRent / 1e9).toFixed(4) === "0.0000" ? "0" : (totalRent / 1e9).toFixed(4)} SOL
                   </XTypography>
                 </div>
-                {/* <div>
-                  <XTypography
-                    variant="body"
-                    className="text-sm"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    Selected Accounts
-                  </XTypography>
-                  <XTypography
-                    variant="h4"
-                    className="font-bold"
-                    style={{ color: colors.primary }}
-                  >
-                    {selectedAccounts.size}
-                  </XTypography>
-                </div>
-                <div>
-                  <XTypography
-                    variant="body"
-                    className="text-sm"
-                    style={{ color: colors.text.secondary }}
-                  >
-                    Total Accounts
-                  </XTypography>
-                  <XTypography
-                    variant="h4"
-                    className="font-bold"
-                    style={{ color: colors.text.primary }}
-                  >
-                    {accounts.length}
-                  </XTypography>
-                </div> */}
               </div>
             </div>
           )}
@@ -413,8 +381,8 @@ export const AccountsManager = () => {
               }}
             >
               {isClosing
-                ? "Closing Accounts..."
-                : `Close Accounts & Claim Your SOL`}
+                ? " Claiming..."
+                : `Claim`}
             </XButton>
             <XTypography
               variant="body"

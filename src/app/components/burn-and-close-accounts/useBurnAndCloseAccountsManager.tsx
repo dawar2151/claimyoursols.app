@@ -311,7 +311,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         try {
           const signature = await sendTransactionHelper(
             transaction,
-            connection
+            connection,
+            wallet
           );
           console.log(
             `✅ Closed batch ${Math.floor(i / BATCH_SIZE) + 1}:`,
@@ -329,8 +330,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${
-              Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {

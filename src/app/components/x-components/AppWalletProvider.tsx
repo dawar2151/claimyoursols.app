@@ -69,15 +69,14 @@ export default function AppWalletProvider({ children }: { children: React.ReactN
                     const userResponse = alert(
                         `This wallet is not installed. Please install it first.`
                     );
-                }
-
-                // Reset the wallet adapter state
-                if (adapter) {
-                    try {
-                        await adapter.disconnect(); // Disconnect the wallet to reset its state
-                        console.log("Wallet state reset successfully.");
-                    } catch (disconnectError) {
-                        console.error("Failed to reset wallet adapter state:", disconnectError);
+                    // Reset the wallet adapter state
+                    if (adapter) {
+                        try {
+                            await adapter.disconnect(); // Disconnect the wallet to reset its state
+                            console.log("Wallet state reset successfully.");
+                        } catch (disconnectError) {
+                            console.error("Failed to reset wallet adapter state:", disconnectError);
+                        }
                     }
                 }
             }}>

@@ -110,6 +110,7 @@ export function useAccountsHelper(connection: Connection) {
   );
   const [transactionHashes, setTransactionHashes] = useState<string[]>([]); // New state for transaction hashes
   const publicKey = useWallet().publicKey;
+  const wallet = useWallet();
 
   const cleanClosedAccounts = useCallback(() => {
     setAccounts(
@@ -219,7 +220,8 @@ export function useAccountsHelper(connection: Connection) {
         try {
           const signature = await sendTransactionHelper(
             transaction,
-            connection
+            connection,
+            wallet
           );
           console.log(
             `✅ Closed batch ${Math.floor(i / BATCH_SIZE) + 1}:`,
@@ -237,8 +239,7 @@ export function useAccountsHelper(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${
-              Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import BurnAndCloseContent from "../components/pages/BurnAndCloseContent";
 
 export const metadata: Metadata = {
-  title: "Burn Tokens & Close Accounts",
+  title: "Recover SOL from Useless Accounts",
   description:
     "Safely burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want on Solana.",
   keywords:

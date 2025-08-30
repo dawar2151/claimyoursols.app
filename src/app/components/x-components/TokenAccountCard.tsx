@@ -46,8 +46,8 @@ export const TokenAccountCard = ({
   return (
     <div
       className={`flex items-center p-3 border-2 rounded-xl transition-all duration-200 cursor-pointer ${isSelected
-          ? "shadow-lg scale-[1.02]"
-          : "shadow-sm hover:shadow-md hover:scale-[1.01]"
+        ? "shadow-lg scale-[1.02]"
+        : "shadow-sm hover:shadow-md hover:scale-[1.01]"
         }`}
       style={{
         backgroundColor: isSelected
@@ -111,17 +111,7 @@ export const TokenAccountCard = ({
               </span>
             )}
           </XTypography>
-          {isSelected && (
-            <span
-              className="px-2 py-1 rounded-full text-xs font-semibold"
-              style={{
-                backgroundColor: `${colors.primary}20`,
-                color: colors.primary,
-              }}
-            >
-              Selected
-            </span>
-          )}
+
         </div>
 
         {/* Mint Address - Only show this */}
@@ -143,7 +133,17 @@ export const TokenAccountCard = ({
             className="text-xs font-medium"
             style={{ color: colors.text.secondary }}
           >
-            Tokens
+            {isSelected ? (
+              <span
+                className="px-2 py-1 rounded-full text-xs font-semibold"
+                style={{
+                  backgroundColor: `${colors.primary}20`,
+                  color: colors.primary,
+                }}
+              >
+                Selected
+              </span>
+            ) : "Balance"}
           </XTypography>
           <XTypography
             variant="body"
