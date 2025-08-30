@@ -85,7 +85,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
   const [isClosing, setIsClosing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [transactionHashes, setTransactionHashes] = useState<string[]>([]);
-
+  const wallet = useWallet();
   const cleanClosedAccounts = useCallback(() => {
     setMintAccounts(
       mintAccounts.filter(
@@ -346,7 +346,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
       );
 
       // Send and confirm transaction
-      const signature = await sendTransactionHelper(transaction, connection);
+      const signature = await sendTransactionHelper(transaction, connection, wallet);
 
       console.log(
         `Successfully processed mint account: ${account.pubkey.toString()}`
