@@ -16,6 +16,7 @@ import GitHubButton from "./components/claimyoursol/GithubButton";
 import AnimatedPage from "./utils/AnimatedPage";
 import WalletSection from "./components/wallet/WalletSection";
 import FAQSection from "./components/claimyoursol/FAQSection";
+import TransactionHistory from "./components/transaction-history/TransactionHistory";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -269,7 +270,9 @@ export default function RootLayout({
                             Close Zero-Balance Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close empty token accounts and reclaim the rent deposit (0.00204 SOL per account). Safe, simple, and only targets accounts with zero balance.
+                            Close empty token accounts and reclaim the rent
+                            deposit (0.00204 SOL per account). Safe, simple, and
+                            only targets accounts with zero balance.
                           </p>
                         </div>
 
@@ -295,7 +298,10 @@ export default function RootLayout({
                             Burn Tokens & Close Accounts
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want (0.00204 SOL per account)
+                            Burn unwanted tokens and close their accounts in one
+                            step. Perfect for removing dust tokens, scam tokens,
+                            or tokens you no longer want (0.00204 SOL per
+                            account)
                           </p>
                         </div>
 
@@ -320,7 +326,10 @@ export default function RootLayout({
                             Close Mint Accounts (Token2022)
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-300">
-                            Close Token2022 mint accounts you created and recover their rent deposits (0.0048 SOL per account). Automatically burns remaining tokens if only from the close authority account.
+                            Close Token2022 mint accounts you created and
+                            recover their rent deposits (0.0048 SOL per
+                            account). Automatically burns remaining tokens if
+                            only from the close authority account.
                           </p>
                         </div>
                       </div>
@@ -328,7 +337,7 @@ export default function RootLayout({
 
                     {/* Main page content */}
                     {children}
-
+                    <TransactionHistory />
                     {/* FAQ Section */}
                     <FAQSection />
 
