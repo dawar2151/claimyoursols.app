@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import HomeContent from "./components/pages/HomeContent";
 
 export const metadata: Metadata = {
-  title: "Recover SOL from Token Accounts",
+  title: "Claim Your SOL | Recover SOL from Token Accounts",
   description:
     "Close unused SPL token accounts with zero balance and recover rent deposits (0.00204 SOL per account). Safe and simple - only affects empty accounts.",
   keywords:
