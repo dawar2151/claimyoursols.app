@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import CloseMintContent from "../components/pages/CloseMintContent";
 
 export const metadata: Metadata = {
-  title: "Recover SOL from Useless Tokens",
+  title: "Claim SOL from Useless Tokens",
   description:
     "Safely close Token2022 mint accounts you created and recover rent deposits (0.0048 SOL per account). Automatically burns remaining tokens if only from the close authority account.",
   keywords:
