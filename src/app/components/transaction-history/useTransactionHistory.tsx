@@ -3,11 +3,16 @@ import { PublicKey, TransactionSignature } from "@solana/web3.js";
 import { ClaimYourSolsStateContext } from "@/app/providers";
 import { getFeeRecipientString } from "@/app/utils/utils";
 
-interface TransactionInfo {
+export interface TransactionInfo {
   signature: TransactionSignature;
   blockTime: number | null;
   methodNames: string[];
   instructionCount: number;
+  meta?: {
+    preBalances: number[];
+    postBalances: number[];
+    [key: string]: any;
+  };
 }
 
 export function useTransactionHistory(limit: number = 20) {
@@ -45,7 +50,7 @@ export function useTransactionHistory(limit: number = 20) {
           const tx = await connection.getParsedTransaction(sigInfo.signature, {
             maxSupportedTransactionVersion: 0,
           });
-
+          console.log(tx);
           if (!tx) continue;
 
           // Get method names from instructions
@@ -70,6 +75,7 @@ export function useTransactionHistory(limit: number = 20) {
             blockTime: tx.blockTime ?? null,
             methodNames,
             instructionCount,
+            meta: tx.meta || undefined,
           });
         }
 

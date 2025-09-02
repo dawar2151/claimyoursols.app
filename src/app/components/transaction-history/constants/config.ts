@@ -8,10 +8,10 @@ export const CONFIG = {
   UNKNOWN_TIME_LABEL: "Unknown",
   GRID_COLUMNS: {
     TRANSACTION: 3,
-    TYPE: 3,
-    OPERATIONS: 3,
-    INSTRUCTIONS: 2,
-    TIME: 3,
+    TYPE: 2,
+    OPERATIONS: 2,
+    CLAIMED_SOL: 2,
+    TIME: 2,
   },
 } as const;
 
