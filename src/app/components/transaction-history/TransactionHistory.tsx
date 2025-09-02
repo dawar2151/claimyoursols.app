@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
-import { useTransactionHistory } from "./useTransactionHistory";
+import {
+  useTransactionHistory,
+  TransactionInfo,
+} from "./useTransactionHistory";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 import {
@@ -34,6 +37,23 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
     navigator.clipboard.writeText(text);
   };
 
+  const getClaimedSolAmount = (transaction: TransactionInfo): string => {
+    // Calculate SOL balance change from preBalances and postBalances
+    if (!transaction.meta?.preBalances || !transaction.meta?.postBalances) {
+      return "0.00";
+    }
+
+    const preBalance = transaction.meta.preBalances[0] || 0;
+    const postBalance = transaction.meta.postBalances[0] || 0;
+    const balanceChange = (postBalance - preBalance) / 1e9; // Convert lamports to SOL
+
+    // Only show positive balance changes (SOL claimed/received)
+    if (balanceChange > 0) {
+      return balanceChange.toFixed(4);
+    }
+
+    return "0.00";
+  };
   const getTransactionSummary = (methodNames: string[]) => {
     const burnCount = methodNames.filter((m) =>
       m.toLowerCase().includes(METHOD_PATTERNS.BURN)
@@ -149,16 +169,19 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
             {/* Desktop Header */}
             <div className="hidden md:block bg-gray-50 px-6 py-3 border-b border-gray-200">
               <div className="grid grid-cols-12 gap-6 text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                <div className={`col-span-${CONFIG.GRID_COLUMNS.TRANSACTION}`}>
+                <div className="col-span-3">
                   <span>Transaction</span>
                 </div>
-                <div className={`col-span-${CONFIG.GRID_COLUMNS.TYPE}`}>
+                <div className="col-span-2">
                   <span>Type</span>
                 </div>
-                <div className={`col-span-${CONFIG.GRID_COLUMNS.OPERATIONS}`}>
+                <div className="col-span-2">
                   <span>Operations</span>
                 </div>
-                <div className={`col-span-${CONFIG.GRID_COLUMNS.TIME}`}>
+                <div className="col-span-2">
+                  <span>Claimed SOL</span>
+                </div>
+                <div className="col-span-3">
                   <span>Time</span>
                 </div>
               </div>
@@ -174,9 +197,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
                   {/* Desktop Layout */}
                   <div className="hidden md:grid md:grid-cols-12 gap-6 items-center p-4">
                     {/* Transaction Hash */}
-                    <div
-                      className={`col-span-${CONFIG.GRID_COLUMNS.TRANSACTION}`}
-                    >
+                    <div className="col-span-3">
                       <button
                         onClick={() => {
                           copyToClipboard(tx.signature);
@@ -207,24 +228,35 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
                       </button>
                     </div>
 
-                    <div className={`col-span-${CONFIG.GRID_COLUMNS.TYPE}`}>
+                    <div className="col-span-2">
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${summary.color}`}
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${summary.color}`}
                       >
                         {summary.type.replace("-", " & ").toUpperCase()}
                       </span>
                     </div>
 
-                    <div
-                      className={`col-span-${CONFIG.GRID_COLUMNS.OPERATIONS}`}
-                    >
+                    <div className="col-span-2">
                       <span className="text-sm font-semibold text-gray-900">
                         {summary.count}
                       </span>
                     </div>
 
+                    {/* Claimed SOL */}
+                    <div className="col-span-2">
+                      <div className="flex items-center space-x-1">
+                        <span
+                          className="text-sm font-semibold"
+                          style={{ color: colors.success }}
+                        >
+                          {getClaimedSolAmount(tx)}
+                        </span>
+                        <span className="text-xs text-gray-500">SOL</span>
+                      </div>
+                    </div>
+
                     {/* Time */}
-                    <div className={`col-span-${CONFIG.GRID_COLUMNS.TIME}`}>
+                    <div className="col-span-3">
                       <span className="text-sm text-gray-600">
                         {formatTime(tx.blockTime)}
                       </span>
@@ -279,16 +311,29 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
                         <span className="text-gray-600">
                           {formatTime(tx.blockTime)}
                         </span>
-                        <div className="flex items-center space-x-1">
-                          <span className="text-xs text-gray-500">
-                            Instructions:
-                          </span>
-                          <span
-                            className="text-xs font-bold px-2 py-1 rounded text-white"
-                            style={{ backgroundColor: colors.info }}
-                          >
-                            {tx.instructionCount}
-                          </span>
+                        <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-1">
+                            <span className="text-xs text-gray-500">
+                              Claimed:
+                            </span>
+                            <span
+                              className="text-xs font-bold"
+                              style={{ color: colors.success }}
+                            >
+                              {getClaimedSolAmount(tx)} SOL
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span className="text-xs text-gray-500">
+                              Instructions:
+                            </span>
+                            <span
+                              className="text-xs font-bold px-2 py-1 rounded text-white"
+                              style={{ backgroundColor: colors.info }}
+                            >
+                              {tx.instructionCount}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
