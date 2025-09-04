@@ -165,6 +165,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="yandex-verification" content="84076f13b59011db" />
         <link
           rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
