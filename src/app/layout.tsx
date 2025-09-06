@@ -158,6 +158,7 @@ export default function RootLayout({
       "fermer comptes SPL",
       "DeFi",
       "Web3",
+      "SPL tokens",
     ],
     screenshot: "https://www.claimyoursols.app/og-image.png",
   };
