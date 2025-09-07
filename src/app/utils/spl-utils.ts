@@ -33,7 +33,8 @@ export const isValidTokenAccountForClose = (
   const isEmpty = tokenAmount === 0;
 
   console.log(
-    `Account ${account.account.owner.toString()} => balance: ${tokenAmount}, rent: ${info.lamports
+    `Account ${account.account.owner.toString()} => balance: ${tokenAmount}, rent: ${
+      info.lamports
     }, closeable: ${isValidProgram && hasRent && isEmpty}`
   );
 
@@ -79,5 +80,67 @@ export const getAmountString = (amount: number | undefined): string => {
     return `${formatNumber(amount / 1e3)}K`; // Format thousands
   } else {
     return amount.toLocaleString(); // Display smaller numbers normally
+  }
+};
+export const checkWithheldAmount = (
+  accountInfo: AccountInfo<ParsedAccountData>
+) => {
+  try {
+    // Check if this is a Token 2022 account with parsed data
+    if (
+      accountInfo.owner.toString() === TOKEN_2022_PROGRAM_ID.toString() &&
+      "parsed" in accountInfo.data
+    ) {
+      const parsedData = accountInfo.data.parsed;
+
+      // Get mint address
+      const mintAddress = parsedData?.info?.mint
+        ? new PublicKey(parsedData.info.mint)
+        : undefined;
+
+      // Check for withheld amount in extensions or account data
+      if (parsedData?.info?.extensions) {
+        const transferFeeExtension = parsedData.info.extensions.find(
+          (ext: any) => ext.extension === "transferFeeAmount"
+        );
+
+        if (transferFeeExtension?.state?.withheldAmount) {
+          const withheldAmount = parseInt(
+            transferFeeExtension.state.withheldAmount
+          );
+          console.log(
+            "Withheld amount in this account:",
+            withheldAmount.toString()
+          );
+
+          if (withheldAmount > 0) {
+            console.log(
+              "You need to harvest withheld tokens before closing the account."
+            );
+            return { withheldAmount, hasWithheldTokens: true, mintAddress };
+          } else {
+            console.log(
+              "No withheld tokens. You can safely close the account."
+            );
+            return { withheldAmount: 0, hasWithheldTokens: false, mintAddress };
+          }
+        }
+      }
+
+      return { withheldAmount: 0, hasWithheldTokens: false, mintAddress };
+    }
+
+    return {
+      withheldAmount: 0,
+      hasWithheldTokens: false,
+      mintAddress: undefined,
+    };
+  } catch (error) {
+    console.warn("Error checking withheld amount:", error);
+    return {
+      withheldAmount: 0,
+      hasWithheldTokens: false,
+      mintAddress: undefined,
+    };
   }
 };
