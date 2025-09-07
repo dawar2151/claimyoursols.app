@@ -5,7 +5,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date().toISOString();
   return [
     {
-      url: `${baseUrl}/`,
+      url: `https://www.claimyoursols.app/`,
       lastModified: now,
       changeFrequency: "weekly",
       priority: 1.0,
