@@ -184,9 +184,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             hasWithheldTokens,
             mintAddress,
           };
-        })
-        .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
-
+        });
+        
       const updatedAccounts: AccountData[] = [];
       try {
         for (const account of closeableAccounts) {
@@ -334,9 +333,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             if (account.mintAddress) {
               transaction.add(
                 createHarvestWithheldTokensToMintInstruction(
-                  new PublicKey(account.mintAddress), // destination mint
-                  [account.pubkey], // accounts to harvest from
-
+                  new PublicKey(account.mintAddress),
+                  [account.pubkey],
                   programId
                 )
               );
