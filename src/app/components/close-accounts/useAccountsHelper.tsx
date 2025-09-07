@@ -13,7 +13,6 @@ import {
   TOKEN_PROGRAM_ID,
   ACCOUNT_SIZE,
   TOKEN_2022_PROGRAM_ID,
-  createHarvestWithheldTokensToMintInstruction,
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
@@ -153,7 +152,6 @@ export function useAccountsHelper(connection: Connection) {
           isValidTokenAccountForClose(account, rentExemptReserve)
         )
         .map((account) => {
-          // Check for withheld amount in Token 2022 accounts
           const { withheldAmount, hasWithheldTokens, mintAddress } =
             checkWithheldAmount(account.account);
 
@@ -166,9 +164,25 @@ export function useAccountsHelper(connection: Connection) {
             hasWithheldTokens,
             mintAddress,
           };
-        });
+        })
+        .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
 
       setAccounts(closeableAccounts);
+
+      const totalAccountsBeforeFilter = [
+        ...splTokenAccounts.value,
+        ...token2022Accounts.value,
+      ].filter((account) =>
+        isValidTokenAccountForClose(account, rentExemptReserve)
+      ).length;
+
+      const filteredOutCount =
+        totalAccountsBeforeFilter - closeableAccounts.length;
+      if (filteredOutCount > 0) {
+        console.log(
+          `Filtered out ${filteredOutCount} accounts with withheld tokens`
+        );
+      }
     } catch (err) {
       console.error("Error fetching accounts:", err);
     } finally {
@@ -205,23 +219,6 @@ export function useAccountsHelper(connection: Connection) {
           const programId = isToken2022
             ? TOKEN_2022_PROGRAM_ID
             : TOKEN_PROGRAM_ID;
-          if (account.hasWithheldTokens) {
-            console.log(
-              `Closing account ${account.pubkey.toString()} with withheld amount: ${
-                account.withheldAmount
-              }`
-            );
-            if (account.mintAddress) {
-              transaction.add(
-                createHarvestWithheldTokensToMintInstruction(
-                  new PublicKey(account.mintAddress), // destination mint
-                  [account.pubkey], // accounts to harvest from
-
-                  programId
-                )
-              );
-            }
-          }
           transaction.add(
             createCloseAccountInstruction(
               account.pubkey,

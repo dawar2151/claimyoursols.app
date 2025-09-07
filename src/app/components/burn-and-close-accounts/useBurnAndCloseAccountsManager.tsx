@@ -17,7 +17,10 @@ import {
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
-import { isValidTokenAccountForBurnAndClose } from "@/app/utils/spl-utils";
+import {
+  checkWithheldAmount,
+  isValidTokenAccountForBurnAndClose,
+} from "@/app/utils/spl-utils";
 import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
 
 interface AccountData {
@@ -33,6 +36,9 @@ interface AccountData {
   tokenSymbol?: string;
   tokenUri?: string;
   metadata?: TokenMetadata;
+  withheldAmount?: number;
+  hasWithheldTokens?: boolean;
+  mintAddress?: PublicKey;
 }
 
 const BATCH_SIZE = 10;
@@ -51,7 +57,7 @@ const createFeeInstructions = async (
   publicKey: PublicKey,
   totalFee: number,
   referralAccount: string | undefined,
-  connection: Connection // Add connection parameter
+  connection: Connection
 ): Promise<Transaction> => {
   const transaction = new Transaction();
   const feeRecipient = getFeeRecipient();
@@ -117,12 +123,13 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [isClosing, setIsClosing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [transactionHashes, setTransactionHashes] = useState<string[]>([]); // New state for transaction hashes
+  const [transactionHashes, setTransactionHashes] = useState<string[]>([]);
   const [selectedAccounts, setSelectedAccounts] = useState<Set<string>>(
     new Set()
   );
   const wallet = useWallet();
   const publicKey = wallet.publicKey;
+
   const cleanClosedAccounts = useCallback(() => {
     setAccounts(
       accounts.filter(
@@ -131,7 +138,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     );
     setSelectedAccounts(new Set());
     setIsSuccess(false);
-  }, [selectedAccounts]);
+  }, [accounts, selectedAccounts]);
+
   const fetchAccounts = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -157,16 +165,27 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         .filter((account) =>
           isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
         )
-        .map((account) => ({
-          pubkey: account.pubkey,
-          account: account.account,
-          uiAmount: account.account.data.parsed.info.tokenAmount.uiAmount,
-          decimals: account.account.data.parsed.info.tokenAmount.decimals,
-          mint: account.account.data.parsed.info.mint,
-          amount: account.account.data.parsed.info.tokenAmount.amount,
-          lamports: account.account.lamports,
-          rentExemptReserve,
-        }));
+        .map((account) => {
+          // Check for withheld amount in Token 2022 accounts
+          const { withheldAmount, hasWithheldTokens, mintAddress } =
+            checkWithheldAmount(account.account);
+
+          return {
+            pubkey: account.pubkey,
+            account: account.account,
+            uiAmount: account.account.data.parsed.info.tokenAmount.uiAmount,
+            decimals: account.account.data.parsed.info.tokenAmount.decimals,
+            mint: account.account.data.parsed.info.mint,
+            amount: account.account.data.parsed.info.tokenAmount.amount,
+            lamports: account.account.lamports,
+            rentExemptReserve,
+            withheldAmount,
+            hasWithheldTokens,
+            mintAddress,
+          };
+        })
+        .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
+
       const updatedAccounts: AccountData[] = [];
       try {
         for (const account of closeableAccounts) {
@@ -188,10 +207,15 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               `Error fetching metadata for ${account.mint}:`,
               metadataError
             );
+            // Still add the account even if metadata fetch fails
+            updatedAccounts.push(account);
           }
         }
       } catch (err) {
         console.error("Error fetching token metadata:", err);
+        // Fallback to using accounts without metadata
+        setAccounts(closeableAccounts);
+        return;
       }
 
       setAccounts(updatedAccounts);
@@ -205,7 +229,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   const closeAllAccounts = useCallback(async () => {
     setIsClosing(true);
     setError(null);
-    setTransactionHashes([]); // Reset transaction hashes at the start
+    setTransactionHashes([]);
 
     const ensurePublicKey = (key: PublicKey | string): PublicKey =>
       typeof key === "string" ? new PublicKey(key) : key;
@@ -222,6 +246,19 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         selectedAccounts.has(account.pubkey.toString())
       );
       let currentRent = 0;
+
+      // Check for accounts with withheld tokens and warn user
+      const accountsWithWithheldTokens = accountsToBurnAndClose.filter(
+        (account) => account.hasWithheldTokens
+      );
+      if (accountsWithWithheldTokens.length > 0) {
+        console.warn(
+          `Warning: ${accountsWithWithheldTokens.length} accounts have withheld tokens that should be harvested before burning and closing.`
+        );
+        setError(
+          `Warning: ${accountsWithWithheldTokens.length} accounts have withheld tokens. Consider harvesting them first.`
+        );
+      }
 
       for (let i = 0; i < accountsToBurnAndClose.length; i += BATCH_SIZE) {
         const batch = accountsToBurnAndClose.slice(i, i + BATCH_SIZE);
@@ -242,7 +279,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           }
 
           const rawAmount =
-            account.account.data.parsed?.info?.tokenAmount?.amount; // Raw lamports
+            account.account.data.parsed?.info?.tokenAmount?.amount;
           if (rawAmount === undefined) {
             console.error(
               `Token amount not found for account: ${account.pubkey.toString()}`
@@ -250,7 +287,15 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             continue;
           }
 
-          // Use raw amount for burning
+          // Log withheld amount info for each account being processed
+          if (account.hasWithheldTokens) {
+            console.log(
+              `Processing account ${account.pubkey.toString()} with withheld amount: ${
+                account.withheldAmount
+              }`
+            );
+          }
+
           const burnAmount = rawAmount ? BigInt(rawAmount) : BigInt(0);
 
           console.log(`Burn Amount: ${burnAmount.toString()} lamports`);
@@ -268,7 +313,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             : TOKEN_PROGRAM_ID;
 
           const pubkey = ensurePublicKey(account.pubkey);
-          const mintPubkey = new PublicKey(mint); // Convert mint to PublicKey
+          const mintPubkey = new PublicKey(mint);
           transaction.add(
             createBurnInstruction(
               pubkey,
@@ -330,7 +375,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${
+              Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
@@ -357,7 +403,15 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     } finally {
       setIsClosing(false);
     }
-  }, [publicKey, accounts, selectedAccounts, referralAccount, connection]);
+  }, [
+    publicKey,
+    accounts,
+    selectedAccounts,
+    referralAccount,
+    connection,
+    wallet,
+  ]);
+
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts, publicKey]);
@@ -373,7 +427,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     isLoading,
     isClosing,
     error,
-    transactionHashes, // Expose transactionHashes in the hook's return value
+    transactionHashes,
     closeAllAccounts,
     clearTransactionHashes: setTransactionHashes,
     refreshAccounts: fetchAccounts,
