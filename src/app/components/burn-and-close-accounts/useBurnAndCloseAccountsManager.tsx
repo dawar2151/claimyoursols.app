@@ -185,7 +185,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             mintAddress,
           };
         });
-        
+
       const updatedAccounts: AccountData[] = [];
       try {
         for (const account of closeableAccounts) {
@@ -246,19 +246,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         selectedAccounts.has(account.pubkey.toString())
       );
       let currentRent = 0;
-
-      // Check for accounts with withheld tokens and warn user
-      const accountsWithWithheldTokens = accountsToBurnAndClose.filter(
-        (account) => account.hasWithheldTokens
-      );
-      if (accountsWithWithheldTokens.length > 0) {
-        console.warn(
-          `Warning: ${accountsWithWithheldTokens.length} accounts have withheld tokens that should be harvested before burning and closing.`
-        );
-        setError(
-          `Warning: ${accountsWithWithheldTokens.length} accounts have withheld tokens. Consider harvesting them first.`
-        );
-      }
 
       for (let i = 0; i < accountsToBurnAndClose.length; i += BATCH_SIZE) {
         const batch = accountsToBurnAndClose.slice(i, i + BATCH_SIZE);
