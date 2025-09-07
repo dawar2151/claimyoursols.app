@@ -13,16 +13,23 @@ import {
   TOKEN_PROGRAM_ID,
   ACCOUNT_SIZE,
   TOKEN_2022_PROGRAM_ID,
+  createHarvestWithheldTokensToMintInstruction,
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
-import { isValidTokenAccountForClose } from "@/app/utils/spl-utils";
+import {
+  checkWithheldAmount,
+  isValidTokenAccountForClose,
+} from "@/app/utils/spl-utils";
 
 interface AccountData {
   pubkey: PublicKey;
   account: AccountInfo<ParsedAccountData>;
   lamports: number;
   rentExemptReserve: number;
+  withheldAmount?: number;
+  hasWithheldTokens?: boolean;
+  mintAddress?: PublicKey;
 }
 
 const BATCH_SIZE = 20;
@@ -145,12 +152,21 @@ export function useAccountsHelper(connection: Connection) {
         .filter((account) =>
           isValidTokenAccountForClose(account, rentExemptReserve)
         )
-        .map((account) => ({
-          pubkey: account.pubkey,
-          account: account.account,
-          lamports: account.account.lamports,
-          rentExemptReserve,
-        }));
+        .map((account) => {
+          // Check for withheld amount in Token 2022 accounts
+          const { withheldAmount, hasWithheldTokens, mintAddress } =
+            checkWithheldAmount(account.account);
+
+          return {
+            pubkey: account.pubkey,
+            account: account.account,
+            lamports: account.account.lamports,
+            rentExemptReserve,
+            withheldAmount,
+            hasWithheldTokens,
+            mintAddress,
+          };
+        });
 
       setAccounts(closeableAccounts);
     } catch (err) {
@@ -189,7 +205,23 @@ export function useAccountsHelper(connection: Connection) {
           const programId = isToken2022
             ? TOKEN_2022_PROGRAM_ID
             : TOKEN_PROGRAM_ID;
+          if (account.hasWithheldTokens) {
+            console.log(
+              `Closing account ${account.pubkey.toString()} with withheld amount: ${
+                account.withheldAmount
+              }`
+            );
+            if (account.mintAddress) {
+              transaction.add(
+                createHarvestWithheldTokensToMintInstruction(
+                  new PublicKey(account.mintAddress), // destination mint
+                  [account.pubkey], // accounts to harvest from
 
+                  programId
+                )
+              );
+            }
+          }
           transaction.add(
             createCloseAccountInstruction(
               account.pubkey,
@@ -239,7 +271,8 @@ export function useAccountsHelper(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${
+              Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {
