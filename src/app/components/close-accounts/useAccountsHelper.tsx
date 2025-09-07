@@ -13,6 +13,7 @@ import {
   TOKEN_PROGRAM_ID,
   ACCOUNT_SIZE,
   TOKEN_2022_PROGRAM_ID,
+  createHarvestWithheldTokensToMintInstruction,
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
@@ -165,7 +166,7 @@ export function useAccountsHelper(connection: Connection) {
             mintAddress,
           };
         })
-        .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
+       // .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
 
       setAccounts(closeableAccounts);
 
@@ -219,6 +220,23 @@ export function useAccountsHelper(connection: Connection) {
           const programId = isToken2022
             ? TOKEN_2022_PROGRAM_ID
             : TOKEN_PROGRAM_ID;
+            if (account.hasWithheldTokens) {
+              console.log(
+                `Closing account ${account.pubkey.toString()} with withheld amount: ${
+                  account.withheldAmount
+                }`
+              );
+              if (account.mintAddress) {
+                transaction.add(
+                  createHarvestWithheldTokensToMintInstruction(
+                    new PublicKey(account.mintAddress), // destination mint
+                    [account.pubkey], // accounts to harvest from
+  
+                    programId
+                  )
+                );
+              }
+            }
           transaction.add(
             createCloseAccountInstruction(
               account.pubkey,

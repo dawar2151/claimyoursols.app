@@ -14,6 +14,7 @@ import {
   ACCOUNT_SIZE,
   createBurnInstruction,
   TOKEN_2022_PROGRAM_ID,
+  createHarvestWithheldTokensToMintInstruction,
 } from "@solana/spl-token";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { calculateCommission, getFeeRecipient } from "@/app/utils/utils";
@@ -324,6 +325,23 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               programId
             )
           );
+          if (account.hasWithheldTokens) {
+            console.log(
+              `Closing account ${account.pubkey.toString()} with withheld amount: ${
+                account.withheldAmount
+              }`
+            );
+            if (account.mintAddress) {
+              transaction.add(
+                createHarvestWithheldTokensToMintInstruction(
+                  new PublicKey(account.mintAddress), // destination mint
+                  [account.pubkey], // accounts to harvest from
+
+                  programId
+                )
+              );
+            }
+          }
 
           transaction.add(
             createCloseAccountInstruction(
