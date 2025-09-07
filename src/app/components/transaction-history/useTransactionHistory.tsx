@@ -15,6 +15,37 @@ export interface TransactionInfo {
   };
 }
 
+// Helper function to calculate claimed SOL amount
+const getClaimedSolAmount = (tx: TransactionInfo): number => {
+  if (!tx.meta?.preBalances || !tx.meta?.postBalances) {
+    return 0;
+  }
+
+  try {
+    const preBalances = tx.meta.preBalances;
+    const postBalances = tx.meta.postBalances;
+
+    // Calculate the total balance change (positive means SOL was received/claimed)
+    let totalBalanceChange = 0;
+    for (
+      let i = 0;
+      i < Math.min(preBalances.length, postBalances.length);
+      i++
+    ) {
+      const balanceChange = postBalances[i] - preBalances[i];
+      if (balanceChange > 0) {
+        totalBalanceChange += balanceChange;
+      }
+    }
+
+    // Convert lamports to SOL
+    return totalBalanceChange / 1e9;
+  } catch (error) {
+    console.warn("Error calculating claimed SOL amount:", error);
+    return 0;
+  }
+};
+
 export function useTransactionHistory(limit: number = 20) {
   const [history, setHistory] = useState<TransactionInfo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -70,13 +101,32 @@ export function useTransactionHistory(limit: number = 20) {
             }
           }
 
-          txs.push({
+          const transactionInfo: TransactionInfo = {
             signature: sigInfo.signature,
             blockTime: tx.blockTime ?? null,
             methodNames,
             instructionCount,
             meta: tx.meta || undefined,
-          });
+          };
+
+          // Only add transactions where claimed SOL amount > 0
+          const claimedAmount = getClaimedSolAmount(transactionInfo);
+          if (claimedAmount > 0) {
+            console.log(
+              `Transaction ${
+                sigInfo.signature
+              } has claimed SOL: ${claimedAmount.toFixed(4)} SOL`
+            );
+            txs.push(transactionInfo);
+          } else {
+            console.log(
+              `Transaction ${
+                sigInfo.signature
+              } has no claimed SOL (${claimedAmount.toFixed(
+                4
+              )} SOL) - filtering out`
+            );
+          }
         }
 
         if (append) {
