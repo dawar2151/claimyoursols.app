@@ -152,6 +152,7 @@ export function useAccountsHelper(connection: Connection) {
         .filter((account) =>
           isValidTokenAccountForClose(account, rentExemptReserve)
         )
+        .filter((account) => account.account.data.parsed?.info?.state !== "frozen")
         .map((account) => {
           const { withheldAmount, hasWithheldTokens, mintAddress } =
             checkWithheldAmount(account.account);
@@ -166,7 +167,6 @@ export function useAccountsHelper(connection: Connection) {
             mintAddress,
           };
         })
-       // .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
 
       setAccounts(closeableAccounts);
 

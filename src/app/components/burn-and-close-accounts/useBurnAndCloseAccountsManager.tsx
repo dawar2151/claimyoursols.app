@@ -166,6 +166,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         .filter((account) =>
           isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
         )
+        .filter((account) => account.account.data.parsed?.info?.state !== "frozen")
         .map((account) => {
           // Check for withheld amount in Token 2022 accounts
           const { withheldAmount, hasWithheldTokens, mintAddress } =
