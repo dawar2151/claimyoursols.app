@@ -242,9 +242,11 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
       }
       let totalClosed = 0;
       const newTransactionHashes: string[] = [];
-      const accountsToBurnAndClose = accounts.filter((account) =>
-        selectedAccounts.has(account.pubkey.toString())
-      );
+      const accountsToBurnAndClose = accounts.filter((account) => {
+        const isSelected = selectedAccounts.has(account.pubkey.toString());
+        const isNotFrozen = account.account.data.parsed?.info?.state !== "frozen";
+        return isSelected && isNotFrozen;
+      });
       let currentRent = 0;
 
       for (let i = 0; i < accountsToBurnAndClose.length; i += BATCH_SIZE) {

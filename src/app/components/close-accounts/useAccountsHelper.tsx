@@ -202,9 +202,13 @@ export function useAccountsHelper(connection: Connection) {
       }
       let totalClosed = 0;
       const newTransactionHashes: string[] = []; // Temporary array to collect hashes
-      const accountsToClose = accounts.filter((account) =>
-        selectedAccounts.has(account.pubkey.toString())
-      );
+      console.log(accounts);
+      const accountsToClose = accounts.filter((account) => {
+        const isSelected = selectedAccounts.has(account.pubkey.toString());
+        const isNotFrozen = account.account.data.parsed?.info?.state !== "frozen";
+        return isSelected && isNotFrozen;
+      });
+    
       for (let i = 0; i < accountsToClose.length; i += BATCH_SIZE) {
         const batch = accountsToClose.slice(i, i + BATCH_SIZE);
         const transaction = new Transaction();
