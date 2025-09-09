@@ -83,7 +83,7 @@ const FAQSection = () => {
           <p>
             Even after selling all your tokens, that account stays open and
             holds your rent. We detect and close these empty accounts, refunding
-            your SOL back to your wallet. A small 10% donation from the
+            your SOL back to your wallet. A small 15% donation from the
             recovered SOL supports our operations.
           </p>
         </FAQItem>
