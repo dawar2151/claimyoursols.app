@@ -16,7 +16,7 @@ Disallow: /static/
 
 # Allow important pages
 Allow: /
-Allow /burn-and-close-accounts
-Allow /close-mint-accounts
+Allow: /burn-and-close-accounts
+Allow: /close-mint-accounts
 Allow: /support
 Allow: /terms
