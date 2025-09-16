@@ -1,7 +1,6 @@
 "use client";
 
 import { useContext, useState, useEffect } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
 import { ClaimYourSolsStateContext } from "@/app/providers";
 import { useBurnAndCloseAccountsManager } from "./useBurnAndCloseAccountsManager";
 import XButton from "@/app/components/x-components/XButton";
@@ -21,7 +20,6 @@ import { useConfirmDialog } from "@/app/hooks/useConfirmDialog";
 
 export const BurnAndCloseAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
-  const wallet = useWallet();
 
   // Add state for success alert
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -40,6 +38,12 @@ export const BurnAndCloseAccountsManager = () => {
     cleanClosedAccounts,
     currentTotalRent,
     accounts,
+    currentPage,
+    hasMoreAccounts,
+    isLoadingMore,
+    metadataProgress,
+    itemsPerPage,
+    totalAccounts,
     error,
     isSuccess,
     isLoading,
@@ -48,6 +52,7 @@ export const BurnAndCloseAccountsManager = () => {
     clearTransactionHashes,
     closeAllAccounts,
     refreshAccounts,
+    loadMoreAccounts,
   } = useBurnAndCloseAccountsManager(claimYourSolsState.connection);
 
   const searchParams = useSearchParams();
@@ -85,7 +90,13 @@ export const BurnAndCloseAccountsManager = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isSuccess]);
+  }, [
+    isSuccess,
+    showSuccessAlert,
+    currentTotalRent,
+    selectedAccounts.size,
+    cleanClosedAccounts,
+  ]);
 
   // Handle closing the alert
   const handleCloseSuccessAlert = () => {
@@ -114,12 +125,16 @@ export const BurnAndCloseAccountsManager = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center space-y-4 bg-white min-h-screen">
+      <div className="flex flex-col items-center justify-center space-y-3 py-12">
         <div
-          className="animate-spin rounded-full h-8 w-8 border-b-2"
+          className="animate-spin rounded-full h-6 w-6 border-b-2"
           style={{ borderColor: colors.primary }}
         ></div>
-        <XTypography variant="body" style={{ color: colors.text.secondary }}>
+        <XTypography
+          variant="body"
+          className="text-sm"
+          style={{ color: colors.text.secondary }}
+        >
           Loading your accounts...
         </XTypography>
       </div>
@@ -128,7 +143,7 @@ export const BurnAndCloseAccountsManager = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center space-y-4 bg-white min-h-screen p-6">
+      <div className="flex flex-col items-center space-y-4 py-8 px-6">
         <XTypography
           variant="h4"
           className="mb-2"
@@ -179,39 +194,7 @@ export const BurnAndCloseAccountsManager = () => {
             borderColor: `${colors.border}/50`,
           }}
         >
-          {!wallet.publicKey ? (
-            <div className="text-center py-12 flex flex-col justify-center items-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
-                  />
-                </svg>
-              </div>
-              <XTypography
-                variant="h4"
-                className="mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                Connect Your Wallet
-              </XTypography>
-              <XTypography
-                variant="body"
-                className="text-center max-w-md"
-                style={{ color: colors.text.secondary }}
-              >
-                Please connect your wallet by clicking &quot;Select Wallet&quot; above to scan for eligible accounts to burn and close.
-              </XTypography>
-            </div>
-          ) : accounts.length === 0 ? (
+          {accounts.length === 0 ? (
             <div className="text-center py-12 flex flex-col justify-center items-center">
               <div className="text-6xl mb-4">🎉</div>
               <XTypography
@@ -303,6 +286,112 @@ export const BurnAndCloseAccountsManager = () => {
                   />
                 ))}
               </div>
+
+              {/* Metadata Loading Progress */}
+              {metadataProgress && (
+                <div
+                  className="mt-4 p-3 border rounded-lg"
+                  style={{
+                    backgroundColor: `${colors.background.light}/10`,
+                    borderColor: `${colors.border}/30`,
+                  }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <XTypography
+                      variant="body"
+                      className="text-sm font-medium"
+                      style={{ color: colors.text.primary }}
+                    >
+                      Loading Token Metadata...
+                    </XTypography>
+                    <XTypography
+                      variant="body"
+                      className="text-sm"
+                      style={{ color: colors.text.secondary }}
+                    >
+                      {metadataProgress.current}/{metadataProgress.total}
+                    </XTypography>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${
+                          (metadataProgress.current / metadataProgress.total) *
+                          100
+                        }%`,
+                        backgroundColor: colors.primary,
+                      }}
+                    />
+                  </div>
+                  <XTypography
+                    variant="body"
+                    className="text-xs mt-1"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Fetching token information in batches to ensure optimal
+                    performance...
+                  </XTypography>
+                </div>
+              )}
+
+              {/* Pagination Controls */}
+              {totalAccounts > itemsPerPage && (
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  {/* Pagination Info */}
+                  <div
+                    className="text-sm"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    Showing{" "}
+                    {Math.min((currentPage + 1) * itemsPerPage, totalAccounts)}{" "}
+                    of {totalAccounts} accounts
+                  </div>
+
+                  {/* Load More Button for easier UX */}
+                  {hasMoreAccounts && (
+                    <button
+                      onClick={loadMoreAccounts}
+                      disabled={isLoadingMore}
+                      className="w-full sm:w-auto px-4 py-2 text-sm border rounded-md transition-colors flex items-center justify-center gap-2"
+                      style={{
+                        borderColor: colors.primary,
+                        color: colors.primary,
+                        backgroundColor: "transparent",
+                      }}
+                    >
+                      {isLoadingMore ? (
+                        <>
+                          <svg
+                            className="animate-spin h-4 w-4"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                              fill="none"
+                              strokeDasharray="32"
+                              strokeDashoffset="32"
+                            />
+                          </svg>
+                          <span>
+                            {metadataProgress
+                              ? `Loading metadata (${metadataProgress.current}/${metadataProgress.total})...`
+                              : "Processing accounts..."}
+                          </span>
+                        </>
+                      ) : (
+                        `Load More (${
+                          totalAccounts - (currentPage + 1) * itemsPerPage
+                        } remaining)`
+                      )}
+                    </button>
+                  )}
+                </div>
+              )}
             </>
           )}
 
@@ -329,7 +418,10 @@ export const BurnAndCloseAccountsManager = () => {
                     className="font-bold"
                     style={{ color: colors.secondary }}
                   >
-                    {(totalRent / 1e9).toFixed(4) === "0.0000" ? "0" : (totalRent / 1e9).toFixed(4)} SOL
+                    {(totalRent / 1e9).toFixed(4) === "0.0000"
+                      ? "0"
+                      : (totalRent / 1e9).toFixed(4)}{" "}
+                    SOL
                   </XTypography>
                 </div>
                 <div>
@@ -361,7 +453,7 @@ export const BurnAndCloseAccountsManager = () => {
                     className="font-bold"
                     style={{ color: colors.text.primary }}
                   >
-                    {accounts.length}
+                    {totalAccounts}
                   </XTypography>
                 </div>
               </div>

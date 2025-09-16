@@ -43,6 +43,7 @@ interface AccountData {
 }
 
 const BATCH_SIZE = 10;
+const METADATA_BATCH_SIZE = 5; // Smaller batches for metadata fetching
 
 const fetchTokenAccounts = async (
   connection: Connection,
@@ -52,6 +53,83 @@ const fetchTokenAccounts = async (
   return connection.getParsedTokenAccountsByOwner(publicKey, {
     programId: programId,
   });
+};
+
+const fetchMetadataForAccounts = async (
+  accounts: AccountData[],
+  connection: Connection,
+  onProgress?: (_current: number, _total: number) => void
+): Promise<AccountData[]> => {
+  const accountsWithMetadata: AccountData[] = [];
+  let processedCount = 0;
+
+  console.log(`📋 Starting metadata fetch for ${accounts.length} accounts...`);
+
+  // Process in batches like transactions
+  for (let i = 0; i < accounts.length; i += METADATA_BATCH_SIZE) {
+    const batch = accounts.slice(i, i + METADATA_BATCH_SIZE);
+    const batchNumber = Math.floor(i / METADATA_BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(accounts.length / METADATA_BATCH_SIZE);
+
+    console.log(
+      `🔄 Processing metadata batch ${batchNumber}/${totalBatches}...`
+    );
+
+    try {
+      // Process batch concurrently for better performance
+      const batchPromises = batch.map(async (account) => {
+        try {
+          const metadata = await fetchTokenMetadata(
+            connection,
+            account.account.data.parsed.info.mint
+          );
+
+          return {
+            ...account,
+            metadata,
+            tokenName: metadata.name,
+            tokenSymbol: metadata.symbol,
+            tokenUri: metadata.uri,
+          };
+        } catch (metadataError) {
+          console.error(
+            `❌ Error fetching metadata for ${account.mint}:`,
+            metadataError
+          );
+          // Still add the account even if metadata fetch fails
+          return account;
+        }
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      accountsWithMetadata.push(...batchResults);
+      processedCount += batch.length;
+
+      console.log(
+        `✅ Completed metadata batch ${batchNumber}: ${batch.length} accounts`
+      );
+
+      if (onProgress) {
+        onProgress(processedCount, accounts.length);
+      }
+
+      if (i + METADATA_BATCH_SIZE < accounts.length) {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+    } catch (batchError) {
+      console.error(
+        `❌ Error processing metadata batch ${batchNumber}:`,
+        batchError
+      );
+      continue;
+    }
+  }
+
+  console.log(
+    `📋 Metadata fetch completed. Processed: ${processedCount}/${accounts.length} accounts`
+  );
+
+  return accountsWithMetadata;
 };
 
 const createFeeInstructions = async (
@@ -114,10 +192,20 @@ const createFeeInstructions = async (
   return transaction;
 };
 
+const ITEMS_PER_PAGE = 10;
+
 export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
+  const [allAccounts, setAllAccounts] = useState<AccountData[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMoreAccounts, setHasMoreAccounts] = useState(true);
   const [referralAccount, setReferralAccount] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [metadataProgress, setMetadataProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
   const [currentTotalRent, setCurrentTotalRent] = useState<number>(0);
 
   const [isSuccess, setIsSuccess] = useState(false);
@@ -132,100 +220,253 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   const publicKey = wallet.publicKey;
 
   const cleanClosedAccounts = useCallback(() => {
-    setAccounts(
-      accounts.filter(
-        (account) => !selectedAccounts.has(account.pubkey.toString())
-      )
+    const updatedAllAccounts = allAccounts.filter(
+      (account) => !selectedAccounts.has(account.pubkey.toString())
     );
+    setAllAccounts(updatedAllAccounts);
+
+    const currentDisplayedCount = accounts.length;
+    const endIndex = Math.min(currentDisplayedCount, updatedAllAccounts.length);
+    setAccounts(updatedAllAccounts.slice(0, endIndex));
+
     setSelectedAccounts(new Set());
     setIsSuccess(false);
-  }, [accounts, selectedAccounts]);
+    setHasMoreAccounts(updatedAllAccounts.length > endIndex);
+  }, [allAccounts, selectedAccounts, accounts.length]);
 
-  const fetchAccounts = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      if (!publicKey) {
-        throw new Error(
-          "Wallet not connected. Please connect your wallet to fetch accounts."
-        );
+  const fetchAccounts = useCallback(
+    async (reset: boolean = true) => {
+      if (reset) {
+        setIsLoading(true);
+        setCurrentPage(0);
+      } else {
+        setIsLoadingMore(true);
       }
-      const rentExemptReserve =
-        await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
+      setError(null);
 
-      const [splTokenAccounts, token2022Accounts] = await Promise.all([
-        fetchTokenAccounts(connection, publicKey, TOKEN_PROGRAM_ID),
-        fetchTokenAccounts(connection, publicKey, TOKEN_2022_PROGRAM_ID),
-      ]);
-
-      let closeableAccounts = [
-        ...splTokenAccounts.value,
-        ...token2022Accounts.value,
-      ]
-        .filter((account) =>
-          isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
-        )
-        .filter((account) => account.account.data.parsed?.info?.state !== "frozen")
-        .map((account) => {
-          // Check for withheld amount in Token 2022 accounts
-          const { withheldAmount, hasWithheldTokens, mintAddress } =
-            checkWithheldAmount(account.account);
-
-          return {
-            pubkey: account.pubkey,
-            account: account.account,
-            uiAmount: account.account.data.parsed.info.tokenAmount.uiAmount,
-            decimals: account.account.data.parsed.info.tokenAmount.decimals,
-            mint: account.account.data.parsed.info.mint,
-            amount: account.account.data.parsed.info.tokenAmount.amount,
-            lamports: account.account.lamports,
-            rentExemptReserve,
-            withheldAmount,
-            hasWithheldTokens,
-            mintAddress,
-          };
-        });
-
-      const updatedAccounts: AccountData[] = [];
       try {
-        for (const account of closeableAccounts) {
-          try {
-            const metadata = await fetchTokenMetadata(
-              connection,
-              account.account.data.parsed.info.mint
-            );
+        if (!publicKey) {
+          throw new Error(
+            "Wallet not connected. Please connect your wallet to fetch accounts."
+          );
+        }
 
-            updatedAccounts.push({
-              ...account,
-              metadata,
-              tokenName: metadata.name,
-              tokenSymbol: metadata.symbol,
-              tokenUri: metadata.uri,
-            });
-          } catch (metadataError) {
-            console.error(
-              `Error fetching metadata for ${account.mint}:`,
-              metadataError
-            );
-            // Still add the account even if metadata fetch fails
-            updatedAccounts.push(account);
-          }
+        const rentExemptReserve =
+          await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
+
+        const [splTokenAccounts, token2022Accounts] = await Promise.all([
+          fetchTokenAccounts(connection, publicKey, TOKEN_PROGRAM_ID),
+          fetchTokenAccounts(connection, publicKey, TOKEN_2022_PROGRAM_ID),
+        ]);
+
+        let closeableAccounts = [
+          ...splTokenAccounts.value,
+          ...token2022Accounts.value,
+        ]
+          .filter((account) =>
+            isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
+          )
+          .filter(
+            (account) => account.account.data.parsed?.info?.state !== "frozen"
+          )
+          .map((account) => {
+            // Check for withheld amount in Token 2022 accounts
+            const { withheldAmount, hasWithheldTokens, mintAddress } =
+              checkWithheldAmount(account.account);
+
+            return {
+              pubkey: account.pubkey,
+              account: account.account,
+              uiAmount: account.account.data.parsed.info.tokenAmount.uiAmount,
+              decimals: account.account.data.parsed.info.tokenAmount.decimals,
+              mint: account.account.data.parsed.info.mint,
+              amount: account.account.data.parsed.info.tokenAmount.amount,
+              lamports: account.account.lamports,
+              rentExemptReserve,
+              withheldAmount,
+              hasWithheldTokens,
+              mintAddress,
+            };
+          })
+          .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
+
+        if (reset) {
+          // Store all accounts without metadata first
+          setAllAccounts(closeableAccounts);
+          setHasMoreAccounts(closeableAccounts.length > ITEMS_PER_PAGE);
+
+          // Fetch metadata only for the first page
+          const firstPageAccounts = closeableAccounts.slice(0, ITEMS_PER_PAGE);
+          setMetadataProgress({ current: 0, total: firstPageAccounts.length });
+
+          const accountsWithMetadata = await fetchMetadataForAccounts(
+            firstPageAccounts,
+            connection,
+            (current, total) => {
+              setMetadataProgress({ current, total });
+            }
+          );
+
+          setAccounts(accountsWithMetadata);
+          setMetadataProgress(null); // Clear progress when done
         }
       } catch (err) {
-        console.error("Error fetching token metadata:", err);
-        // Fallback to using accounts without metadata
-        setAccounts(closeableAccounts);
-        return;
+        console.error("Error fetching accounts:", err);
+      } finally {
+        if (reset) {
+          setIsLoading(false);
+        } else {
+          setIsLoadingMore(false);
+        }
       }
+    },
+    [connection, publicKey]
+  );
 
-      setAccounts(updatedAccounts);
-    } catch (err) {
-      console.error("Error fetching accounts:", err);
-    } finally {
-      setIsLoading(false);
+  const loadMoreAccounts = useCallback(async () => {
+    const nextPage = currentPage + 1;
+    const endIndex = (nextPage + 1) * ITEMS_PER_PAGE;
+    const currentDisplayedCount = (currentPage + 1) * ITEMS_PER_PAGE;
+
+    if (currentDisplayedCount < allAccounts.length) {
+      setIsLoadingMore(true);
+
+      try {
+        const newAccountsToShow = allAccounts.slice(
+          currentDisplayedCount,
+          Math.min(endIndex, allAccounts.length)
+        );
+
+        const accountsNeedingMetadata = newAccountsToShow.filter(
+          (account) => !account.metadata
+        );
+
+        if (accountsNeedingMetadata.length > 0) {
+          setMetadataProgress({
+            current: 0,
+            total: accountsNeedingMetadata.length,
+          });
+
+          const newAccountsWithMetadata = await fetchMetadataForAccounts(
+            accountsNeedingMetadata,
+            connection,
+            (current, total) => {
+              setMetadataProgress({ current, total });
+            }
+          );
+
+          const updatedAllAccounts = [...allAccounts];
+          newAccountsWithMetadata.forEach((accountWithMetadata) => {
+            const index = updatedAllAccounts.findIndex(
+              (acc) =>
+                acc.pubkey.toString() === accountWithMetadata.pubkey.toString()
+            );
+            if (index !== -1) {
+              updatedAllAccounts[index] = {
+                ...updatedAllAccounts[index],
+                ...accountWithMetadata,
+              };
+            }
+          });
+          setAllAccounts(updatedAllAccounts);
+
+          const finalEndIndex = Math.min(endIndex, updatedAllAccounts.length);
+          setAccounts(updatedAllAccounts.slice(0, finalEndIndex));
+          setMetadataProgress(null);
+        } else {
+          const finalEndIndex = Math.min(endIndex, allAccounts.length);
+          setAccounts(allAccounts.slice(0, finalEndIndex));
+        }
+
+        setCurrentPage(nextPage);
+        const finalDisplayedCount = Math.min(endIndex, allAccounts.length);
+        setHasMoreAccounts(finalDisplayedCount < allAccounts.length);
+      } catch (error) {
+        console.error("Error loading more accounts:", error);
+        // Fallback to showing accounts without metadata
+        setCurrentPage(nextPage);
+        const finalEndIndex = Math.min(endIndex, allAccounts.length);
+        setAccounts(allAccounts.slice(0, finalEndIndex));
+        setHasMoreAccounts(finalEndIndex < allAccounts.length);
+      } finally {
+        setIsLoadingMore(false);
+      }
     }
-  }, [connection, publicKey]);
+  }, [currentPage, allAccounts, connection]);
+
+  const goToPage = useCallback(
+    async (page: number) => {
+      const endIndex = (page + 1) * ITEMS_PER_PAGE;
+
+      if (page >= 0 && page * ITEMS_PER_PAGE < allAccounts.length) {
+        setIsLoadingMore(true);
+
+        try {
+          // Check if we need to fetch metadata for any accounts up to this page
+          const accountsToShow = allAccounts.slice(
+            0,
+            Math.min(endIndex, allAccounts.length)
+          );
+          const accountsNeedingMetadata = accountsToShow.filter(
+            (account) => !account.metadata
+          );
+
+          if (accountsNeedingMetadata.length > 0) {
+            // Set progress for metadata loading
+            setMetadataProgress({
+              current: 0,
+              total: accountsNeedingMetadata.length,
+            });
+
+            // Fetch metadata for accounts that need it
+            const accountsWithMetadata = await fetchMetadataForAccounts(
+              accountsNeedingMetadata,
+              connection,
+              (current, total) => {
+                setMetadataProgress({ current, total });
+              }
+            );
+
+            // Update allAccounts with the new metadata
+            const updatedAllAccounts = [...allAccounts];
+            accountsWithMetadata.forEach((accountWithMetadata) => {
+              const index = updatedAllAccounts.findIndex(
+                (acc) =>
+                  acc.pubkey.toString() ===
+                  accountWithMetadata.pubkey.toString()
+              );
+              if (index !== -1) {
+                updatedAllAccounts[index] = {
+                  ...updatedAllAccounts[index],
+                  ...accountWithMetadata,
+                };
+              }
+            });
+            setAllAccounts(updatedAllAccounts);
+            const finalEndIndex = Math.min(endIndex, updatedAllAccounts.length);
+            setAccounts(updatedAllAccounts.slice(0, finalEndIndex));
+            setMetadataProgress(null); // Clear progress when done
+          } else {
+            const finalEndIndex = Math.min(endIndex, allAccounts.length);
+            setAccounts(allAccounts.slice(0, finalEndIndex));
+          }
+
+          setCurrentPage(page);
+          setHasMoreAccounts(allAccounts.length > endIndex);
+        } catch (error) {
+          console.error("Error going to page:", error);
+          // Fallback to showing accounts without metadata
+          setCurrentPage(page);
+          const finalEndIndex = Math.min(endIndex, allAccounts.length);
+          setAccounts(allAccounts.slice(0, finalEndIndex));
+          setHasMoreAccounts(allAccounts.length > endIndex);
+        } finally {
+          setIsLoadingMore(false);
+        }
+      }
+    },
+    [allAccounts, connection]
+  );
 
   const closeAllAccounts = useCallback(async () => {
     setIsClosing(true);
@@ -245,7 +486,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
       const newTransactionHashes: string[] = [];
       const accountsToBurnAndClose = accounts.filter((account) => {
         const isSelected = selectedAccounts.has(account.pubkey.toString());
-        const isNotFrozen = account.account.data.parsed?.info?.state !== "frozen";
+        const isNotFrozen =
+          account.account.data.parsed?.info?.state !== "frozen";
         return isSelected && isNotFrozen;
       });
       let currentRent = 0;
@@ -380,14 +622,18 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             `❌ Error closing batch ${Math.floor(i / BATCH_SIZE) + 1}:`,
             batchError
           );
-          setError(
-            `Failed to close batch ${
-              Math.floor(i / BATCH_SIZE) + 1
-            }: ${errorMessage}`
-          );
+
           if (errorMessage.includes("rejected")) {
-            setError("Transaction was rejected by user. Stopping process.");
+            // Show popup alert instead of setting error state
+            alert("Transaction was rejected by user. Process stopped.");
             break;
+          } else {
+            // Only set error for non-rejection errors
+            setError(
+              `Failed to close batch ${
+                Math.floor(i / BATCH_SIZE) + 1
+              }: ${errorMessage}`
+            );
           }
         }
 
@@ -411,15 +657,132 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     }
   }, [
     publicKey,
-    accounts,
+    allAccounts,
     selectedAccounts,
     referralAccount,
     connection,
     wallet,
   ]);
 
+  const refreshAccounts = useCallback(async () => {
+    const currentPageToMaintain = currentPage;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      if (!publicKey) {
+        throw new Error(
+          "Wallet not connected. Please connect your wallet to fetch accounts."
+        );
+      }
+
+      const rentExemptReserve =
+        await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
+
+      const [splTokenAccounts, token2022Accounts] = await Promise.all([
+        fetchTokenAccounts(connection, publicKey, TOKEN_PROGRAM_ID),
+        fetchTokenAccounts(connection, publicKey, TOKEN_2022_PROGRAM_ID),
+      ]);
+
+      let closeableAccounts = [
+        ...splTokenAccounts.value,
+        ...token2022Accounts.value,
+      ]
+        .filter((account) =>
+          isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
+        )
+        .filter(
+          (account) => account.account.data.parsed?.info?.state !== "frozen"
+        )
+        .map((account) => {
+          // Check for withheld amount in Token 2022 accounts
+          const { withheldAmount, hasWithheldTokens, mintAddress } =
+            checkWithheldAmount(account.account);
+
+          return {
+            pubkey: account.pubkey,
+            account: account.account,
+            uiAmount: account.account.data.parsed.info.tokenAmount.uiAmount,
+            decimals: account.account.data.parsed.info.tokenAmount.decimals,
+            mint: account.account.data.parsed.info.mint,
+            amount: account.account.data.parsed.info.tokenAmount.amount,
+            lamports: account.account.lamports,
+            rentExemptReserve,
+            withheldAmount,
+            hasWithheldTokens,
+            mintAddress,
+          };
+        })
+        .filter((account) => !account.hasWithheldTokens);
+
+      // Store all accounts without metadata first
+      setAllAccounts(closeableAccounts);
+
+      // Calculate how many accounts to show based on current page
+      const accountsToShow = Math.min(
+        (currentPageToMaintain + 1) * ITEMS_PER_PAGE,
+        closeableAccounts.length
+      );
+
+      const accountsToFetch = closeableAccounts.slice(0, accountsToShow);
+
+      if (accountsToFetch.length > 0) {
+        setMetadataProgress({ current: 0, total: accountsToFetch.length });
+
+        const accountsWithMetadata = await fetchMetadataForAccounts(
+          accountsToFetch,
+          connection,
+          (current, total) => {
+            setMetadataProgress({ current, total });
+          }
+        );
+
+        // Update allAccounts with metadata
+        const updatedAllAccounts = [...closeableAccounts];
+        accountsWithMetadata.forEach((accountWithMetadata) => {
+          const index = updatedAllAccounts.findIndex(
+            (acc) =>
+              acc.pubkey.toString() === accountWithMetadata.pubkey.toString()
+          );
+          if (index !== -1) {
+            updatedAllAccounts[index] = {
+              ...updatedAllAccounts[index],
+              ...accountWithMetadata,
+            };
+          }
+        });
+
+        setAllAccounts(updatedAllAccounts);
+        setAccounts(accountsWithMetadata);
+        setMetadataProgress(null);
+      } else {
+        setAccounts([]);
+      }
+
+      // Maintain the current page if it's valid
+      if (
+        currentPageToMaintain >= 0 &&
+        accountsToShow <= closeableAccounts.length
+      ) {
+        setCurrentPage(currentPageToMaintain);
+      } else {
+        setCurrentPage(0);
+      }
+
+      setHasMoreAccounts(closeableAccounts.length > accountsToShow);
+    } catch (err) {
+      console.error("Error refreshing accounts:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to refresh accounts"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, publicKey, connection]);
+
   useEffect(() => {
-    fetchAccounts();
+    fetchAccounts(true);
   }, [fetchAccounts, publicKey]);
 
   return {
@@ -429,6 +792,14 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     cleanClosedAccounts,
     currentTotalRent,
     accounts,
+    allAccounts,
+    currentPage,
+    hasMoreAccounts,
+    isLoadingMore,
+    metadataProgress,
+    totalPages: Math.ceil(allAccounts.length / ITEMS_PER_PAGE),
+    itemsPerPage: ITEMS_PER_PAGE,
+    totalAccounts: allAccounts.length,
     isSuccess,
     isLoading,
     isClosing,
@@ -436,6 +807,8 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
     transactionHashes,
     closeAllAccounts,
     clearTransactionHashes: setTransactionHashes,
-    refreshAccounts: fetchAccounts,
+    refreshAccounts,
+    loadMoreAccounts,
+    goToPage,
   };
 }
