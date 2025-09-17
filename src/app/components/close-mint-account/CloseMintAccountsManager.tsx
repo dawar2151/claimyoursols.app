@@ -13,10 +13,12 @@ import {
   AccountDetails,
   TokenAccountCard,
 } from "../x-components/TokenAccountCard";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { ConnectYourWallet } from "../ConnectYourWallet";
 
 export const CloseMintAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
-
+  const wallet = useWallet();
   // Add state for success alert
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [lastSuccessData, setLastSuccessData] = useState<{
@@ -254,8 +256,9 @@ export const CloseMintAccountsManager = () => {
               Refresh
             </button>
           </div>
-
-          {mintAccounts.length === 0 ? (
+          {!wallet.publicKey ? (
+            <ConnectYourWallet className="my-20" />
+          ) : mintAccounts.length === 0 ? (
             <div className="text-center py-12 flex flex-col justify-center items-center">
               <div className="text-6xl mb-4">🎉</div>
               <XTypography
@@ -321,7 +324,10 @@ export const CloseMintAccountsManager = () => {
                     className="font-bold"
                     style={{ color: colors.secondary }}
                   >
-                    {(totalRent / 1e9).toFixed(4) === "0.0000" ? "0" : (totalRent / 1e9).toFixed(4)} SOL
+                    {(totalRent / 1e9).toFixed(4) === "0.0000"
+                      ? "0"
+                      : (totalRent / 1e9).toFixed(4)}{" "}
+                    SOL
                   </XTypography>
                 </div>
                 <div>

@@ -17,9 +17,12 @@ import {
 import { validateTokenPrice } from "@/app/utils/TokenPriceValidator";
 import ConfirmDialog from "../x-components/ConfirmDialog";
 import { useConfirmDialog } from "@/app/hooks/useConfirmDialog";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { ConnectYourWallet } from "../ConnectYourWallet";
 
 export const BurnAndCloseAccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
+  var wallet = useWallet();
 
   // Add state for success alert
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
@@ -194,7 +197,9 @@ export const BurnAndCloseAccountsManager = () => {
             borderColor: `${colors.border}/50`,
           }}
         >
-          {accounts.length === 0 ? (
+          {!wallet.publicKey ? (
+            <ConnectYourWallet className="my-20" />
+          ) : accounts.length === 0 ? (
             <div className="text-center py-12 flex flex-col justify-center items-center">
               <div className="text-6xl mb-4">🎉</div>
               <XTypography

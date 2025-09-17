@@ -13,9 +13,12 @@ import {
   AccountDetails,
   TokenAccountCard,
 } from "../x-components/TokenAccountCard";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { ConnectYourWallet } from "../ConnectYourWallet";
 
 export const AccountsManager = () => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
+  const wallet = useWallet();
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [lastSuccessData, setLastSuccessData] = useState<{
     recoveredAmount: number;
@@ -212,11 +215,7 @@ export const AccountsManager = () => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  d={
-                    isListOpen
-                      ? "M5 15l7-7 7 7"
-                      : "M19 9l-7 7-7-7"
-                  }
+                  d={isListOpen ? "M5 15l7-7 7 7" : "M19 9l-7 7-7-7"}
                 />
               </svg>
               {isListOpen ? "Hide Accounts" : "Show Accounts"}
@@ -302,27 +301,30 @@ export const AccountsManager = () => {
             </>
           )}
 
-          {/* Empty State */}
-          {accounts.length === 0 && (
-            <div className="text-center py-12 flex flex-col justify-center items-center">
-              <div className="text-6xl mb-4">🎉</div>
-              <XTypography
-                variant="h4"
-                className="mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                All Clean!
-              </XTypography>
-              <XTypography
-                variant="body"
-                className="text-center max-w-md"
-                style={{ color: colors.text.secondary }}
-              >
-                {
-                  "No open accounts found. All your accounts are already closed or you don't have any accounts to close."
-                }
-              </XTypography>
-            </div>
+          {!wallet.publicKey ? (
+            <ConnectYourWallet className="my-20" />
+          ) : (
+            accounts.length === 0 && (
+              <div className="text-center py-12 flex flex-col justify-center items-center">
+                <div className="text-6xl mb-4">🎉</div>
+                <XTypography
+                  variant="h4"
+                  className="mb-2"
+                  style={{ color: colors.text.primary }}
+                >
+                  All Clean!
+                </XTypography>
+                <XTypography
+                  variant="body"
+                  className="text-center max-w-md"
+                  style={{ color: colors.text.secondary }}
+                >
+                  {
+                    "No open accounts found. All your accounts are already closed or you don't have any accounts to close."
+                  }
+                </XTypography>
+              </div>
+            )
           )}
 
           {/* Total Calculation */}
@@ -348,7 +350,10 @@ export const AccountsManager = () => {
                     className="font-bold"
                     style={{ color: colors.secondary }}
                   >
-                    {(totalRent / 1e9).toFixed(4) === "0.0000" ? "0" : (totalRent / 1e9).toFixed(4)} SOL
+                    {(totalRent / 1e9).toFixed(4) === "0.0000"
+                      ? "0"
+                      : (totalRent / 1e9).toFixed(4)}{" "}
+                    SOL
                   </XTypography>
                 </div>
               </div>
@@ -380,17 +385,15 @@ export const AccountsManager = () => {
                 }
               }}
             >
-              {isClosing
-                ? " Claiming..."
-                : `Claim`}
+              {isClosing ? " Claiming..." : `Claim`}
             </XButton>
             <XTypography
               variant="body"
               className="text-xs mt-3 text-center"
               style={{ color: colors.text.secondary }}
             >
-              This will close empty accounts and refund your locked SOL back
-              to your wallet. Large batches may require multiple transactions.
+              This will close empty accounts and refund your locked SOL back to
+              your wallet. Large batches may require multiple transactions.
             </XTypography>
             {transactionHashes.length > 0 && (
               <div
