@@ -74,6 +74,20 @@ const FAQSection = () => {
       </p>
 
       <div className="space-y-4">
+        <FAQItem question="What is ClaimYourSOLs?">
+          <p className="mb-4">
+            ClaimYourSOLs is a tool that helps you recover SOL locked as rent
+            fees on unused token accounts. Whenever you buy a token on Solana, a
+            token account is created to store it. Keeping this account active
+            costs a rent fee of 0.00204 SOL.
+          </p>
+          <p className="mb-4">With ClaimYourSOLs, you can:</p>
+          <ul className="list-disc pl-6 space-y-2">
+            <li>Claim SOL from unused or empty token accounts</li>
+            <li>Burn worthless tokens or spam coins</li>
+            <li>Keep your wallet safe, clean, and efficient!</li>
+          </ul>
+        </FAQItem>
         <FAQItem question="How does this work?">
           <p className="mb-4">
             Every time you buy a token on Solana, a token account is created to
