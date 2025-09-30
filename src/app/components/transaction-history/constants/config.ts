@@ -1,6 +1,6 @@
 // Core configuration settings
 export const CONFIG = {
-  DEFAULT_LIMIT: 10,
+  DEFAULT_LIMIT: 4,
   HASH_TRUNCATE_LENGTH: {
     DESKTOP: 6,
     MOBILE: 8,
