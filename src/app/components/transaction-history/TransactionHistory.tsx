@@ -24,7 +24,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
 
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 768); // md breakpoint
+      setIsMobile(window.innerWidth < 768);
     };
 
     checkIsMobile();
