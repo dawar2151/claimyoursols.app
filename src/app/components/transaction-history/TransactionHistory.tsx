@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   useTransactionHistory,
   TransactionInfo,
@@ -20,7 +20,22 @@ interface TransactionHistoryProps {
 }
 
 const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
-  const [limit] = useState(CONFIG.DEFAULT_LIMIT);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkIsMobile();
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
+  }, []);
+
+  const limit = useMemo(() => {
+    return isMobile ? CONFIG.MOBILE_LIMIT : CONFIG.DEFAULT_LIMIT;
+  }, [isMobile]);
   const { history, loading, error, hasMore, loadMore } =
     useTransactionHistory(limit);
 
