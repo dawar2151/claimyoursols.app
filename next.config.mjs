@@ -13,34 +13,6 @@ const nextConfig = {
 
     return config;
   },
-  async redirects() {
-    return [
-      // Redirect non-www to www (specific root)
-      {
-        source: "/",
-        has: [
-          {
-            type: "host",
-            value: "claimyoursols.app",
-          },
-        ],
-        destination: "https://www.claimyoursols.app/",
-        permanent: true,
-      },
-      // Redirect non-www to www (all paths)
-      {
-        source: "/(.*)",
-        has: [
-          {
-            type: "host",
-            value: "claimyoursols.app",
-          },
-        ],
-        destination: "https://www.claimyoursols.app/:path*",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;
