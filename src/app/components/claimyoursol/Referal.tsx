@@ -4,12 +4,13 @@ import React from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { colors } from "@/app/utils/colors";
 
-interface ReferralProps { }
+interface ReferralProps {}
 
 const Referral: React.FC<ReferralProps> = () => {
   const { publicKey } = useWallet();
-  const referralLink = `https://www.claimyoursols.app?ref=${publicKey?.toBase58() || ""
-    }`;
+  const referralLink = `https:/claimyoursols.app?ref=${
+    publicKey?.toBase58() || ""
+  }`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralLink);
