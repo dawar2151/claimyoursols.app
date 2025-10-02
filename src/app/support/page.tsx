@@ -8,16 +8,16 @@ export const metadata: Metadata = {
   keywords:
     "support, help, contact, solana support, spl token support, SOL recovery, ClaimYourSols support",
   alternates: {
-    canonical: "https:/claimyoursols.app/support",
+    canonical: "https://claimyoursols.app/support",
   },
   openGraph: {
     title: "Support | Claim Your SOLs",
     description:
       "Need help with ClaimYourSols? Get support for token account management, SOL recovery, and account cleanup. Contact our team for assistance.",
-    url: "https:/claimyoursols.app/support",
+    url: "https://claimyoursols.app/support",
     images: [
       {
-        url: "https:/claimyoursols.app/og-image.png",
+        url: "https://claimyoursols.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "Support | Claim Your SOLs",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     description:
       "Need help with ClaimYourSols? Get support for token account management, SOL recovery, and account cleanup. Contact our team for assistance.",
     card: "summary_large_image",
-    images: ["https:/claimyoursols.app/og-image.png"],
+    images: ["https://claimyoursols.app/og-image.png"],
   },
 };
 

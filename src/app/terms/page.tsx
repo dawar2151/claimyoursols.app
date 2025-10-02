@@ -8,16 +8,16 @@ export const metadata: Metadata = {
   keywords:
     "terms of service, legal agreement, ClaimYourSols terms, solana platform terms, token management legal",
   alternates: {
-    canonical: "https:/claimyoursols.app/terms",
+    canonical: "https://claimyoursols.app/terms",
   },
   openGraph: {
     title: "Terms of Service | Claim Your SOLs",
     description:
       "Read the Terms of Service for ClaimYourSols token account management platform. Learn about the legal terms and conditions for using our SOL recovery tools.",
-    url: "https:/claimyoursols.app/terms",
+    url: "https://claimyoursols.app/terms",
     images: [
       {
-        url: "https:/claimyoursols.app/og-image.png",
+        url: "https://claimyoursols.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "Terms of Service | Claim Your SOLs",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     description:
       "Read the Terms of Service for ClaimYourSols token account management platform. Learn about the legal terms and conditions for using our SOL recovery tools.",
     card: "summary_large_image",
-    images: ["https:/claimyoursols.app/og-image.png"],
+    images: ["https://claimyoursols.app/og-image.png"],
   },
 };
 

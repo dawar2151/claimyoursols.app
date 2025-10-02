@@ -12,10 +12,10 @@ export const metadata: Metadata = {
     title: "Burn Tokens & Close Accounts | Claim Your SOLs",
     description:
       "Safely burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want on Solana.",
-    url: "https:/claimyoursols.app/burn-and-close-accounts",
+    url: "https://claimyoursols.app/burn-and-close-accounts",
     images: [
       {
-        url: "https:/claimyoursols.app/burn-and-close-accounts.png",
+        url: "https://claimyoursols.app/burn-and-close-accounts.png",
         width: 1200,
         height: 630,
         alt: "Burn Tokens & Close Accounts",
@@ -27,10 +27,10 @@ export const metadata: Metadata = {
     description:
       "Safely burn unwanted tokens and close their accounts in one step. Perfect for removing dust tokens, scam tokens, or tokens you no longer want on Solana.",
     card: "summary_large_image",
-    images: ["https:/claimyoursols.app/burn-and-close-accounts.png"],
+    images: ["https://claimyoursols.app/burn-and-close-accounts.png"],
   },
   alternates: {
-    canonical: "https:/claimyoursols.app/burn-and-close-accounts",
+    canonical: "https://claimyoursols.app/burn-and-close-accounts",
   },
 };
 

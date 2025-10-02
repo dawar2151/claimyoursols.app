@@ -48,14 +48,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https:/claimyoursols.app",
+    url: "https://claimyoursols.app",
     title: "Claim Your SOLs | Récupérer vos SOL",
     description:
       "Close unused SPL token accounts and reclaim your SOL rent fees safely and securely on Solana blockchain. Fermez les comptes de jetons SPL inutilisés et récupérez vos frais de location SOL.",
     siteName: "Claim Your SOLs",
     images: [
       {
-        url: "https:/claimyoursols.app/og-image.png",
+        url: "https://claimyoursols.app/og-image.png",
         width: 1200,
         height: 630,
         alt: "Claim Your SOLs - Reclaim Your SOL | Récupérer vos SOL",
@@ -68,7 +68,7 @@ export const metadata: Metadata = {
     title: "Claim Your SOLs | Récupérer vos SOL",
     description:
       "Close unused SPL token accounts and reclaim your SOL rent fees safely and securely. Fermez les comptes de jetons SPL inutilisés.",
-    images: ["https:/claimyoursols.app/og-image.png"],
+    images: ["https://claimyoursols.app/og-image.png"],
     creator: "@claimsols",
   },
   icons: {
@@ -105,15 +105,15 @@ export const metadata: Metadata = {
     google: "your-google-verification-code",
   },
   alternates: {
-    canonical: "https:/claimyoursols.app/",
+    canonical: "https://claimyoursols.app/",
     languages: {
-      "en-US": "https:/claimyoursols.app/",
-      en: "https:/claimyoursols.app/",
-      "fr-FR": "https:/claimyoursols.app/",
-      fr: "https:/claimyoursols.app/",
+      "en-US": "https://claimyoursols.app/",
+      en: "https://claimyoursols.app/",
+      "fr-FR": "https://claimyoursols.app/",
+      fr: "https://claimyoursols.app/",
     },
   },
-  metadataBase: new URL("https:/claimyoursols.app"),
+  metadataBase: new URL("https://claimyoursols.app"),
   category: "technology",
   classification: "Finance Application",
 };
@@ -130,7 +130,7 @@ export default function RootLayout({
     alternateName: "Nettoyeur de Comptes Solana",
     description:
       "Close unused SPL token accounts and reclaim your SOL rent fees safely and securely on Solana blockchain.",
-    url: "https:/claimyoursols.app",
+    url: "https://claimyoursols.app",
     applicationCategory: "FinanceApplication",
     operatingSystem: "Web Browser",
     inLanguage: ["en", "fr"],
@@ -160,7 +160,7 @@ export default function RootLayout({
       "Web3",
       "SPL tokens",
     ],
-    screenshot: "https:/claimyoursols.app/og-image.png",
+    screenshot: "https://claimyoursols.app/og-image.png",
   };
 
   return (
