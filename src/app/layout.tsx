@@ -247,7 +247,9 @@ export default function RootLayout({
 
                     {/* Wallet Button */}
                     <WalletSection />
-
+                    {/* Main page content */}
+                    {children}
+                    <TransactionHistory />
                     {/* Use Cases Cards */}
                     <section className="py-8">
                       <div className="grid md:grid-cols-3 gap-6 p-6">
@@ -336,10 +338,6 @@ export default function RootLayout({
                         </div>
                       </div>
                     </section>
-
-                    {/* Main page content */}
-                    {children}
-                    <TransactionHistory />
                     {/* FAQ Section */}
                     <FAQSection />
 
