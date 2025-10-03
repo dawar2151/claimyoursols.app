@@ -39,7 +39,7 @@ export function ConnectYourWallet({ className = "" }: ConnectYourWalletProps) {
         style={{ color: colors.text.secondary }}
       >
         Please connect your wallet by clicking &quot;Select Wallet&quot; above
-        to scan for eligible mint accounts to close.
+        to scan for eligible accounts.
       </XTypography>
     </div>
   );
