@@ -393,7 +393,13 @@ export const AccountsManager = () => {
               style={{ color: colors.text.secondary }}
             >
               This will close empty accounts and refund your locked SOL back to
-              your wallet. Large batches may require multiple transactions.
+              your wallet. Large batches may require multiple transactions{" "}
+              <span className="font-semibold" style={{ color: colors.primary }}>
+                because Solana transaction size is limited, so we process about
+                20 accounts at a time.
+              </span>{" "}
+              Please wait for all transactions to complete - do not cancel or
+              close the browser.
             </XTypography>
             {transactionHashes.length > 0 && (
               <div
