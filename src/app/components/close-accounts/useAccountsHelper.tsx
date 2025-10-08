@@ -152,7 +152,9 @@ export function useAccountsHelper(connection: Connection) {
         .filter((account) =>
           isValidTokenAccountForClose(account, rentExemptReserve)
         )
-        .filter((account) => account.account.data.parsed?.info?.state !== "frozen")
+        .filter(
+          (account) => account.account.data.parsed?.info?.state !== "frozen"
+        )
         .map((account) => {
           const { withheldAmount, hasWithheldTokens, mintAddress } =
             checkWithheldAmount(account.account);
@@ -166,7 +168,7 @@ export function useAccountsHelper(connection: Connection) {
             hasWithheldTokens,
             mintAddress,
           };
-        })
+        });
 
       setAccounts(closeableAccounts);
 
@@ -194,21 +196,21 @@ export function useAccountsHelper(connection: Connection) {
   const closeAllAccounts = useCallback(async () => {
     setIsClosing(true);
     setError(null);
-    setTransactionHashes([]); // Reset transaction hashes at the start
+    setTransactionHashes([]);
 
     try {
       if (!publicKey) {
         throw new Error("Wallet not connected");
       }
       let totalClosed = 0;
-      const newTransactionHashes: string[] = []; // Temporary array to collect hashes
-      console.log(accounts);
+      const newTransactionHashes: string[] = [];
       const accountsToClose = accounts.filter((account) => {
         const isSelected = selectedAccounts.has(account.pubkey.toString());
-        const isNotFrozen = account.account.data.parsed?.info?.state !== "frozen";
+        const isNotFrozen =
+          account.account.data.parsed?.info?.state !== "frozen";
         return isSelected && isNotFrozen;
       });
-    
+
       for (let i = 0; i < accountsToClose.length; i += BATCH_SIZE) {
         const batch = accountsToClose.slice(i, i + BATCH_SIZE);
         const transaction = new Transaction();
@@ -224,23 +226,23 @@ export function useAccountsHelper(connection: Connection) {
           const programId = isToken2022
             ? TOKEN_2022_PROGRAM_ID
             : TOKEN_PROGRAM_ID;
-            if (account.hasWithheldTokens) {
-              console.log(
-                `Closing account ${account.pubkey.toString()} with withheld amount: ${
-                  account.withheldAmount
-                }`
+          if (account.hasWithheldTokens) {
+            console.log(
+              `Closing account ${account.pubkey.toString()} with withheld amount: ${
+                account.withheldAmount
+              }`
+            );
+            if (account.mintAddress) {
+              transaction.add(
+                createHarvestWithheldTokensToMintInstruction(
+                  new PublicKey(account.mintAddress), // destination mint
+                  [account.pubkey], // accounts to harvest from
+
+                  programId
+                )
               );
-              if (account.mintAddress) {
-                transaction.add(
-                  createHarvestWithheldTokensToMintInstruction(
-                    new PublicKey(account.mintAddress), // destination mint
-                    [account.pubkey], // accounts to harvest from
-  
-                    programId
-                  )
-                );
-              }
             }
+          }
           transaction.add(
             createCloseAccountInstruction(
               account.pubkey,
@@ -278,7 +280,7 @@ export function useAccountsHelper(connection: Connection) {
             `✅ Closed batch ${Math.floor(i / BATCH_SIZE) + 1}:`,
             signature
           );
-          newTransactionHashes.push(signature); // Collect the transaction hash
+          newTransactionHashes.push(signature);
           totalClosed += batch.length;
         } catch (batchError) {
           const errorMessage =

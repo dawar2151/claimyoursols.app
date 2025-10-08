@@ -138,16 +138,15 @@ export const AccountsManager = () => {
       </div>
     );
   }
-
   if (error) {
     return (
-      <div className="flex flex-col items-center space-y-4 bg-white min-h-screen p-6">
+      <div className="flex flex-col items-center justify-center space-y-4 py-12">
         <XTypography
           variant="h4"
           className="mb-2"
           style={{ color: colors.error }}
         >
-          Error Loading Accounts
+          Having trouble connecting
         </XTypography>
         <XTypography
           variant="body"
@@ -163,7 +162,7 @@ export const AccountsManager = () => {
             color: colors.background.white,
           }}
         >
-          Try Again
+          Let&apos;s try that again
         </XButton>
       </div>
     );
