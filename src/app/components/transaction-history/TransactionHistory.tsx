@@ -139,7 +139,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
         <div className="h-1 w-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full"></div>
       </div>
 
-      {/* Error Display */}
+      {/* Error Display message*/}
       {error && (
         <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 rounded-xl shadow-lg backdrop-blur-sm">
           <div className="flex items-center mb-4">
