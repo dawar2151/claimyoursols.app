@@ -161,7 +161,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
             </p>
           </div>
 
-          {/* Error message and Solscan link */}
+          {/* Unable to load history from node */}
           <div className="mt-4 p-4 bg-white/50 rounded-lg border border-blue-200">
             <p className="text-blue-700 text-sm mb-3">
               Unable to load recent transactions from our cache. You can still
