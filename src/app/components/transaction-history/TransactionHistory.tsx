@@ -157,7 +157,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
               />
             </svg>
             <p className="text-blue-800 font-semibold text-lg">
-              Transaction History Unavailable
+              Transaction History
             </p>
           </div>
 
@@ -438,7 +438,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
       )}
 
       {/* No Results */}
-      {!loading && history.length === 0 && (
+      {!loading && history.length === 0 && !error && (
         <div className="text-center py-20">
           <div className="flex justify-center mb-6">
             <div className="relative">
