@@ -36,7 +36,7 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
   const limit = useMemo(() => {
     return isMobile ? CONFIG.MOBILE_LIMIT : CONFIG.DEFAULT_LIMIT;
   }, [isMobile]);
-  const { history, loading, error, hasMore, loadMore } =
+  const { history, loading, error, hasMore, loadMore, accountAddress } =
     useTransactionHistory(limit);
 
   const formatTime = (blockTime: number | null) => {
@@ -141,10 +141,10 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
 
       {/* Error Display */}
       {error && (
-        <div className="mb-8 p-6 bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-400 rounded-xl shadow-lg backdrop-blur-sm">
-          <div className="flex items-center">
+        <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 rounded-xl shadow-lg backdrop-blur-sm">
+          <div className="flex items-center mb-4">
             <svg
-              className="w-6 h-6 text-red-500 mr-3"
+              className="w-6 h-6 text-blue-600 mr-3"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -153,13 +153,43 @@ const TransactionHistory: React.FC<TransactionHistoryProps> = ({}) => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            <p className="text-red-800 font-semibold text-lg">
-              {TEXT_CONTENT.ERROR_PREFIX}
-              {error}
+            <p className="text-blue-800 font-semibold text-lg">
+              Transaction History Unavailable
             </p>
+          </div>
+
+          {/* Error message and Solscan link */}
+          <div className="mt-4 p-4 bg-white/50 rounded-lg border border-blue-200">
+            <p className="text-blue-700 text-sm mb-3">
+              Unable to load recent transactions from our cache. You can still
+              view the complete transaction history on Solscan.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href={`https://solscan.io/account/${accountAddress}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  />
+                </svg>
+                Check on Solscan
+              </a>
+            </div>
           </div>
         </div>
       )}

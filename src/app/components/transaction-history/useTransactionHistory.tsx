@@ -154,5 +154,5 @@ export function useTransactionHistory(limit: number = 20) {
     fetchHistory();
   }, [fetchHistory, limit, claimYourSolsState.network]);
 
-  return { history, loading, error, hasMore, loadMore };
+  return { history, loading, error, hasMore, loadMore, accountAddress };
 }
