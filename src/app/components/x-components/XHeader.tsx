@@ -62,7 +62,7 @@ export const XHeader = () => {
     },
     {
       name: "Twitter",
-      href: "https://x.com/claimsols",
+      href: "https://x.com/claimyoursolsx",
       icon: FaTwitter,
       hoverColor: "hover:text-blue-400",
     },
