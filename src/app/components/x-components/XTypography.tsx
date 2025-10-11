@@ -29,6 +29,8 @@ export const XTypography: React.FC<XTypologyProps> = ({
         placeholder={undefined}
         onPointerEnterCapture={undefined}
         onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
       >
         {children}
       </Typography>

@@ -29,6 +29,8 @@ const XAlert: React.FC<XAlertProps> = ({ hash, type = "tx" }) => {
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             placeholder={undefined}
+            onResize={undefined}
+            onResizeCapture={undefined}
           >
             <a
               href={getSolscanURL(claimYourSolsState.network, hash || "", type)}

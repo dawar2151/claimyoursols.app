@@ -37,6 +37,8 @@ const XButton: React.FC<XButtonProps> = ({
       placeholder={undefined}
       onPointerEnterCapture={undefined}
       onPointerLeaveCapture={undefined}
+      onResize={undefined}
+      onResizeCapture={undefined}
     >
       {isLoading ? (
         <FaSpinner className="animate-spin w-5 h-5 text-white" /> // Loading spinner
