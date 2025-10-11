@@ -252,7 +252,7 @@ export default function RootLayout({
                     <section className="py-8">
                       <div className="grid md:grid-cols-3 gap-6 p-6">
                         {/* Close Accounts Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center hover:shadow-md transition-shadow">
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
                           <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg
                               className="w-6 h-6 text-white"
@@ -268,10 +268,10 @@ export default function RootLayout({
                               />
                             </svg>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-3">
                             Close Zero-Balance Accounts
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                          <p className="text-sm text-gray-600">
                             Close empty token accounts and reclaim the rent
                             deposit (0.00204 SOL per account). Safe, simple, and
                             only targets accounts with zero balance.
@@ -279,7 +279,7 @@ export default function RootLayout({
                         </div>
 
                         {/* Burn & Close Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center hover:shadow-md transition-shadow">
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
                           <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -296,10 +296,10 @@ export default function RootLayout({
                               />
                             </svg>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          <h3 className="text-lg font-semibold text-gray-900  mb-3">
                             Burn Tokens & Close Accounts
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                          <p className="text-sm text-gray-600 ">
                             Burn unwanted tokens and close their accounts in one
                             step. Perfect for removing dust tokens, scam tokens,
                             or tokens you no longer want (0.00204 SOL per
@@ -308,7 +308,7 @@ export default function RootLayout({
                         </div>
 
                         {/* Close Mint Accounts Card */}
-                        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 text-center hover:shadow-md transition-shadow">
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
                           <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg
                               className="w-6 h-6 text-white"
@@ -324,10 +324,10 @@ export default function RootLayout({
                               />
                             </svg>
                           </div>
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                          <h3 className="text-lg font-semibold text-gray-900  mb-3">
                             Close Mint Accounts (Token2022)
                           </h3>
-                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                          <p className="text-sm text-gray-600">
                             Close Token2022 mint accounts you created and
                             recover their rent deposits (0.0048 SOL per
                             account). Automatically burns remaining tokens if
