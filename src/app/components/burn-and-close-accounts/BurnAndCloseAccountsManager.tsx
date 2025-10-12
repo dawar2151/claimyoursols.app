@@ -26,6 +26,7 @@ export const BurnAndCloseAccountsManager = () => {
 
   // Add state for success alert
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [disabled, setDisabled] = useState(true);
   const [lastSuccessData, setLastSuccessData] = useState<{
     recoveredAmount: number;
     accountCount: number;
@@ -126,6 +127,18 @@ export const BurnAndCloseAccountsManager = () => {
     setSelectedAccounts(newSelected);
   };
 
+  if(disabled ) {
+   return (<div className="flex flex-col items-center justify-center space-y-3 py-12">
+      
+        <XTypography
+          variant="body"
+          className="text-sm"
+          style={{ color: colors.text.secondary }}
+        >
+          Nothing to burn
+        </XTypography>
+      </div>)
+  }
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center space-y-3 py-12">
