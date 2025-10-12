@@ -61,10 +61,10 @@ export default function Support() {
             <li>
               Email:{" "}
               <a
-                href="mailto:support@BulkSendTokens.xyz"
+                href="mailto:contact@claimyoursols.app"
                 className="text-blue-400 underline"
               >
-                support@BulkSendTokens.xyz
+                contact@claimyoursols.app
               </a>
             </li>
             <li>

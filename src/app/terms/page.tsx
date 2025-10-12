@@ -107,10 +107,10 @@ export default function TermsOfService() {
             If you have any questions about these Terms of Service, please
             contact us at{" "}
             <a
-              href="mailto:support@BulkSendTokens.xyz"
+              href="mailto:contact@claimyoursols.app"
               className="text-blue-400 underline"
             >
-              support@BulkSendTokens.xyz
+              contact@claimyoursols.app
             </a>
             .
           </p>
