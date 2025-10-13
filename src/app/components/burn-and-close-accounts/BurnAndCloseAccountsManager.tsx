@@ -199,10 +199,18 @@ export const BurnAndCloseAccountsManager = () => {
         />
       )}
 
-      <div
-        className="w-full max-w-4xl mx-auto p-6"
-        style={{ backgroundColor: colors.background.white }}
+      <div className="w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center" style={{ backgroundColor: colors.background.white }}>
+      <div className="text-center py-4">
+      <XTypography
+        variant="body"
+        className="text-center max-w-lg mb-4"
+        style={{ color: colors.text.secondary }}
       >
+          {
+            "⚠️ Warning: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this."
+          }
+        </XTypography>
+      </div>
         <div
           className="border rounded-lg shadow-lg p-6"
           style={{
