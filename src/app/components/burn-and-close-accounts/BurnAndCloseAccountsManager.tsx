@@ -127,17 +127,17 @@ export const BurnAndCloseAccountsManager = () => {
     setSelectedAccounts(newSelected);
   };
 
-  if(disabled ) {
-   return (<div className="flex flex-col items-center justify-center space-y-3 py-12">
-      
-        <XTypography
-          variant="body"
-          className="text-sm"
-          style={{ color: colors.text.secondary }}
-        >
-          Nothing to burn
-        </XTypography>
-      </div>)
+  if (disabled) {
+    return (<div className="flex flex-col items-center justify-center space-y-3 py-12">
+
+      <XTypography
+        variant="body"
+        className="text-sm"
+        style={{ color: colors.text.secondary }}
+      >
+        Nothing to burn
+      </XTypography>
+    </div>)
   }
   if (isLoading) {
     return (
@@ -199,19 +199,20 @@ export const BurnAndCloseAccountsManager = () => {
         />
       )}
 
-      <div className="w-full max-w-4xl mx-auto p-6 flex flex-col items-center justify-center" style={{ backgroundColor: colors.background.white }}>
-      <div className="text-center py-4">
-      <XTypography
-        variant="body"
-        className="text-center max-w-lg mb-4"
-        style={{ color: "red" }} // Set the warning text color to red
-
+      <div className="w-full max-w-4xl mx-auto p-6"
+        style={{ backgroundColor: colors.background.white }}
       >
-          {
-            "⚠️ Warning: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this."
-          }
-        </XTypography>
-      </div>
+        <div className="py-4">
+          <XTypography
+            variant="body"
+            className="w-full mb-4"
+            style={{ color: "red" }}
+          >
+            {
+              "⚠️ Warning: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this."
+            }
+          </XTypography>
+        </div>
         <div
           className="border rounded-lg shadow-lg p-6"
           style={{
@@ -343,10 +344,9 @@ export const BurnAndCloseAccountsManager = () => {
                     <div
                       className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                       style={{
-                        width: `${
-                          (metadataProgress.current / metadataProgress.total) *
+                        width: `${(metadataProgress.current / metadataProgress.total) *
                           100
-                        }%`,
+                          }%`,
                         backgroundColor: colors.primary,
                       }}
                     />
@@ -411,8 +411,7 @@ export const BurnAndCloseAccountsManager = () => {
                           </span>
                         </>
                       ) : (
-                        `Load More (${
-                          totalAccounts - (currentPage + 1) * itemsPerPage
+                        `Load More (${totalAccounts - (currentPage + 1) * itemsPerPage
                         } remaining)`
                       )}
                     </button>
@@ -507,25 +506,10 @@ export const BurnAndCloseAccountsManager = () => {
               onClick={closeAllAccounts}
               disabled={isClosing || selectedAccounts.size === 0}
               isLoading={isClosing}
-              className="w-full disabled:opacity-50"
-              style={{
-                background: `linear-gradient(to right, ${colors.primary}, ${colors.accent})`,
-                color: colors.background.white,
-              }}
-              onMouseEnter={(e) => {
-                if (!isClosing && selectedAccounts.size > 0) {
-                  e.currentTarget.style.background = `linear-gradient(to right, ${colors.secondary}, ${colors.secondary})`;
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isClosing && selectedAccounts.size > 0) {
-                  e.currentTarget.style.background = `linear-gradient(to right, ${colors.primary}, ${colors.accent})`;
-                }
-              }}
-            >
+              className="w-full disabled:opacity-50 bg-red-600 hover:bg-red-700 text-white rounded-md transition-all duration-200"            >
               {isClosing
                 ? "Burning & Closing Accounts..."
-                : `Burn & Close Accounts & Get SOL Back (${selectedAccounts.size})`}
+                : `I Understand this action can't be Undone and I will Burn & Close Accounts & Get SOL Back (${selectedAccounts.size})`}
             </XButton>
             <XTypography
               variant="body"
@@ -602,10 +586,10 @@ export const BurnAndCloseAccountsManager = () => {
             )}
           </div>
         </div>
-      </div>
+      </div >
 
       {/* Confirmation Dialog */}
-      <ConfirmDialog {...confirmationProps} />
+      < ConfirmDialog {...confirmationProps} />
     </>
   );
 };

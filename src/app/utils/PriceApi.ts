@@ -6,7 +6,7 @@ interface CoinGeckoResponse {
   [mintAddress: string]: TokenPrice;
 }
 
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 6;
 const RETRY_DELAY = 1000; // 1 second
 
 // Helper function to delay execution
@@ -46,8 +46,7 @@ export const fetchSingleTokenPrice = async (
     });
 
     console.log(
-      `Successfully fetched price for ${mintAddress}: ${
-        prices[mintAddress] || "not found"
+      `Successfully fetched price for ${mintAddress}: ${prices[mintAddress] || "not found"
       }`
     );
     return prices;
@@ -109,8 +108,7 @@ export const fetchTokenPrices = async (
     }
 
     console.log(
-      `Completed fetching prices. Got ${Object.keys(allPrices).length} out of ${
-        mintAddresses.length
+      `Completed fetching prices. Got ${Object.keys(allPrices).length} out of ${mintAddresses.length
       } tokens`
     );
     return allPrices;

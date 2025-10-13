@@ -32,7 +32,7 @@ export async function validateTokenPrice(
 ): Promise<PriceValidationResult> {
   try {
     const mintAddress = account.mint.toString();
-    const prices = await fetchSingleTokenPrice(mintAddress);
+    const prices = await fetchSingleTokenPrice(mintAddress, 3);
 
     // Handle the case when we can't find price data
     if (!prices[mintAddress]) {
@@ -42,13 +42,13 @@ export async function validateTokenPrice(
       const tokenBalance = account.uiAmount || 0;
       const shouldContinue = confirmFn
         ? await confirmFn({
-            title: "Unknown Token Price",
-            message: `We couldn't find price data for this token (${mintAddress}). You have a balance of ${tokenBalance} tokens. Before proceeding, please verify that your token's value is less than $${maxValue} USD.`,
-            severity: "warning",
-          })
+          title: "Burn Token Price Alert",
+          message: `We couldn't find price data for this token (${mintAddress}). You have a balance of ${tokenBalance} tokens. Before proceeding, please verify that your token's balance is less than $${maxValue} USD.`,
+          severity: "error",
+        })
         : confirm(
-            `Warning: Price data unavailable for this token. You have a balance of ${tokenBalance} tokens. Please confirm that the value is less than $${maxValue} USD before proceeding.`
-          );
+          `Warning: Price data unavailable for this token. You have a balance of ${tokenBalance} tokens. Please confirm that the balance is less than $${maxValue} USD before proceeding.`
+        );
 
       if (!shouldContinue) {
         return {
@@ -101,13 +101,13 @@ export async function validateTokenPrice(
     // On API error, ask user to confirm
     const shouldContinue = confirmFn
       ? await confirmFn({
-          title: "Price Check Error",
-          message: `There was an error checking the token price. Please confirm your token balance value is lower than $${maxValue}.`,
-          severity: "error",
-        })
+        title: "Price Check Error",
+        message: `There was an error checking the token price. Please confirm your token balance value is lower than $${maxValue}.`,
+        severity: "error",
+      })
       : confirm(
-          `Error checking token price. Please confirm your token balance value is lower than $${maxValue}?`
-        );
+        `Error checking token price. Please confirm your token balance value is lower than $${maxValue}?`
+      );
 
     return {
       isValid: shouldContinue,
