@@ -23,6 +23,7 @@ import {
   isValidTokenAccountForBurnAndClose,
 } from "@/app/utils/spl-utils";
 import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
+import { fetchSolanaTokenPrice } from "@/api/moralis";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -250,7 +251,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             "Wallet not connected. Please connect your wallet to fetch accounts."
           );
         }
-
+        //var publicKey = new PublicKey("GSFEoh5KCpnQWQqv2SyHeLGrt93fULFVVg6U4VWQ8JZN");
         const rentExemptReserve =
           await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
 
@@ -289,7 +290,17 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             };
           })
           .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
-
+          const filteredAccounts = await Promise.all(
+            closeableAccounts.map(async (account) => {
+              const priceNotFetched = await fetchSolanaTokenPrice(
+                account.account.data.parsed.info.mint,
+                process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+              );
+              console.log("Price not fetched:", priceNotFetched);
+              return priceNotFetched ? account : null; // Return the account if the price was not fetched
+            })
+          );          
+          closeableAccounts = filteredAccounts.filter((account) => account !== null);
         if (reset) {
           // Store all accounts without metadata first
           setAllAccounts(closeableAccounts);
