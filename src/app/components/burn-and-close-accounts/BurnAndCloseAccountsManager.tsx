@@ -53,6 +53,8 @@ export const BurnAndCloseAccountsManager = () => {
     isLoading,
     isClosing,
     transactionHashes,
+    acceptedTerms,
+    setAcceptedTerms,
     clearTransactionHashes,
     closeAllAccounts,
     refreshAccounts,
@@ -212,6 +214,22 @@ export const BurnAndCloseAccountsManager = () => {
               "⚠️ Warning: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this."
             }
           </XTypography>
+          <div className="flex items-center gap-3 mb-4">
+            <input
+              type="checkbox"
+              id="acceptWarning"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              className="w-5 h-5 rounded border-2 border-red-500 text-red-600 focus:ring-red-500"
+            />
+            <label
+              htmlFor="acceptWarning"
+              className="text-sm cursor-pointer"
+              style={{ color: colors.text.primary }}
+            >
+              I understand and accept that this action is irreversible
+            </label>
+          </div>
         </div>
         <div
           className="border rounded-lg shadow-lg p-6"
