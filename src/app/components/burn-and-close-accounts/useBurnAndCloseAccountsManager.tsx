@@ -103,7 +103,8 @@ const fetchMetadataForAccounts = async (
       });
 
       const batchResults = await Promise.all(batchPromises);
-      accountsWithMetadata.push(...batchResults);
+      const filteredBatchResults = batchResults.filter(a => a.tokenName != "Unknown");
+      accountsWithMetadata.push(...filteredBatchResults);
       processedCount += batch.length;
 
       console.log(
@@ -289,17 +290,17 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             };
           })
           .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
-          const filteredAccounts = await Promise.all(
-            closeableAccounts.map(async (account) => {
-              const priceNotFetched = await fetchSolanaTokenPrice(
-                account.account.data.parsed.info.mint,
-                process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
-              );
-              console.log("Price not fetched:", priceNotFetched);
-              return priceNotFetched ? account : null; // Return the account if the price was not fetched
-            })
-          );          
-          closeableAccounts = filteredAccounts.filter((account) => account !== null);
+        const filteredAccounts = await Promise.all(
+          closeableAccounts.map(async (account) => {
+            const priceNotFetched = await fetchSolanaTokenPrice(
+              account.account.data.parsed.info.mint,
+              process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+            );
+            console.log("Price not fetched:", priceNotFetched);
+            return priceNotFetched ? account : null; // Return the account if the price was not fetched
+          })
+        );
+        closeableAccounts = filteredAccounts.filter((account) => account !== null);
         if (reset) {
           // Store all accounts without metadata first
           setAllAccounts(closeableAccounts);
@@ -532,8 +533,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           // Log withheld amount info for each account being processed
           if (account.hasWithheldTokens) {
             console.log(
-              `Processing account ${account.pubkey.toString()} with withheld amount: ${
-                account.withheldAmount
+              `Processing account ${account.pubkey.toString()} with withheld amount: ${account.withheldAmount
               }`
             );
           }
@@ -568,8 +568,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           );
           if (account.hasWithheldTokens) {
             console.log(
-              `Closing account ${account.pubkey.toString()} with withheld amount: ${
-                account.withheldAmount
+              `Closing account ${account.pubkey.toString()} with withheld amount: ${account.withheldAmount
               }`
             );
             if (account.mintAddress) {
@@ -640,8 +639,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           } else {
             // Only set error for non-rejection errors
             setError(
-              `Failed to close batch ${
-                Math.floor(i / BATCH_SIZE) + 1
+              `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
               }: ${errorMessage}`
             );
           }

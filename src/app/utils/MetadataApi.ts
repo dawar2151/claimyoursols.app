@@ -8,6 +8,7 @@ export interface TokenMetadata {
   decimals: number;
   uri: string;
 }
+var Unknown = "Unknown";
 
 // Define Jupiter token interface for type safety
 interface JupiterToken {
@@ -31,12 +32,9 @@ export const fetchTokenMetadata = async (
       mintPubkey = new PublicKey(mintAddress);
     } catch (invalidKeyError) {
       console.error(`Invalid mint address: ${mintAddress}`, invalidKeyError);
-      const shortAddress = `${mintAddress.slice(0, 4)}...${mintAddress.slice(
-        -4
-      )}`;
       return {
-        symbol: shortAddress,
-        name: `Invalid: ${shortAddress}`,
+        symbol: Unknown,
+        name: Unknown,
         decimals: 0,
         uri: "",
       };
@@ -111,8 +109,8 @@ export const fetchTokenMetadata = async (
             jupiterToken
           );
           return {
-            symbol: jupiterToken.symbol || "Unknown",
-            name: jupiterToken.name || "Unknown Token",
+            symbol: jupiterToken.symbol || Unknown,
+            name: jupiterToken.name || Unknown,
             decimals: jupiterToken.decimals || decimals || 0,
             uri: jupiterToken.logoURI || "",
           };
@@ -124,33 +122,24 @@ export const fetchTokenMetadata = async (
 
     if (metadata) {
       return {
-        symbol: metadata.symbol || "Unknown",
-        name: metadata.name || "Unknown Token",
+        symbol: metadata.symbol || Unknown,
+        name: metadata.name || Unknown,
         decimals: decimals,
         uri: metadata.uri || "",
       };
     }
 
-    // Final fallback with readable mint address
-    const shortAddress = `${mintAddress.slice(0, 4)}...${mintAddress.slice(
-      -4
-    )}`;
-    console.log(`Using fallback metadata for ${mintAddress}`);
     return {
-      symbol: shortAddress,
-      name: `Token ${shortAddress}`,
+      symbol: Unknown,
+      name: Unknown,
       decimals: decimals,
       uri: "",
     };
   } catch (error) {
     console.error(`Failed to fetch any data for ${mintAddress}:`, error);
-    // Emergency fallback
-    const shortAddress = `${mintAddress.slice(0, 4)}...${mintAddress.slice(
-      -4
-    )}`;
     return {
-      symbol: shortAddress,
-      name: `Error: ${shortAddress}`,
+      symbol: Unknown,
+      name: Unknown,
       decimals: 0,
       uri: "",
     };
