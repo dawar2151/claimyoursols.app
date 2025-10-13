@@ -22,7 +22,7 @@ import {
   checkWithheldAmount,
   isValidTokenAccountForBurnAndClose,
 } from "@/app/utils/spl-utils";
-import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
+import { fetchTokenMetadata, TokenMetadata, Unknown } from "@/app/utils/MetadataApi";
 import { fetchSolanaTokenPrice } from "@/api/moralis";
 
 interface AccountData {
@@ -103,7 +103,7 @@ const fetchMetadataForAccounts = async (
       });
 
       const batchResults = await Promise.all(batchPromises);
-      const filteredBatchResults = batchResults.filter(a => a.tokenName != "Unknown");
+      const filteredBatchResults = batchResults.filter(a => a.tokenName != Unknown);
       accountsWithMetadata.push(...filteredBatchResults);
       processedCount += batch.length;
 
@@ -200,6 +200,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [allAccounts, setAllAccounts] = useState<AccountData[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [hasMoreAccounts, setHasMoreAccounts] = useState(true);
   const [referralAccount, setReferralAccount] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
@@ -724,6 +725,18 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         })
         .filter((account) => !account.hasWithheldTokens);
 
+      const filteredAccounts = await Promise.all(
+        closeableAccounts.map(async (account) => {
+          const priceNotFetched = await fetchSolanaTokenPrice(
+            account.account.data.parsed.info.mint,
+            process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+          );
+          console.log("Price not fetched:", priceNotFetched);
+          return priceNotFetched ? account : null; // Return the account if the price was not fetched
+        })
+      );
+      closeableAccounts = filteredAccounts.filter((account) => account !== null);
+
       // Store all accounts without metadata first
       setAllAccounts(closeableAccounts);
 
@@ -790,14 +803,25 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
   }, [currentPage, publicKey, connection]);
 
   useEffect(() => {
-    fetchAccounts(true);
-  }, [fetchAccounts, publicKey]);
+    if (acceptedTerms && publicKey) {
+      fetchAccounts(true);
+    } else {
+      setAccounts([]);
+      setAllAccounts([]);
+      setCurrentPage(0);
+      setHasMoreAccounts(false);
+      setIsSuccess(false);
+      setSelectedAccounts(new Set());
+    }
+  }, [fetchAccounts, publicKey, acceptedTerms]);
 
   return {
     selectedAccounts,
     setSelectedAccounts,
     setReferralAccount,
     cleanClosedAccounts,
+    setAcceptedTerms,
+    acceptedTerms,
     currentTotalRent,
     accounts,
     allAccounts,
