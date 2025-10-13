@@ -204,7 +204,8 @@ export const BurnAndCloseAccountsManager = () => {
       <XTypography
         variant="body"
         className="text-center max-w-lg mb-4"
-        style={{ color: colors.text.secondary }}
+        style={{ color: "red" }} // Set the warning text color to red
+
       >
           {
             "⚠️ Warning: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this."
