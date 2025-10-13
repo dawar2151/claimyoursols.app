@@ -242,23 +242,34 @@ export const BurnAndCloseAccountsManager = () => {
             <ConnectYourWallet className="my-20" />
           ) : accounts.length === 0 ? (
             <div className="text-center py-12 flex flex-col justify-center items-center">
-              <div className="text-6xl mb-4">🎉</div>
-              <XTypography
-                variant="h4"
-                className="mb-2"
-                style={{ color: colors.text.primary }}
-              >
-                All Clean!
-              </XTypography>
-              <XTypography
-                variant="body"
-                className="text-center max-w-md"
-                style={{ color: colors.text.secondary }}
-              >
-                {
-                  "No token accounts found to burn and close. All your accounts are already clean or you don't have any accounts with tokens to burn."
-                }
-              </XTypography>
+              {!acceptedTerms ? (
+                <XTypography
+                  variant="body"
+                  className="mb-4 text-red-600"
+                  style={{ color: "red" }}
+                >
+                  Please accept the warning above to proceed.
+                </XTypography>
+              ) : (
+                <>
+                  <div className="text-6xl mb-4">🎉</div>
+                  <XTypography
+                    variant="h4"
+                    className="mb-2"
+                    style={{ color: colors.text.primary }}
+                  >
+                    All Clean!
+                  </XTypography>
+                  <XTypography
+                    variant="body"
+                    className="text-center max-w-md"
+                    style={{ color: colors.text.secondary }}
+                  >
+                    {
+                      "No token accounts found to burn and close. All your accounts are already clean or you don't have any accounts with tokens to burn."
+                    }
+                  </XTypography></>
+              )}
             </div>
           ) : (
             <>

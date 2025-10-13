@@ -8,7 +8,7 @@ export interface TokenMetadata {
   decimals: number;
   uri: string;
 }
-var Unknown = "Unknown";
+export var Unknown = "Unknown";
 
 // Define Jupiter token interface for type safety
 interface JupiterToken {
