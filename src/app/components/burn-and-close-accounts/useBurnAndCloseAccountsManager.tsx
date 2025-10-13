@@ -251,7 +251,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             "Wallet not connected. Please connect your wallet to fetch accounts."
           );
         }
-        //var publicKey = new PublicKey("GSFEoh5KCpnQWQqv2SyHeLGrt93fULFVVg6U4VWQ8JZN");
         const rentExemptReserve =
           await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
 
