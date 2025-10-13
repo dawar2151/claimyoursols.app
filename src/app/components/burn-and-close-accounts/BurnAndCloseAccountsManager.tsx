@@ -26,7 +26,7 @@ export const BurnAndCloseAccountsManager = () => {
 
   // Add state for success alert
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [disabled, setDisabled] = useState(true);
+  const [disabled, setDisabled] = useState(false);
   const [lastSuccessData, setLastSuccessData] = useState<{
     recoveredAmount: number;
     accountCount: number;
