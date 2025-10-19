@@ -22,14 +22,15 @@ import {
   checkWithheldAmount,
   isValidTokenAccountForBurnAndClose,
 } from "@/app/utils/spl-utils";
-import { fetchTokenMetadata, TokenMetadata, Unknown } from "@/app/utils/MetadataApi";
-import { fetchSolanaTokenPrice } from "@/api/moralis";
+import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
+import { isElligibleForBurn } from "@/api/moralis";
 
 interface AccountData {
   pubkey: PublicKey;
   account: AccountInfo<ParsedAccountData>;
   lamports: number;
   uiAmount: number | null;
+  usdValue?: number;
   mint: PublicKey;
   decimals: number;
   amount: string;
@@ -75,10 +76,13 @@ const fetchMetadataForAccounts = async (
     console.log(
       `🔄 Processing metadata batch ${batchNumber}/${totalBatches}...`
     );
-
     try {
       // Process batch concurrently for better performance
       const batchPromises = batch.map(async (account) => {
+        if (account?.tokenName) {
+          return account;
+        }
+
         try {
           const metadata = await fetchTokenMetadata(
             connection,
@@ -103,8 +107,8 @@ const fetchMetadataForAccounts = async (
       });
 
       const batchResults = await Promise.all(batchPromises);
-      const filteredBatchResults = batchResults.filter(a => a.tokenName != Unknown);
-      accountsWithMetadata.push(...filteredBatchResults);
+      //const filteredBatchResults = batchResults.filter(a => a.tokenName != Unknown);
+      accountsWithMetadata.push(...batchResults);
       processedCount += batch.length;
 
       console.log(
@@ -195,7 +199,6 @@ const createFeeInstructions = async (
 };
 
 const ITEMS_PER_PAGE = 10;
-
 export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [allAccounts, setAllAccounts] = useState<AccountData[]>([]);
@@ -272,7 +275,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             (account) => account.account.data.parsed?.info?.state !== "frozen"
           )
           .map((account) => {
-            // Check for withheld amount in Token 2022 accounts
             const { withheldAmount, hasWithheldTokens, mintAddress } =
               checkWithheldAmount(account.account);
 
@@ -290,15 +292,15 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               mintAddress,
             };
           })
-          .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
+          .filter((account) => !account.hasWithheldTokens);
         const filteredAccounts = await Promise.all(
           closeableAccounts.map(async (account) => {
-            const priceNotFetched = await fetchSolanaTokenPrice(
+            const accountWithPrice = await isElligibleForBurn(
               account.account.data.parsed.info.mint,
-              process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+              process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
+              account.account.data.parsed.info.tokenAmount.uiAmount
             );
-            console.log("Price not fetched:", priceNotFetched);
-            return priceNotFetched ? account : null; // Return the account if the price was not fetched
+            return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
           })
         );
         closeableAccounts = filteredAccounts.filter((account) => account !== null);
@@ -727,20 +729,19 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
       const filteredAccounts = await Promise.all(
         closeableAccounts.map(async (account) => {
-          const priceNotFetched = await fetchSolanaTokenPrice(
+          const accountWithPrice = await isElligibleForBurn(
             account.account.data.parsed.info.mint,
-            process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+            process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
+            account.account.data.parsed.info.tokenAmount.uiAmount
           );
-          console.log("Price not fetched:", priceNotFetched);
-          return priceNotFetched ? account : null; // Return the account if the price was not fetched
-        })
+          return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
+        }
+        )
       );
       closeableAccounts = filteredAccounts.filter((account) => account !== null);
 
-      // Store all accounts without metadata first
       setAllAccounts(closeableAccounts);
 
-      // Calculate how many accounts to show based on current page
       const accountsToShow = Math.min(
         (currentPageToMaintain + 1) * ITEMS_PER_PAGE,
         closeableAccounts.length

@@ -14,7 +14,6 @@ import {
   AccountDetails,
   TokenAccountCard,
 } from "../x-components/TokenAccountCard";
-import { validateTokenPrice } from "@/app/utils/TokenPriceValidator";
 import ConfirmDialog from "../x-components/ConfirmDialog";
 import { useConfirmDialog } from "@/app/hooks/useConfirmDialog";
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -115,15 +114,6 @@ export const BurnAndCloseAccountsManager = () => {
     if (newSelected.has(account.pubkey.toString())) {
       newSelected.delete(account.pubkey.toString());
     } else {
-      const validation = await validateTokenPrice(
-        account,
-        10,
-        showConfirmation
-      );
-      if (!validation.isValid) {
-        // Error is already handled by the confirmation dialog
-        return;
-      }
       newSelected.add(account.pubkey.toString());
     }
     setSelectedAccounts(newSelected);
@@ -211,7 +201,7 @@ export const BurnAndCloseAccountsManager = () => {
             style={{ color: "red" }}
           >
             {
-              "⚠️ Warning: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this."
+              "Disclaimer: Burning tokens is an irreversible action. By proceeding, you acknowledge and accept this. By using the platform you explicitly accept full responsibility for any and all burns.The CLaimYourSOLs platform additionally does not assume liability for any mistakes, accidents, miss-intentions or any other actions that led to an undesired burn."
             }
           </XTypography>
           <div className="flex items-center gap-3 mb-4">
@@ -227,7 +217,7 @@ export const BurnAndCloseAccountsManager = () => {
               className="text-sm cursor-pointer"
               style={{ color: colors.text.primary }}
             >
-              I understand and accept that this action is irreversible
+              I understand and accept the disclaimer above.
             </label>
           </div>
         </div>
@@ -333,6 +323,10 @@ export const BurnAndCloseAccountsManager = () => {
                     key={account.pubkey.toString()}
                     account={{
                       ...account,
+                      usdValue:
+                        account.usdValue === null
+                          ? undefined
+                          : account.usdValue,
                       uiAmount:
                         account.uiAmount === null
                           ? undefined

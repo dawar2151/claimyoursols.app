@@ -119,6 +119,36 @@ export const fetchTokenMetadata = async (
         console.warn(`Jupiter fetch failed for ${mintAddress}:`, jupiterError);
       }
     }
+    if (!metadata) {
+      interface TokenListEntry {
+        address: string;
+        name: string;
+        symbol: string;
+        decimals: number;
+        chainId: number;
+      }
+
+      interface TokenList {
+        tokens: TokenListEntry[];
+      }
+      try {
+        const url = 'https://raw.githubusercontent.com/solana-labs/token-list/main/src/tokens/solana.tokenlist.json';
+        const response = await fetch(url);
+        const data: TokenList = await response.json();
+        const token = data.tokens.find(t => t.address === mintAddress);
+
+        if (token) {
+          return {
+            name: token.symbol,
+            symbol: token.symbol,
+            decimals: token.decimals || 0,
+            uri: "",
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching from Solscan:', error);
+      }
+    }
 
     if (metadata) {
       return {
