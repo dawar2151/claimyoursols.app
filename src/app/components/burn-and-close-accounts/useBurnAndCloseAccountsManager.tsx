@@ -275,7 +275,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             (account) => account.account.data.parsed?.info?.state !== "frozen"
           )
           .map((account) => {
-            // Check for withheld amount in Token 2022 accounts
             const { withheldAmount, hasWithheldTokens, mintAddress } =
               checkWithheldAmount(account.account);
 
@@ -288,7 +287,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               amount: account.account.data.parsed.info.tokenAmount.amount,
               lamports: account.account.lamports,
               rentExemptReserve,
-              withheldAmount: withheldAmount ?? 0,
+              withheldAmount,
               hasWithheldTokens,
               mintAddress,
             };
@@ -296,13 +295,13 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           .filter((account) => !account.hasWithheldTokens);
         const filteredAccounts = await Promise.all(
           closeableAccounts.map(async (account) => {
-            const tokenPrice = await isElligibleForBurn(
+            const accountWithPrice = await isElligibleForBurn(
               account.account.data.parsed.info.mint,
               process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
               account.account.data.parsed.info.tokenAmount.uiAmount
             );
-            console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${tokenPrice.isElligible}, USD Value: ${tokenPrice.name}`);
-            return tokenPrice.isElligible ? { ...account, usdValue: tokenPrice.usdBalance, tokenName: tokenPrice.name, tokenSymbol: tokenPrice.symbol } : null;
+            console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${accountWithPrice.isElligible}, USD Value: ${accountWithPrice.name}`);
+            return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
           })
         );
         closeableAccounts = filteredAccounts.filter((account) => account !== null);
@@ -731,13 +730,13 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
       const filteredAccounts = await Promise.all(
         closeableAccounts.map(async (account) => {
-          const tokenPrice = await isElligibleForBurn(
+          const accountWithPrice = await isElligibleForBurn(
             account.account.data.parsed.info.mint,
             process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
             account.account.data.parsed.info.tokenAmount.uiAmount
           );
-          console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${tokenPrice.isElligible}, USD Value: ${tokenPrice.name}`);
-          return tokenPrice.isElligible ? { ...account, usdValue: tokenPrice.usdBalance, tokenName: tokenPrice.name, tokenSymbol: tokenPrice.symbol } : null;
+          console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${accountWithPrice.isElligible}, USD Value: ${accountWithPrice.name}`);
+          return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
         }
         )
       );
