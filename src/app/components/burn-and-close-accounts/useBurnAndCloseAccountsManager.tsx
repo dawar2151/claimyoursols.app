@@ -22,7 +22,7 @@ import {
   checkWithheldAmount,
   isValidTokenAccountForBurnAndClose,
 } from "@/app/utils/spl-utils";
-import { fetchTokenMetadata, TokenMetadata, Unknown } from "@/app/utils/MetadataApi";
+import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
 import { isElligibleForBurn } from "@/api/moralis";
 
 interface AccountData {
