@@ -7,6 +7,7 @@ import { getAmountString } from "@/app/utils/spl-utils";
 export type AccountDetails = {
   pubkey: { toString: () => string };
   mint: { toString: () => string };
+  usdValue?: number;
   tokenName?: string;
   tokenSymbol?: string;
   uiAmount?: number;
@@ -91,7 +92,6 @@ export const TokenAccountCard = ({
 
         {/* Main Content */}
         <div className="flex-1 min-w-0">
-          {/* Token Name: Symbol - Fully Visible */}
           <div className="flex items-start gap-2 mb-1">
             <XTypography
               variant="body"
@@ -105,14 +105,14 @@ export const TokenAccountCard = ({
               }}
             >
               {account.tokenName}
-              {account.tokenSymbol && (
-                <span
-                  className="font-normal text-xs sm:text-sm ml-1"
-                  style={{ color: colors.text.secondary }}
-                >
-                  : {account.tokenSymbol}
-                </span>
-              )}
+
+              <span
+                className="font-normal text-xs sm:text-sm ml-1"
+                style={{ color: colors.success }}
+              >
+                ${account.usdValue ? account.usdValue.toFixed(6) : 0}
+              </span>
+
             </XTypography>
           </div>
 
@@ -187,46 +187,6 @@ export const TokenAccountCard = ({
             {(account.rentExemptReserve / 1e9).toFixed(3)} SOL
           </XTypography>
         </div>
-
-        {/* Selection Indicator */}
-        {/* <div
-          className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0"
-          style={{
-            backgroundColor: isSelected
-              ? `${colors.primary}20`
-              : colors.neutral,
-          }}
-        >
-          {isSelected ? (
-            <svg
-              className="w-5 h-5"
-              style={{ color: colors.primary }}
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="w-5 h-5"
-              style={{ color: colors.text.secondary }}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
-          )}
-        </div> */}
       </div>
     </div>
   );

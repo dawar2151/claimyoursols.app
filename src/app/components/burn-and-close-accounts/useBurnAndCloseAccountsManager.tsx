@@ -30,6 +30,7 @@ interface AccountData {
   account: AccountInfo<ParsedAccountData>;
   lamports: number;
   uiAmount: number | null;
+  usdValue?: number;
   mint: PublicKey;
   decimals: number;
   amount: string;
@@ -75,10 +76,13 @@ const fetchMetadataForAccounts = async (
     console.log(
       `🔄 Processing metadata batch ${batchNumber}/${totalBatches}...`
     );
-
     try {
       // Process batch concurrently for better performance
       const batchPromises = batch.map(async (account) => {
+        if (account?.tokenName) {
+          return account;
+        }
+
         try {
           const metadata = await fetchTokenMetadata(
             connection,
@@ -195,7 +199,6 @@ const createFeeInstructions = async (
 };
 
 const ITEMS_PER_PAGE = 10;
-
 export function useBurnAndCloseAccountsManager(connection: Connection) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [allAccounts, setAllAccounts] = useState<AccountData[]>([]);
@@ -285,21 +288,21 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               amount: account.account.data.parsed.info.tokenAmount.amount,
               lamports: account.account.lamports,
               rentExemptReserve,
-              withheldAmount,
+              withheldAmount: withheldAmount ?? 0,
               hasWithheldTokens,
               mintAddress,
             };
           })
-          .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
+          .filter((account) => !account.hasWithheldTokens);
         const filteredAccounts = await Promise.all(
           closeableAccounts.map(async (account) => {
-            const isBurnale = await isElligibleForBurn(
+            const tokenPrice = await isElligibleForBurn(
               account.account.data.parsed.info.mint,
               process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
               account.account.data.parsed.info.tokenAmount.uiAmount
             );
-            console.log(`Account ${account.pubkey.toString()} burnable: ${isBurnale}`);
-            return isBurnale ? account : null; // Return the account if the price was not fetched
+            console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${tokenPrice.isElligible}, USD Value: ${tokenPrice.name}`);
+            return tokenPrice.isElligible ? { ...account, usdValue: tokenPrice.usdBalance, tokenName: tokenPrice.name, tokenSymbol: tokenPrice.symbol } : null;
           })
         );
         closeableAccounts = filteredAccounts.filter((account) => account !== null);
@@ -728,13 +731,15 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
       const filteredAccounts = await Promise.all(
         closeableAccounts.map(async (account) => {
-          const isBurnale = await isElligibleForBurn(
+          const tokenPrice = await isElligibleForBurn(
             account.account.data.parsed.info.mint,
             process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
             account.account.data.parsed.info.tokenAmount.uiAmount
           );
-          return isBurnale ? account : null; // Return the account if the price was not fetched
-        })
+          console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${tokenPrice.isElligible}, USD Value: ${tokenPrice.name}`);
+          return tokenPrice.isElligible ? { ...account, usdValue: tokenPrice.usdBalance, tokenName: tokenPrice.name, tokenSymbol: tokenPrice.symbol } : null;
+        }
+        )
       );
       closeableAccounts = filteredAccounts.filter((account) => account !== null);
 
