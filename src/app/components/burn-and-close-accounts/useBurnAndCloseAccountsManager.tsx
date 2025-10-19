@@ -300,7 +300,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
               process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
               account.account.data.parsed.info.tokenAmount.uiAmount
             );
-            console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${accountWithPrice.isElligible}, USD Value: ${accountWithPrice.name}`);
             return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
           })
         );
@@ -735,7 +734,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
             account.account.data.parsed.info.tokenAmount.uiAmount
           );
-          console.log(`Token ${account.account.data.parsed.info.mint} eligibility: ${accountWithPrice.isElligible}, USD Value: ${accountWithPrice.name}`);
           return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
         }
         )
