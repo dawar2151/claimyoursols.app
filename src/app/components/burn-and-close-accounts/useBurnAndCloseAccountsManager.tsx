@@ -23,7 +23,7 @@ import {
   isValidTokenAccountForBurnAndClose,
 } from "@/app/utils/spl-utils";
 import { fetchTokenMetadata, TokenMetadata, Unknown } from "@/app/utils/MetadataApi";
-import { fetchSolanaTokenPrice } from "@/api/moralis";
+import { isElligibleForBurn } from "@/api/moralis";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -103,8 +103,8 @@ const fetchMetadataForAccounts = async (
       });
 
       const batchResults = await Promise.all(batchPromises);
-      const filteredBatchResults = batchResults.filter(a => a.tokenName != Unknown);
-      accountsWithMetadata.push(...filteredBatchResults);
+      //const filteredBatchResults = batchResults.filter(a => a.tokenName != Unknown);
+      accountsWithMetadata.push(...batchResults);
       processedCount += batch.length;
 
       console.log(
@@ -293,12 +293,13 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           .filter((account) => !account.hasWithheldTokens); // Filter out accounts with withheld tokens
         const filteredAccounts = await Promise.all(
           closeableAccounts.map(async (account) => {
-            const priceNotFetched = await fetchSolanaTokenPrice(
+            const isBurnale = await isElligibleForBurn(
               account.account.data.parsed.info.mint,
-              process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+              process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
+              account.account.data.parsed.info.tokenAmount.uiAmount
             );
-            console.log("Price not fetched:", priceNotFetched);
-            return priceNotFetched ? account : null; // Return the account if the price was not fetched
+            console.log(`Account ${account.pubkey.toString()} burnable: ${isBurnale}`);
+            return isBurnale ? account : null; // Return the account if the price was not fetched
           })
         );
         closeableAccounts = filteredAccounts.filter((account) => account !== null);
@@ -727,20 +728,18 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
 
       const filteredAccounts = await Promise.all(
         closeableAccounts.map(async (account) => {
-          const priceNotFetched = await fetchSolanaTokenPrice(
+          const isBurnale = await isElligibleForBurn(
             account.account.data.parsed.info.mint,
-            process.env.NEXT_PUBLIC_MORALIS_API_KEY || ""
+            process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
+            account.account.data.parsed.info.tokenAmount.uiAmount
           );
-          console.log("Price not fetched:", priceNotFetched);
-          return priceNotFetched ? account : null; // Return the account if the price was not fetched
+          return isBurnale ? account : null; // Return the account if the price was not fetched
         })
       );
       closeableAccounts = filteredAccounts.filter((account) => account !== null);
 
-      // Store all accounts without metadata first
       setAllAccounts(closeableAccounts);
 
-      // Calculate how many accounts to show based on current page
       const accountsToShow = Math.min(
         (currentPageToMaintain + 1) * ITEMS_PER_PAGE,
         closeableAccounts.length

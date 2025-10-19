@@ -47,8 +47,8 @@ export const TokenAccountCard = ({
   return (
     <div
       className={`flex flex-col sm:flex-row items-start sm:items-center p-3 sm:p-4 border-2 rounded-xl transition-all duration-200 cursor-pointer ${isSelected
-          ? "shadow-lg scale-[1.02]"
-          : "shadow-sm hover:shadow-md hover:scale-[1.01]"
+        ? "shadow-lg scale-[1.02]"
+        : "shadow-sm hover:shadow-md hover:scale-[1.01]"
         }`}
       style={{
         backgroundColor: isSelected
@@ -189,7 +189,7 @@ export const TokenAccountCard = ({
         </div>
 
         {/* Selection Indicator */}
-        <div
+        {/* <div
           className="w-8 h-8 rounded-full flex items-center justify-center transition-all duration-200 flex-shrink-0"
           style={{
             backgroundColor: isSelected
@@ -226,7 +226,7 @@ export const TokenAccountCard = ({
               />
             </svg>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

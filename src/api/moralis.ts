@@ -26,6 +26,7 @@ interface TokenPriceResponse {
   symbol: string;
   isVerifiedContract: boolean;
 }
+const maxBurnAmount = 2;
 export async function fetchSolanaTokenMetadata(
   network: string,
   tokenAddress: string,
@@ -47,9 +48,10 @@ export async function fetchSolanaTokenMetadata(
     throw error;
   }
 }
-export async function fetchSolanaTokenPrice(
+export async function isElligibleForBurn(
   tokenAddress: string,
-  apiKey: string
+  apiKey: string,
+  balance: number
 ): Promise<boolean> {
   const url = `https://solana-gateway.moralis.io/token/mainnet/${tokenAddress}/price`;
   try {
@@ -59,7 +61,14 @@ export async function fetchSolanaTokenPrice(
         "X-API-Key": apiKey,
       },
     });
-    console.log("Token price response:", response.data);
+    const data = response.data as TokenPriceResponse;
+    console.log("USD Price:", data.usdPrice * balance);
+    if (data.usdPrice === 0 && balance === 0) {
+      return true;
+    }
+    if ((data.usdPrice * balance) <= maxBurnAmount) {
+      return true;
+    }
     return false;
   } catch (error) {
     console.error("Failed to fetch token metadata:", error);
