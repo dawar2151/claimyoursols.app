@@ -3,6 +3,7 @@ import { colors } from "../utils/colors";
 import { getSolscanURL } from "../utils";
 import { useContext } from "react";
 import { ClaimYourSolsStateContext } from "../providers";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export const SuccessAlert = ({
   isVisible,
@@ -18,6 +19,7 @@ export const SuccessAlert = ({
   transactionHashes?: string[];
 }) => {
   const { claimYourSolsState } = useContext(ClaimYourSolsStateContext);
+  const { publicKey } = useWallet();
 
   return (
     <AnimatePresence>
@@ -119,9 +121,8 @@ export const SuccessAlert = ({
                   <div
                     className="mt-4 mb-6 p-4 border rounded-lg text-left"
                     style={{
-                      backgroundColor: `${
-                        colors.background.light || colors.border
-                      }/10`,
+                      backgroundColor: `${colors.background.light || colors.border
+                        }/10`,
                       borderColor: `${colors.border}/30`,
                     }}
                   >
@@ -170,22 +171,39 @@ export const SuccessAlert = ({
                 )}
 
                 {/* Close Button */}
-                <button
-                  onClick={onClose}
-                  className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105"
-                  style={{
-                    backgroundColor: colors.primary,
-                    color: colors.background.white,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.secondary;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.primary;
-                  }}
-                >
-                  Close
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      const message = `I just claimed ${(recoveredAmount / 1e9).toFixed(6)} SOL from @claimyoursolsx, claim yours via claimyoursols.app?ref=${publicKey}`;
+                      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`;
+                      window.open(twitterUrl, '_blank');
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                    </svg>
+                    Share to X & Earn 50% Referral Bonus
+                  </button>
+
+                  <button
+                    onClick={onClose}
+                    className="px-6 py-3 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105"
+                    style={{
+                      backgroundColor: colors.primary,
+                      color: colors.background.white,
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = colors.secondary;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = colors.primary;
+                    }}
+                  >
+                    Close
+                  </button>
+                </div>
+
               </div>
 
               {/* X Button */}
@@ -194,9 +212,8 @@ export const SuccessAlert = ({
                 className="absolute top-4 right-4 p-1 rounded-full transition-colors"
                 style={{ color: colors.text.secondary }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = `${
-                    colors.border || colors.text.secondary
-                  }30`;
+                  e.currentTarget.style.backgroundColor = `${colors.border || colors.text.secondary
+                    }30`;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = "transparent";
