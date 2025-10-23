@@ -206,7 +206,7 @@ export default function RootLayout({
                       <div className="flex justify-center mb-6">
                         <div className="relative w-20 h-20 animate-pulse">
                           <Image
-                            src="/logo.png"
+                            src="/logo-80-80.png"
                             alt="Claim Your SOLs Logo"
                             width={80}
                             height={80}

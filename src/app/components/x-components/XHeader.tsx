@@ -132,7 +132,7 @@ export const XHeader = () => {
             className="flex items-center space-x-2 text-left hover:opacity-80 transition-opacity"
           >
             <Image
-              src="/logo.png"
+              src="/logo-80-80.png"
               alt="ClaimYourSols Logo"
               width={40}
               height={40}
@@ -167,9 +167,8 @@ export const XHeader = () => {
                     ?.name || "Mainnet"}
                 </span>
                 <ChevronDownIcon
-                  className={`h-4 w-4 transition-transform ${
-                    rpcDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`h-4 w-4 transition-transform ${rpcDropdownOpen ? "rotate-180" : ""
+                    }`}
                 />
               </button>
 
@@ -248,11 +247,10 @@ export const XHeader = () => {
                         handleRpcSelection(option.value, e);
                         setMobileMenuOpen(false);
                       }}
-                      className={`flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg transition-colors ${
-                        selectedNetwork === option.value
-                          ? "bg-purple-700 text-white"
-                          : "text-gray-300 hover:bg-gray-700"
-                      }`}
+                      className={`flex items-center space-x-3 w-full px-3 py-2 text-left rounded-lg transition-colors ${selectedNetwork === option.value
+                        ? "bg-purple-700 text-white"
+                        : "text-gray-300 hover:bg-gray-700"
+                        }`}
                     >
                       <Image
                         src={option.icon}
