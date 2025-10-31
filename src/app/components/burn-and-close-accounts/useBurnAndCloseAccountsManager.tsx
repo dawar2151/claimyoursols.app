@@ -46,6 +46,7 @@ interface AccountData {
 
 const BATCH_SIZE = 10;
 const METADATA_BATCH_SIZE = 5; // Smaller batches for metadata fetching
+const WSOLMINT = "So11111111111111111111111111111111111111112";
 
 const fetchTokenAccounts = async (
   connection: Connection,
@@ -272,7 +273,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
           )
           .filter(
-            (account) => account.account.data.parsed?.info?.state !== "frozen"
+            (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT
           )
           .map((account) => {
             const { withheldAmount, hasWithheldTokens, mintAddress } =
@@ -704,7 +705,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
         )
         .filter(
-          (account) => account.account.data.parsed?.info?.state !== "frozen"
+          (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT
         )
         .map((account) => {
           // Check for withheld amount in Token 2022 accounts
