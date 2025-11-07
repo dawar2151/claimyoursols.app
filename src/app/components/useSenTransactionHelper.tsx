@@ -28,13 +28,12 @@ export async function sendTransactionHelper(
     if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
       break;
     }
-
-    if (status?.slot && status.slot > lastValidBlockHeight) {
-      throw new Error("Transaction expired before confirmation");
-    }
-
     if (status?.err) {
       throw new Error("Transaction failed: " + JSON.stringify(status.err));
+    }
+    const stillValid = await connection.isBlockhashValid(blockhash);
+    if (!stillValid) {
+      throw new Error("Transaction expired before confirmation");
     }
 
     await new Promise((resolve) => setTimeout(resolve, 500));
