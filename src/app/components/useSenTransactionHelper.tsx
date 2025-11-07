@@ -4,20 +4,40 @@ import { WalletContextState } from "@solana/wallet-adapter-react";
 export async function sendTransactionHelper(
   transaction: Transaction,
   connection: Connection,
-  wallet: WalletContextState // Pass the wallet object as an argument
+  wallet: WalletContextState,
 ): Promise<string> {
+
   if (!wallet || !wallet.publicKey) {
     throw new Error("No wallet connected. Please connect your wallet.");
   }
 
-  const { sendTransaction } = wallet;
-  const signature = await sendTransaction(transaction, connection);
+  // 1. Fetch latest blockhash for transaction validity
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
-  // Confirm the transaction
-  const confirmation = await connection.confirmTransaction(signature, 'confirmed');
+  transaction.recentBlockhash = blockhash;
+  transaction.feePayer = wallet.publicKey;
 
-  if (confirmation.value.err) {
-    throw new Error("Transaction failed: " + JSON.stringify(confirmation.value.err));
+  const signature = await wallet.sendTransaction(transaction, connection);
+
+  let status = null;
+
+  while (true) {
+    const { value } = await connection.getSignatureStatuses([signature]);
+    status = value[0];
+
+    if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
+      break;
+    }
+
+    if (status?.slot && status.slot > lastValidBlockHeight) {
+      throw new Error("Transaction expired before confirmation");
+    }
+
+    if (status?.err) {
+      throw new Error("Transaction failed: " + JSON.stringify(status.err));
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   return signature;
