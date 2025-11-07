@@ -28,9 +28,6 @@ export async function sendTransactionHelper(
     if (status?.confirmationStatus === "confirmed" || status?.confirmationStatus === "finalized") {
       break;
     }
-
-
-
     if (status?.err) {
       throw new Error("Transaction failed: " + JSON.stringify(status.err));
     }
