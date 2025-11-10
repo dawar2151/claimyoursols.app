@@ -7,7 +7,6 @@ import { Toaster } from "react-hot-toast";
 import { XFooter } from "@/app/components/x-components/Xfooter";
 import { XHeader } from "@/app/components/x-components/XHeader";
 import AppWalletProvider from "./components/x-components/AppWalletProvider";
-import Image from "next/image";
 import { colors } from "./utils/colors";
 import ReferralMessage from "./components/claimyoursol/ReferralMessage";
 import SolanaTools from "./components/claimyoursol/SolanaTools";
