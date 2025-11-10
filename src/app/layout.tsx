@@ -201,22 +201,23 @@ export default function RootLayout({
 
                   <div className="max-w-6xl mx-auto px-4 py-8">
                     <div className="text-center mb-6">
-                      <h2 className="text-3xl font-bold mb-3">
-                        <span style={{ color: colors.text.primary }}>
-                          Solana holds your SOL
-                        </span>
-                        <span
-                          className="ml-3"
-                          style={{
-                            background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                            backgroundClip: "text",
-                          }}
-                        >
-                          Claim it Back!
-                        </span>
+                      <h2
+                        className="text-3xl font-bold mb-1"
+                        style={{ color: colors.text.primary }}
+                      >
+                        Solana Blockchain holds your SOL
                       </h2>
+                      <h3
+                        className="text-3xl font-bold mb-3"
+                        style={{
+                          background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
+                          WebkitBackgroundClip: "text",
+                          WebkitTextFillColor: "transparent",
+                          backgroundClip: "text",
+                        }}
+                      >
+                        Claim it Back!
+                      </h3>
 
                       <a
                         href="#faq-section"
@@ -230,8 +231,8 @@ export default function RootLayout({
                         className="max-w-2xl mx-auto text-base mb-3"
                         style={{ color: colors.text.secondary }}
                       >
-                        Close empty accounts and recover 0.002 SOL by Account.
-                        Burn worthless tokens to get 0.002 SOL by Coin.
+                        <span className="block">Close zero-balance accounts — recover ~0.002 SOL per account.</span>
+                        <span className="block">Burn unwanted tokens — reclaim ~0.002 SOL per token.</span>
                       </p>
                     </div>
 
