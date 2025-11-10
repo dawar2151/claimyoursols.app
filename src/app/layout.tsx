@@ -201,29 +201,15 @@ export default function RootLayout({
                   <ReferralMessage />
 
                   <div className="max-w-6xl mx-auto px-4 py-8">
-                    <div className="text-center mb-8">
-                      {/* Logo */}
-                      <div className="flex justify-center mb-6">
-                        <div className="relative w-20 h-20 animate-pulse">
-                          <Image
-                            src="/logo-80-80.png"
-                            alt="Claim Your SOLs Logo"
-                            width={80}
-                            height={80}
-                            className="w-full h-full object-contain rounded-full shadow-lg"
-                            priority
-                          />
-                        </div>
-                      </div>
-
+                    <div className="text-center mb-6">
                       <h2
-                        className="text-4xl font-bold mb-2"
+                        className="text-2xl font-bold mb-1"
                         style={{ color: colors.text.primary }}
                       >
-                        Solana Blockchain holds your SOL
+                        Solana holds your SOL
                       </h2>
                       <h3
-                        className="text-5xl font-bold mb-4"
+                        className="text-3xl font-bold mb-3"
                         style={{
                           background: `linear-gradient(to right, ${colors.primary}, ${colors.secondary})`,
                           WebkitBackgroundClip: "text",
@@ -234,108 +220,25 @@ export default function RootLayout({
                         Claim it Back!
                       </h3>
 
+                      <a
+                        href="#faq-section"
+                        className="text-sm font-medium inline-block mb-3"
+                        style={{ color: colors.primary }}
+                      >
+                        How it works?
+                      </a>
+
                       <p
-                        className="max-w-2xl mx-auto text-lg mb-4"
+                        className="max-w-2xl mx-auto text-base mb-3"
                         style={{ color: colors.text.secondary }}
                       >
-                        The Solana Blockchain charges rent for unused SPL token
-                        accounts, even after you&apos;ve sold your tokens. Close
-                        those unused token accounts and Claim your sol rent fees
-                        safely and securely.
+                        close empty acounts and recover 0.002 SOL by Account.
+                        burn worthless tokens to get 0.002 SOL by coin.
                       </p>
                     </div>
 
                     {/* Wallet Button */}
                     <WalletSection />
-
-                    {/* Use Cases Cards */}
-                    <section className="py-8">
-                      <div className="grid md:grid-cols-3 gap-6 p-6">
-                        {/* Close Accounts Card */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
-                          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg
-                              className="w-6 h-6 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                            Close Zero-Balance Accounts
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            Close empty token accounts and reclaim the rent
-                            deposit (0.00204 SOL per account). Safe, simple, and
-                            only targets accounts with zero balance.
-                          </p>
-                        </div>
-
-                        {/* Burn & Close Card */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
-                          <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-current"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M12 8c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2s2-.9 2-2v-4c0-1.1-.9-2-2-2zm0-6C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
-                              />
-                            </svg>
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900  mb-3">
-                            Burn Tokens & Close Accounts
-                          </h3>
-                          <p className="text-sm text-gray-600 ">
-                            Burn unwanted tokens and close their accounts in one
-                            step. Perfect for removing dust tokens, scam tokens,
-                            or tokens you no longer want (0.00204 SOL per
-                            account)
-                          </p>
-                        </div>
-
-                        {/* Close Mint Accounts Card */}
-                        <div className="bg-white rounded-lg border border-gray-200 p-6 text-center hover:shadow-md transition-shadow">
-                          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg
-                              className="w-6 h-6 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900  mb-3">
-                            Close Mint Accounts (Token2022)
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            Close Token2022 mint accounts you created and
-                            recover their rent deposits (0.0048 SOL per
-                            account). Automatically burns remaining tokens if
-                            only from the close authority account.
-                          </p>
-                        </div>
-                      </div>
-                    </section>
                     {/* Main page content */}
                     {children}
                     <TransactionHistory />
@@ -345,7 +248,7 @@ export default function RootLayout({
                     <SolanaTools />
 
                     {/* Referral Section */}
-                    <div>
+                    <div className="my-4">
                       <Referral />
                     </div>
 
