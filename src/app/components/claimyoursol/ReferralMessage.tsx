@@ -26,7 +26,7 @@ const ReferralMessage: React.FC<ReferralMessageProps> = () => {
             tabIndex={0}
             onClick={handleScrollToBottom}
             onKeyDown={handleKeyDown}
-            className="text-center text-sm md:text-base mt-6 mb-4 text-gray-700 px-4 cursor-pointer hover:underline"
+            className="text-center text-sm md:text-base mt-8 mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 opacity-90 animate-pulse px-8 cursor-pointer"
             aria-label="Get your referral link"
         >
             Share your referral link — earn 50% bonus on each successful referral. Click to get your link.
