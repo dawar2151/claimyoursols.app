@@ -86,7 +86,7 @@ export default function StatsCards({
     const totalNetSol = lamports.reduce((sum, val) => sum + val, 0) / LAMPORTS_PER_SOL;
 
     const total = totalNetSol + STAKED_SOL;
-    const totalSolClaimed = total + (total / 0.15);
+    const totalSolClaimed = total / 0.15;
 
 
     const accountsClosedEstimated = Math.floor(totalSolClaimed / FEE_PER_CLOSE_SOL);
