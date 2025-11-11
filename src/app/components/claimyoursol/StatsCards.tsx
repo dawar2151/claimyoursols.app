@@ -95,7 +95,7 @@ export default function StatsCards({
 
 
     const fmt = (n: number) => {
-        if (n >= 1) return n.toFixed(3);
+        if (n >= 1) return n.toFixed(6);
         return n.toPrecision(2);
     };
 
@@ -106,7 +106,7 @@ export default function StatsCards({
                 className="p-4 rounded-lg shadow-md"
                 style={{ backgroundColor: colors.background.white, border: `1px solid ${colors.border}` }}
             >
-                <div className="text-sm text-gray-500">Accounts Closed (est.)</div>
+                <div className="text-sm text-gray-500">Total Accounts Closed</div>
                 <div className="text-2xl font-bold mt-2" style={{ color: colors.text.primary }}>
                     {loading ? "—" : accountsClosedEstimated.toLocaleString()}
                 </div>
@@ -117,7 +117,7 @@ export default function StatsCards({
                 className="p-4 rounded-lg shadow-md"
                 style={{ backgroundColor: colors.background.white, border: `1px solid ${colors.border}` }}
             >
-                <div className="text-sm text-gray-500">Total Value Closed (est.)</div>
+                <div className="text-sm text-gray-500">Total SOL Claimed</div>
                 <div className="text-2xl font-bold mt-2" style={{ color: colors.success }}>
                     {loading ? "—" : `${fmt(totalSolClaimed)} SOL`}
                 </div>
