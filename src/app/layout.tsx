@@ -9,6 +9,8 @@ import { XHeader } from "@/app/components/x-components/XHeader";
 import AppWalletProvider from "./components/x-components/AppWalletProvider";
 import { colors } from "./utils/colors";
 import ReferralMessage from "./components/claimyoursol/ReferralMessage";
+import StatsCards from "./components/claimyoursol/StatsCards";
+import ShowIfDisconnected from "./components/claimyoursol/ShowIfDisconnected";
 import SolanaTools from "./components/claimyoursol/SolanaTools";
 import Referral from "./components/claimyoursol/Referal";
 import GitHubButton from "./components/claimyoursol/GithubButton";
@@ -238,6 +240,9 @@ export default function RootLayout({
 
                     {/* Wallet Button */}
                     <WalletSection />
+                    <ShowIfDisconnected>
+                      <StatsCards />
+                    </ShowIfDisconnected>
                     {/* Main page content */}
                     {children}
                     <TransactionHistory />
