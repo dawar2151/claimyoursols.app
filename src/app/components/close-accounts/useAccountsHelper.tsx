@@ -21,6 +21,7 @@ import {
   checkWithheldAmount,
   isValidTokenAccountForClose,
 } from "@/app/utils/spl-utils";
+import { getAccountInfoWithRetry } from "@/app/utils/accountUtils";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -61,7 +62,7 @@ const createFeeInstructions = async (
     ) {
       // Check if referralAccount exists on-chain
       const referralPubkey = new PublicKey(referralAccount);
-      const accountInfo = await connection.getAccountInfo(referralPubkey);
+      const accountInfo = await getAccountInfoWithRetry(connection, referralPubkey);
 
       if (accountInfo === null) {
         console.warn(
@@ -228,8 +229,7 @@ export function useAccountsHelper(connection: Connection) {
             : TOKEN_PROGRAM_ID;
           if (account.hasWithheldTokens) {
             console.log(
-              `Closing account ${account.pubkey.toString()} with withheld amount: ${
-                account.withheldAmount
+              `Closing account ${account.pubkey.toString()} with withheld amount: ${account.withheldAmount
               }`
             );
             if (account.mintAddress) {
@@ -292,8 +292,7 @@ export function useAccountsHelper(connection: Connection) {
             batchError
           );
           setError(
-            `Failed to close batch ${
-              Math.floor(i / BATCH_SIZE) + 1
+            `Failed to close batch ${Math.floor(i / BATCH_SIZE) + 1
             }: ${errorMessage}`
           );
           if (errorMessage.includes("rejected")) {

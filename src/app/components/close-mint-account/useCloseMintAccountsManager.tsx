@@ -17,6 +17,7 @@ import {
 } from "@solana/spl-token";
 import { sendTransactionHelper } from "../useSenTransactionHelper";
 import { calculateCommission, getFeeConfiguration } from "@/app/utils/utils";
+import { getAccountInfoWithRetry } from "@/app/utils/accountUtils";
 
 interface ParsedTokenAccountData {
   mint: string;
@@ -149,7 +150,7 @@ export const useCloseMintAccountsManager = (connection: Connection) => {
           "confirmed",
           TOKEN_2022_PROGRAM_ID
         );
-        const accountInfo = await connection.getAccountInfo(mintPubkey);
+        const accountInfo = await getAccountInfoWithRetry(connection, mintPubkey);
 
         if (!accountInfo) {
           throw new Error("Mint account not found");

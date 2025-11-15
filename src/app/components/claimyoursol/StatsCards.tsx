@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { PublicKey, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ClaimYourSolsStateContext } from "@/app/providers";
 import { colors } from "@/app/utils/colors";
+import { getAccountInfoWithRetry } from "@/app/utils/accountUtils";
 
 const FEE_PER_CLOSE_SOL = 0.00204;
 const STAKED_SOL = 23;
@@ -14,7 +15,7 @@ async function fetchAccountData(
 ): Promise<number> {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            const accountInfo = await conn.getAccountInfo(pubkey, "confirmed");
+            const accountInfo = await getAccountInfoWithRetry(conn, pubkey);
 
             if (!accountInfo) {
                 console.warn(`Account not found for ${pubkey.toBase58()} (attempt ${attempt})`);
