@@ -24,6 +24,7 @@ import {
 } from "@/app/utils/spl-utils";
 import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
 import { isElligibleForBurn } from "@/api/moralis";
+import { getAccountInfoWithRetry } from "@/app/utils/accountUtils";
 
 interface AccountData {
   pubkey: PublicKey;
@@ -155,7 +156,7 @@ const createFeeInstructions = async (
     ) {
       // Check if referralAccount exists on-chain
       const referralPubkey = new PublicKey(referralAccount);
-      const accountInfo = await connection.getAccountInfo(referralPubkey);
+      const accountInfo = await getAccountInfoWithRetry(connection, referralPubkey);
 
       if (accountInfo === null) {
         console.warn(
