@@ -14,7 +14,7 @@ const SolanaTools: React.FC<SolanaToolsProps> = () => {
     {
       title: "Mint Tokens",
       description: "Mint your created tokens easily with your mint authority",
-      url: "hhttps://solclaimer.app/mint-tokens",
+      url: "https://solclaimer.app/mint-tokens",
     },
     {
       title: "Airdrop Token",
