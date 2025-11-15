@@ -8,18 +8,18 @@ const SolanaTools: React.FC<SolanaToolsProps> = () => {
   const tools = [
     {
       title: "Create Token",
-      description: "Create SPL & SPL22 tokens on Solana",
-      url: "https://tools.claimyoursols.app/create-spl-spl22-tokens",
+      description: "Create Your Coin on Solana",
+      url: "https://solclaimer.app/create-token",
     },
     {
       title: "Mint Tokens",
       description: "Mint your created tokens easily with your mint authority",
-      url: "https://tools.claimyoursols.app/mint-spl-spl22-tokens",
+      url: "hhttps://solclaimer.app/mint-tokens",
     },
     {
       title: "Airdrop Token",
       description: "Distribute SOL, SPL and SPL22 tokens to multiple wallets",
-      url: "https://tools.claimyoursols.app/",
+      url: "https://solclaimer.app/bulksender",
     },
   ];
 
