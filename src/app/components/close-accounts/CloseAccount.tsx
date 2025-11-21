@@ -50,7 +50,7 @@ export const AccountsManager = () => {
   }, 0);
 
   const feePercentage = parseFloat(
-    process.env.NEXT_PUBLIC_FEE_PERCENTAGE || "0.1"
+    process.env.NEXT_PUBLIC_CLOSE_ACCOUNT_FEE || "0.1"
   );
   const commission = Math.floor(totalRent * feePercentage);
   const userReceives = totalRent - commission;
