@@ -37,7 +37,7 @@ async function fetchAccountData(
 
 export default function StatsCards({
     pubkeys = [
-        "6tdnTdEBPow4FcZW2WEXm6R9CHAwsxci6QdCa3NX9zDp",
+        "GzZ5vVT2awie1LkgFXiMFGqfA7YtzKUFAvK14v8cazGk",
         "CWjpSUDa7VD3GagQgzgZESXDnsu2Q5Fb8ezUipSC2gfn",
     ],
 }: {
