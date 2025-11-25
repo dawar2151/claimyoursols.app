@@ -7,7 +7,7 @@ import { colors } from "@/app/utils/colors";
 import { getAccountInfoWithRetry } from "@/app/utils/accountUtils";
 
 const FEE_PER_CLOSE_SOL = 0.00204;
-const STAKED_SOL = 23;
+const OLDBALANCE = parseFloat(process.env.NEXT_PUBLIC_OLD_BALANCE_FOR_STATS || "0");
 async function fetchAccountData(
     conn: Connection,
     pubkey: PublicKey,
@@ -35,14 +35,7 @@ async function fetchAccountData(
     return 0;
 }
 
-export default function StatsCards({
-    pubkeys = [
-        "GzZ5vVT2awie1LkgFXiMFGqfA7YtzKUFAvK14v8cazGk",
-        "CWjpSUDa7VD3GagQgzgZESXDnsu2Q5Fb8ezUipSC2gfn",
-    ],
-}: {
-    pubkeys?: string[];
-}) {
+export default function StatsCards() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [lamports, setLamports] = useState<number[]>([]);
@@ -59,7 +52,7 @@ export default function StatsCards({
         let mounted = true;
         setLoading(true);
         setError(null);
-
+        const pubkeys = [process.env.NEXT_PUBLIC_FEE_RECIPIENT || ""];
         Promise.all(
             pubkeys.map(async (pk) => {
                 const pubkey = new PublicKey(pk);
@@ -82,11 +75,11 @@ export default function StatsCards({
         return () => {
             mounted = false;
         };
-    }, [conn, pubkeys.join(",")]);
+    }, [conn]);
 
     const totalNetSol = lamports.reduce((sum, val) => sum + val, 0) / LAMPORTS_PER_SOL;
 
-    const total = totalNetSol + STAKED_SOL;
+    const total = totalNetSol + OLDBALANCE;
     const totalSolClaimed = total / 0.15;
 
 
