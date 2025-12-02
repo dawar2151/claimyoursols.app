@@ -23,10 +23,10 @@ import {
   isValidTokenAccountForBurnAndClose,
 } from "@/app/utils/spl-utils";
 import { fetchTokenMetadata, TokenMetadata } from "@/app/utils/MetadataApi";
-import { isElligibleForBurn } from "@/api/moralis";
+import { getEllibleAccountsForBurn } from "@/api/moralis";
 import { getAccountInfoWithRetry } from "@/app/utils/accountUtils";
 
-interface AccountData {
+export interface AccountData {
   pubkey: PublicKey;
   account: AccountInfo<ParsedAccountData>;
   lamports: number;
@@ -274,7 +274,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
           )
           .filter(
-            (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT
+            (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT && account.account.data.parsed.info.tokenAmount.amount !== "0"
           )
           .map((account) => {
             const { withheldAmount, hasWithheldTokens, mintAddress } =
@@ -295,17 +295,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             };
           })
           .filter((account) => !account.hasWithheldTokens);
-        const filteredAccounts = await Promise.all(
-          closeableAccounts.map(async (account) => {
-            const accountWithPrice = await isElligibleForBurn(
-              account.account.data.parsed.info.mint,
-              process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
-              account.account.data.parsed.info.tokenAmount.uiAmount
-            );
-            return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
-          })
-        );
-        closeableAccounts = filteredAccounts.filter((account) => account !== null);
+        closeableAccounts = await getEllibleAccountsForBurn(closeableAccounts);
         if (reset) {
           // Store all accounts without metadata first
           setAllAccounts(closeableAccounts);
@@ -498,6 +488,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           "Wallet not connected. Please connect your wallet to close accounts."
         );
       }
+
       let totalClosed = 0;
       const newTransactionHashes: string[] = [];
       const accountsToBurnAndClose = accounts.filter((account) => {
@@ -689,7 +680,6 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           "Wallet not connected. Please connect your wallet to fetch accounts."
         );
       }
-
       const rentExemptReserve =
         await connection.getMinimumBalanceForRentExemption(ACCOUNT_SIZE);
 
@@ -729,18 +719,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         })
         .filter((account) => !account.hasWithheldTokens);
 
-      const filteredAccounts = await Promise.all(
-        closeableAccounts.map(async (account) => {
-          const accountWithPrice = await isElligibleForBurn(
-            account.account.data.parsed.info.mint,
-            process.env.NEXT_PUBLIC_MORALIS_API_KEY || "",
-            account.account.data.parsed.info.tokenAmount.uiAmount
-          );
-          return accountWithPrice.isElligible ? { ...account, usdValue: accountWithPrice.usdBalance, tokenName: accountWithPrice.name, tokenSymbol: accountWithPrice.symbol } : null;
-        }
-        )
-      );
-      closeableAccounts = filteredAccounts.filter((account) => account !== null);
+      closeableAccounts = await getEllibleAccountsForBurn(closeableAccounts, process.env.NEXT_PUBLIC_MORALIS_API_KEY || "");
 
       setAllAccounts(closeableAccounts);
 
