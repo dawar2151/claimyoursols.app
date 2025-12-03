@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { FaGithub, FaTwitter, FaTelegram } from "react-icons/fa";
 import { ClaimYourSolsStateContext } from "@/app/providers";
 import { Connection } from "@solana/web3.js";
+import { getRpcEndpoint } from "@/app/types/ClaimYourSolsStage";
 
 export const XHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -37,7 +38,7 @@ export const XHeader = () => {
       name: "Solana RPC Mainnet",
       value: "mainnet-beta",
       icon: "/mainnet-icon.png",
-      url: "https://solana-mainnet.g.alchemy.com/v2/RRb0J5PtEH1eOlcXgMgx0F6idlzeIOvx",
+      url: getRpcEndpoint(),
     },
     {
       name: "Solana RPC Testnet",

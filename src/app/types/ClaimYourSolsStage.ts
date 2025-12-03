@@ -7,7 +7,7 @@ export type ClaimYourSolsState = {
     connection: Connection;
 }
 
-const getRpcEndpoint = () => {
+export const getRpcEndpoint = () => {
     const customRpc = process.env.NEXT_PUBLIC_RPC_ENDPOINT;
     const alchemyApiKey = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY;
 
