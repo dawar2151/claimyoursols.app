@@ -1,5 +1,5 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import axios from "axios";
+// This is an Edge API route implemented using the Web Fetch API.
+// Use the standard Request/Response objects instead of NextApiResponse.
 
 interface TokenPriceResponse {
     tokenAddress: string;
@@ -25,45 +25,60 @@ interface TokenPriceResponse {
 const MORALIS_URL = `https://solana-gateway.moralis.io/token/mainnet/prices`;
 const BATCH_SIZE = 50;
 export const runtime = 'edge';
-export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<Record<string, TokenPriceResponse | null> | { error: string }>
-) {
-    if (req.method !== "POST") {
-        res.setHeader("Allow", "POST");
-        return res.status(405).json({ error: "Method not allowed" });
-    }
 
-    const apiKey = process.env.MORALIS_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: "Moralis API key is not configured on the server." });
-    }
-
-    const addresses: string[] = Array.isArray(req.body?.addresses) ? req.body.addresses : [];
-    if (!addresses || addresses.length === 0) {
-        return res.status(400).json({ error: "No addresses provided" });
-    }
-
-    const result: Record<string, TokenPriceResponse | null> = {};
-    addresses.forEach((a) => (result[a] = null));
-
-    // chunk and call Moralis
-    const chunks: string[][] = [];
-    for (let i = 0; i < addresses.length; i += BATCH_SIZE) {
-        chunks.push(addresses.slice(i, i + BATCH_SIZE));
-    }
-
+export default async function handler(req: Request) {
     try {
+        if (req.method !== "POST") {
+            return new Response(JSON.stringify({ error: "Method not allowed" }), {
+                status: 405,
+                headers: { Allow: "POST", "Content-Type": "application/json" },
+            });
+        }
+
+        const apiKey = process.env.MORALIS_API_KEY;
+        if (!apiKey) {
+            return new Response(JSON.stringify({ error: "Moralis API key is not configured on the server." }), {
+                status: 500,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
+
+        const body = await req.json().catch(() => ({}));
+        const addresses: string[] = Array.isArray(body?.addresses) ? body.addresses : [];
+        if (!addresses || addresses.length === 0) {
+            return new Response(JSON.stringify({ error: "No addresses provided" }), {
+                status: 400,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
+
+        const result: Record<string, TokenPriceResponse | null> = {};
+        addresses.forEach((a) => (result[a] = null));
+
+        // chunk and call Moralis using fetch (edge friendly)
+        const chunks: string[][] = [];
+        for (let i = 0; i < addresses.length; i += BATCH_SIZE) {
+            chunks.push(addresses.slice(i, i + BATCH_SIZE));
+        }
+
         for (const chunk of chunks) {
-            const resp = await axios.post(MORALIS_URL, { addresses: chunk }, {
+            const resp = await fetch(MORALIS_URL, {
+                method: "POST",
                 headers: {
                     accept: "application/json",
                     "content-type": "application/json",
                     "X-API-Key": apiKey,
                 },
+                body: JSON.stringify({ addresses: chunk }),
             });
 
-            const data = resp.data as TokenPriceResponse[];
+            if (!resp.ok) {
+                const txt = await resp.text().catch(() => "");
+                console.error("/api/moralis/prices chunk fetch failed:", resp.status, txt.substring(0, 200));
+                throw new Error("Moralis fetch failed");
+            }
+
+            const data = (await resp.json()) as TokenPriceResponse[];
             if (Array.isArray(data)) {
                 for (const item of data) {
                     if (item && item.tokenAddress) {
@@ -73,9 +88,15 @@ export default async function handler(
             }
         }
 
-        return res.status(200).json(result);
+        return new Response(JSON.stringify(result), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+        });
     } catch (err: any) {
-        console.error("/api/moralis/prices error:", err?.response?.data || err?.message || err);
-        return res.status(502).json({ error: "Failed to fetch prices from Moralis" });
+        console.error("/api/moralis/prices error:", err?.message || err);
+        return new Response(JSON.stringify({ error: "Failed to fetch prices from Moralis" }), {
+            status: 502,
+            headers: { "Content-Type": "application/json" },
+        });
     }
 }
