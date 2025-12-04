@@ -5,7 +5,6 @@ import { ClaimYourSolsStateContext } from "@/app/providers";
 import { useCloseMintAccountsManager } from "./useCloseMintAccountsManager";
 import XButton from "@/app/components/x-components/XButton";
 import { XTypography } from "@/app/components/x-components/XTypography";
-import { useSearchParams } from "next/navigation";
 import { getSolscanURL } from "@/app/utils";
 import { colors } from "@/app/utils/colors";
 import { SuccessAlert } from "../SuccessAlert";
