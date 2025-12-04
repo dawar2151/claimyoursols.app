@@ -40,7 +40,7 @@ export async function getEllibleAccountsForBurn<
   accounts: T[],
   apiKey?: string
 ): Promise<(T & { usdValue?: number; tokenName?: string; tokenSymbol?: string })[]> {
-  const key = apiKey || process.env.NEXT_PUBLIC_MORALIS_API_KEY || "";
+  const key = apiKey || process.env.MORALIS_API_KEY || "";
   // collect unique mint addresses
   const mintToAccounts: Record<string, T[]> = {};
   const mints: string[] = [];
