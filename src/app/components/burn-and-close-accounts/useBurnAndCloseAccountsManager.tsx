@@ -719,7 +719,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
         })
         .filter((account) => !account.hasWithheldTokens);
 
-      closeableAccounts = await getEllibleAccountsForBurn(closeableAccounts, process.env.NEXT_PUBLIC_MORALIS_API_KEY || "");
+      closeableAccounts = await getEllibleAccountsForBurn(closeableAccounts);
 
       setAllAccounts(closeableAccounts);
 

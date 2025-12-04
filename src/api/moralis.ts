@@ -110,67 +110,14 @@ export async function fetchTokenPricesBatched(
   batchSize = 50,
   concurrency = 3
 ): Promise<Record<string, TokenPriceResponse | null>> {
-  const url = `https://solana-gateway.moralis.io/token/mainnet/prices`;
-
-  // prepare result map with null defaults
-  const result: Record<string, TokenPriceResponse | null> = {};
-  addresses.forEach((a) => (result[a] = null));
-
-  // chunking helper
-  const chunks: string[][] = [];
-  for (let i = 0; i < addresses.length; i += batchSize) {
-    chunks.push(addresses.slice(i, i + batchSize));
+  // Route to our local API which proxies the Moralis request server-side using a project env key.
+  // This keeps the Moralis API key on the server and avoids exposing it to the client.
+  try {
+    const resp = await axios.post(`/api/moralis/prices`, { addresses });
+    const data = resp.data as Record<string, TokenPriceResponse | null>;
+    return data;
+  } catch (err) {
+    console.error("fetchTokenPricesBatched proxy to /api/moralis/prices failed:", err);
+    throw err;
   }
-
-  // process chunks with limited concurrency
-  const chunkQueue = chunks.slice();
-  const workers: Promise<void>[] = [];
-  let chunkErrors = 0;
-
-  const worker = async () => {
-    while (chunkQueue.length > 0) {
-      const chunk = chunkQueue.shift();
-      if (!chunk) break;
-      try {
-        const resp = await axios.post(
-          url,
-          { addresses: chunk },
-          {
-            headers: {
-              accept: "application/json",
-              "content-type": "application/json",
-              "X-API-Key": apiKey,
-            },
-          }
-        );
-
-        const data = resp.data as Array<TokenPriceResponse>;
-        if (Array.isArray(data)) {
-          for (const item of data) {
-            if (item && item.tokenAddress) {
-              result[item.tokenAddress] = item;
-            }
-          }
-        }
-      } catch (err) {
-        console.error("fetchTokenPricesBatched chunk failed:", err);
-        // mark that at least one chunk failed
-        chunkErrors++;
-        // on error, leave those addresses as null so caller can handle retries
-      }
-    }
-  };
-
-  // start concurrency number of workers
-  for (let i = 0; i < Math.max(1, concurrency); i++) {
-    workers.push(worker());
-  }
-
-  await Promise.all(workers);
-
-  if (chunkErrors > 0) {
-    throw new Error(`fetchTokenPricesBatched: ${chunkErrors} chunk(s) failed`);
-  }
-
-  return result;
 }
