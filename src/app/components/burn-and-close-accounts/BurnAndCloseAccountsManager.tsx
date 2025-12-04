@@ -61,7 +61,7 @@ export const BurnAndCloseAccountsManager = () => {
   } = useBurnAndCloseAccountsManager(claimYourSolsState.connection);
 
   const searchParams = useSearchParams();
-  const refAccount = searchParams.get("ref");
+  const refAccount = searchParams?.get?.("ref") ?? null;
 
   // Move calculations outside of useEffect to avoid stale closures
   const totalRent = Array.from(selectedAccounts).reduce((sum, accountKey) => {

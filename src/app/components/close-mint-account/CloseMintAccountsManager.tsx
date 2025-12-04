@@ -41,9 +41,6 @@ export const CloseMintAccountsManager = () => {
     clearTransactionHashes,
   } = useCloseMintAccountsManager(claimYourSolsState.connection);
 
-  const searchParams = useSearchParams();
-  const refAccount = searchParams.get("ref");
-
   const [selectAll, setSelectAll] = useState(true);
 
   const totalRent = Array.from(selectedMintAccounts).reduce(

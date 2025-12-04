@@ -41,7 +41,7 @@ export const AccountsManager = () => {
   } = useAccountsHelper(claimYourSolsState.connection);
 
   const searchParams = useSearchParams();
-  const refAccount = searchParams.get("ref");
+  const refAccount = searchParams?.get?.("ref") ?? null;
   const totalRent = Array.from(selectedAccounts).reduce((sum, accountKey) => {
     const account = accounts.find(
       (acc) => acc.pubkey.toString() === accountKey
