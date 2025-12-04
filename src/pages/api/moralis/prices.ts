@@ -24,7 +24,7 @@ interface TokenPriceResponse {
 
 const MORALIS_URL = `https://solana-gateway.moralis.io/token/mainnet/prices`;
 const BATCH_SIZE = 50;
-
+export const runtime = 'edge';
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<Record<string, TokenPriceResponse | null> | { error: string }>
