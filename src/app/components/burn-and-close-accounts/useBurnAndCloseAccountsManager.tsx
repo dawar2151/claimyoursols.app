@@ -274,7 +274,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
             isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
           )
           .filter(
-            (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT && account.account.data.parsed.info.tokenAmount.amount !== "0" && account.account.data.parsed.info.tokenAmount.amount !== "1"
+            (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT && account.account.data.parsed.info.tokenAmount.amount !== "0" && account.account.data.parsed.info.tokenAmount.decimals !== 0
           )
           .map((account) => {
             const { withheldAmount, hasWithheldTokens, mintAddress } =
@@ -696,7 +696,7 @@ export function useBurnAndCloseAccountsManager(connection: Connection) {
           isValidTokenAccountForBurnAndClose(account, rentExemptReserve)
         )
         .filter(
-          (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT && account.account.data.parsed.info.tokenAmount.amount !== "0" && account.account.data.parsed.info.tokenAmount.amount !== "1"
+          (account) => account.account.data.parsed?.info?.state !== "frozen" && account.account.data.parsed?.info?.mint != WSOLMINT && account.account.data.parsed.info.tokenAmount.amount !== "0" && account.account.data.parsed.info.tokenAmount.decimals !== 0
         )
         .map((account) => {
           // Check for withheld amount in Token 2022 accounts
