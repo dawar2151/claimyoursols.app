@@ -116,9 +116,9 @@ export const TokenAccountCard = ({
               {!account.usdValue && (
                 <span
                   className="font-normal text-xs sm:text-sm ml-1"
-                  style={{ color: colors.danger }}
+                  style={{ color: colors.warning }}
                 >
-                  Unkown price(double check before burning)
+                  Unkown price
                 </span>
               )}
 
