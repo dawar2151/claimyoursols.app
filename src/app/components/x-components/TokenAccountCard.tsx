@@ -105,13 +105,22 @@ export const TokenAccountCard = ({
               }}
             >
               {account.tokenName}
-
-              <span
-                className="font-normal text-xs sm:text-sm ml-1"
-                style={{ color: colors.success }}
-              >
-                ${account.usdValue ? account.usdValue.toFixed(6) : 0}
-              </span>
+              {account.usdValue && (
+                <span
+                  className="font-normal text-xs sm:text-sm ml-1"
+                  style={{ color: colors.success }}
+                >
+                  ${account.usdValue.toFixed(6)}
+                </span>
+              )}
+              {!account.usdValue && (
+                <span
+                  className="font-normal text-xs sm:text-sm ml-1"
+                  style={{ color: colors.danger }}
+                >
+                  Unkown price(double check before burning)
+                </span>
+              )}
 
             </XTypography>
           </div>
