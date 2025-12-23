@@ -8,7 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FaGithub, FaTwitter, FaTelegram } from "react-icons/fa";
+import { FaTwitter, FaTelegram } from "react-icons/fa";
 import { ClaimYourSolsStateContext } from "@/app/providers";
 import { Connection } from "@solana/web3.js";
 import { getRpcEndpoint } from "@/app/types/ClaimYourSolsStage";
@@ -55,12 +55,6 @@ export const XHeader = () => {
   ];
 
   const socialLinks = [
-    {
-      name: "GitHub",
-      href: "https://github.com/dawar2151/claimyoursols.app",
-      icon: FaGithub,
-      hoverColor: "hover:text-gray-300",
-    },
     {
       name: "Twitter",
       href: "https://x.com/claimyoursolsx",
